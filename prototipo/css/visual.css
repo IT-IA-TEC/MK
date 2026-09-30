@@ -153,3 +153,6 @@ p,.sub,.dica-m,.fe-aviso span,.fe-info,.fe-vazio,.mk-pe,.aviso-txt,.nt.just,.mod
 
 @media(prefers-reduced-motion:reduce){.item:hover,.btn:hover,.num-card:hover,.fe-et:hover,.ib:hover,.fe-k:hover,.rl-c:hover,.cv-tab:hover,.chip-f:hover,.mk-aba:hover,.mk-sub:hover,.mk-modo:hover,.f-aba:hover,.lc:hover{transform:none}}
 @media print{body.imprimindo *{box-shadow:none!important;animation:none!important}}
+
+/* login: painel verde à esquerda, formulário à direita */
+.login-lado{order:-1}
