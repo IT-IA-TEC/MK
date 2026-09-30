@@ -147,7 +147,7 @@ function aviso(msg){
   t.textContent=msg;t.classList.add('on');clearTimeout(aviso.h);aviso.h=setTimeout(function(){t.classList.remove('on')},2600);
 }
 document.addEventListener('click',function(e){
-  if(!el||!el.isConnected||!el.contains(e.target))return;
+  if(!el||!el.isConnected||!el.contains(e.target)&&el.dataset.modulo==='dashboard')return;
   var t=e.target;
   var b=t.closest('[data-filtro]');if(b){filtro=b.dataset.filtro;render();return}
   b=t.closest('[data-lista]');if(b){gaveta(b.dataset.lista);return}

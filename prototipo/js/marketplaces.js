@@ -1,7 +1,7 @@
 /* Tela Marketplaces: conexões, lojas (ficha), faturamento e aplicativos. Tudo preenchido à mão por enquanto. */
 window.MKMarketplaces=(function(){
 var U=window.MKUI,esc=U.esc,ic=U.ic,PAGS=window.MK_PAG,el=null,pronto=false,EU='Marina Costa';
-var aba='conexoes',fq='',fMkt='',fSit='',fResp='',sub='pedidos',fComp='',fLoja='',fMk2='',fResp2='',pg1=1,PG=25;
+var aba='conexoes',subC='Todas',subL='Todas',subA='Shein',fq='',fSit='',fResp='',sub='pedidos',fComp='',fLoja='',fMk2='',fResp2='',pg1=1,PG=25;
 var MKTS=['Shein','Mercado Livre','Kwai'],SITS=['Sem conexão','Aguardando autorização','Conectada','Com erro','Vencida'];
 var SITC={'Sem conexão':'cn','Aguardando autorização':'ok','Conectada':'vd','Com erro':'gr','Vencida':'at'};
 var LOGO={'Shein':['SH','#000000','#FFFFFF'],'Mercado Livre':['ML','#FFE600','#2D3277'],'Kwai':['KW','#FF5000','#FFFFFF']};
@@ -208,63 +208,58 @@ function histHtml(gs,o){
   }
   return h;
 }
-function abrirFicha(gs){
-  fichaGs=gs;fichaAba='cad';var ant=document.activeElement;
-  var x=lojaPor(gs),v=document.createElement('div');v.className='veu';var g=document.createElement('aside');g.className='gaveta larga mk-g';g.setAttribute('role','dialog');g.setAttribute('aria-modal','true');g.setAttribute('aria-label','Ficha da loja '+x.l.n);g.id='mk-ficha';
-  document.body.appendChild(v);document.body.appendChild(g);paintFicha();
-  requestAnimationFrame(function(){v.classList.add('aberto');g.classList.add('aberto')});
-  function fechar(){v.classList.remove('aberto');g.classList.remove('aberto');document.removeEventListener('keydown',tecla);setTimeout(function(){v.remove();g.remove();if(ant&&ant.focus)ant.focus();if(el&&el.isConnected)pintar()},240)}
-  function tecla(e){if(e.key==='Escape'&&!document.querySelector('.modal')&&!document.getElementById('pop-ativo'))fechar()}
-  document.addEventListener('keydown',tecla);v.addEventListener('click',fechar);g.addEventListener('click',function(e){if(e.target.closest('.fechar'))fechar()});
-  g.addEventListener('click',fichaClique);g.addEventListener('change',fichaMudou);
-}
-function paintFicha(){
-  var g=document.getElementById('mk-ficha');if(!g)return;var gs=fichaGs,x=lojaPor(gs),o=lj(gs),m=x.l.plat,c=conDe(gs,m),s=c?sitEf(c):'Sem conexão',bs=blocos(m);
-  var an=o.snaps.length?o.snaps[o.snaps.length-1].data:null;
+function abrirFicha(gs){fichaGs=gs;fichaAba='cad';pintar();window.scrollTo(0,0)}
+function fichaView(){
+  var gs=fichaGs,x=lojaPor(gs),o=lj(gs),m=x.l.plat,c=conDe(gs,m),s=c?sitEf(c):'Sem conexão',bs=blocos(m);
+  var an=o.snaps.length?o.snaps.slice().sort(function(a,b){return a.data<b.data?1:-1})[0].data:null;
   var corpo=fichaAba==='hist'?histHtml(gs,o):(function(){var b=bs.filter(function(y){return y.id===fichaAba})[0];return '<div class="mk-corpo">'+blocoHtml(b,o,gs)+'</div>'})();
-  g.innerHTML='<button class="fechar fechar-abs" aria-label="Fechar">'+ic('x')+'</button><div class="mk-cab"><div style="min-width:0"><h3>'+esc(x.l.n)+'</h3><div class="mk-sub">'+logo(m)+'<span class="mono">'+esc(gs)+'</span>'+chip(s,SITC[s])+'<span class="nt">Última análise: '+(an?fiso(an):'nunca')+'</span></div></div></div>'+
-   '<div class="mk-abas" role="tablist">'+ABAS_F.map(function(a){return '<button role="tab" class="mk-aba" data-faba="'+a+'" aria-selected="'+(fichaAba===a)+'">'+NOMES_F[a]+'</button>'}).join('')+'</div><div class="gaveta-corpo">'+corpo+'</div><div class="gaveta-pe">Campo manual guarda quem preencheu e quando. Quando o motor for ligado, o selo muda para API e o campo deixa de ser editável.</div>';
-  U.icones();
+  return '<div class="mk-fv"><div class="mk-cab"><button class="btn sec mk-voltar" data-voltar style="width:auto;padding:0 12px">'+ic('arrow-left')+'Voltar para as lojas</button><div style="min-width:0"><h3>'+esc(x.l.n)+'</h3><div class="mk-sub">'+logo(m)+'<span class="mono">'+esc(gs)+'</span>'+chip(s,SITC[s])+'<span class="nt">Última análise: '+(an?fiso(an):'nunca')+'</span></div></div></div>'+
+   '<div class="mk-abas" role="tablist" aria-label="Seções da ficha da loja">'+ABAS_F.map(function(a){return '<button role="tab" class="mk-aba" data-faba="'+a+'" aria-selected="'+(fichaAba===a)+'">'+NOMES_F[a]+'</button>'}).join('')+'</div>'+corpo+'<div class="mk-pe">Campo manual guarda quem preencheu e quando. Quando o motor for ligado, o selo muda para API e o campo deixa de ser editável.</div></div>';
 }
+function paintFicha(){pintar()}
 function fichaClique(e){
   var t=e.target,b;
-  if((b=t.closest('[data-faba]'))){fichaAba=b.dataset.faba;paintFicha();var c=document.querySelector('#mk-ficha .gaveta-corpo');if(c)c.scrollTop=0;return}
-  if(!(b=t.closest('[data-mk]')))return;var a=b.dataset.mk,o=lj(fichaGs),m=mkt(fichaGs),f;
+  if((b=t.closest('[data-faba]'))){fichaAba=b.dataset.faba;pintar();return true}
+  if(!(b=t.closest('[data-mk]')))return false;var a=b.dataset.mk,o=lj(fichaGs),m=mkt(fichaGs),f;
   if(a==='addlista'||a==='rmlista'){
     f=null;blocos(m).forEach(function(bl){bl.it.forEach(function(it){if(it.lista&&it.k===b.dataset.k)f=it})});
-    if(a==='rmlista'){(o.d[f.k]=o.d[f.k]||[]).splice(+b.dataset.i,1);paintFicha();U.toast('Linha removida.');return}
+    if(a==='rmlista'){(o.d[f.k]=o.d[f.k]||[]).splice(+b.dataset.i,1);paintFicha();U.toast('Linha removida.');return true}
     var viols=(o.d['viol.lista']||[]).map(function(x){return x.motivo}).filter(Boolean);
     U.modal({titulo:f.add,ok:'Adicionar',html:'<div class="f-grade">'+f.cols.map(function(c,i){var campo='<div class="campo"><label for="ml-'+i+'">'+esc(c.l)+'</label>';
       if(c.t==='sel')return campo+'<select class="sel" id="ml-'+i+'">'+c.op.map(function(x){return '<option>'+esc(x)+'</option>'}).join('')+'</select></div>';
       if(c.t==='violsel')return campo+(viols.length?'<select class="sel" id="ml-'+i+'">'+viols.map(function(x){return '<option>'+esc(x)+'</option>'}).join('')+'</select>':'<input id="ml-'+i+'" placeholder="Motivo da violação">')+'</div>';
       return campo+'<input id="ml-'+i+'"'+(c.t==='data'?' type="date"':'')+'></div>'}).join('')+'</div>',
-      onOk:function(mm){var row={};f.cols.forEach(function(c,i){row[c.c]=mm.querySelector('#ml-'+i).value.trim()});if(!Object.keys(row).some(function(k){return row[k]})){U.toast('Preencha ao menos um campo.');return false}(o.d[f.k]=o.d[f.k]||[]).push(row);o.m[f.k]={q:EU,t:agora()};paintFicha();U.toast('Adicionado.')}});return}
+      onOk:function(mm){var row={};f.cols.forEach(function(c,i){row[c.c]=mm.querySelector('#ml-'+i).value.trim()});if(!Object.keys(row).some(function(k){return row[k]})){U.toast('Preencha ao menos um campo.');return false}(o.d[f.k]=o.d[f.k]||[]).push(row);o.m[f.k]={q:EU,t:agora()};paintFicha();U.toast('Adicionado.')}});return true}
   if(a==='salvaranalise'){
     U.modal({titulo:'Salvar análise',ok:'Salvar análise',html:'<p class="dica-m">A análise guarda uma foto de todos os campos da loja. Ela nunca é apagada.</p><div class="campo"><label for="an-d">Data da análise <i class="obr">*</i></label><input id="an-d" type="date" value="'+iso(hoje())+'"></div><div class="campo" style="margin-top:10px"><label for="an-o">Observação</label><textarea id="an-o" class="cb-area" rows="3"></textarea></div><small class="erro" id="an-e" hidden>Informe a data da análise.</small>',
-      onOk:function(mm){var d=mm.querySelector('#an-d').value;if(!d){mm.querySelector('#an-e').hidden=false;return false}o.snaps.push({id:DB.nid++,data:d,autor:EU,obs:mm.querySelector('#an-o').value.trim(),d:JSON.parse(JSON.stringify(o.d))});paintFicha();U.toast('Análise salva em '+fiso(d)+'.')}});
+      onOk:function(mm){var d=mm.querySelector('#an-d').value;if(!d){mm.querySelector('#an-e').hidden=false;return false}o.snaps.push({id:DB.nid++,data:d,autor:EU,obs:mm.querySelector('#an-o').value.trim(),d:JSON.parse(JSON.stringify(o.d))});paintFicha();U.toast('Análise salva em '+fiso(d)+'.')}});return true
   }
+  return false;
 }
 function fichaMudou(e){
   var t=e.target,o=lj(fichaGs);
-  if(t.dataset.mf){var k=t.dataset.mf,v=t.value;if(o.d[k]===v||(o.d[k]===undefined&&v===''))return;o.d[k]=v;o.m[k]={q:EU,t:agora()};
+  if(t.dataset.mf){var k=t.dataset.mf,v=t.value;if(o.d[k]===v||(o.d[k]===undefined&&v===''))return true;o.d[k]=v;o.m[k]={q:EU,t:agora()};
     var meta=t.closest('.mf');if(meta){var sm=meta.querySelector('small.nt');if(sm)sm.textContent='Preenchido por '+EU+' em '+o.m[k].t}
-    blocos(mkt(fichaGs)).forEach(function(b){if(b.id!==fichaAba)return;b.it.forEach(function(f){if(f.t!=='calc')return;if(b.p3){for(var i=0;i<3;i++){var e=document.querySelector('[data-calc="p'+i+'.'+f.k+'"]');if(e)e.textContent=f.f(o.d,i)}}else{var e2=document.querySelector('[data-calc="'+f.k+'"]');if(e2)e2.textContent=f.f(o.d)}})});
-    U.toast('Salvo. Preenchido por '+EU+'.');return}
-  if(t.id==='cmp-a'){cmpA=t.value;paintFicha()}if(t.id==='cmp-b'){cmpB=t.value;paintFicha()}if(t.id==='cmp-t'){cmpTodos=t.checked;paintFicha()}
+    blocos(mkt(fichaGs)).forEach(function(b){if(b.id!==fichaAba)return;b.it.forEach(function(f){if(f.t!=='calc')return;if(b.p3){for(var i=0;i<3;i++){var e1=document.querySelector('[data-calc="p'+i+'.'+f.k+'"]');if(e1)e1.textContent=f.f(o.d,i)}}else{var e2=document.querySelector('[data-calc="'+f.k+'"]');if(e2)e2.textContent=f.f(o.d)}})});
+    U.toast('Salvo. Preenchido por '+EU+'.');return true}
+  if(t.id==='cmp-a'){cmpA=t.value;paintFicha();return true}if(t.id==='cmp-b'){cmpB=t.value;paintFicha();return true}if(t.id==='cmp-t'){cmpTodos=t.checked;paintFicha();return true}
+  return false;
 }
 /* ---------- aba Conexões ---------- */
+function subTabs(lista,cur,attr,rotulo){return '<div class="mk-subabas" role="tablist" aria-label="'+rotulo+'">'+lista.map(function(x){return '<button role="tab" class="mk-sub" data-'+attr+'="'+esc(x[0])+'" aria-selected="'+(cur===x[0])+'">'+esc(x[1])+(x[2]!==undefined?' <b>'+x[2]+'</b>':'')+'</button>'}).join('')+'</div>'}
 function respOp(){return PAGS.map(function(p){return '<option value="'+p.id+'"'+(String(p.id)===String(fResp)?' selected':'')+'>'+esc(p.nome)+'</option>'}).join('')}
 function conLinhas(){
   var L=lojas(),out=[];
   L.forEach(function(x){var c=conDe(x.l.gs,x.l.plat);out.push({x:x,c:c,sit:c?sitEf(c):'Sem conexão',mkt:x.l.plat})});
   DB.con.forEach(function(c){if(c.mkt!==lojaPor(c.gs).l.plat)out.push({x:lojaPor(c.gs),c:c,sit:sitEf(c),mkt:c.mkt})});
   var t=so(fq.trim()),n=nums(fq);
-  return out.filter(function(r){return (!fMkt||r.mkt===fMkt)&&(!fSit||r.sit===fSit)&&(!fResp||String(r.x.p.id)===String(fResp))&&(!t||so(r.x.l.n).indexOf(t)>-1||so(r.x.p.nome).indexOf(t)>-1||(n&&r.x.l.gs.indexOf(n)>-1))});
+  return out.filter(function(r){return (subC==='Todas'||r.mkt===subC)&&(!fSit||r.sit===fSit)&&(!fResp||String(r.x.p.id)===String(fResp))&&(!t||so(r.x.l.n).indexOf(t)>-1||so(r.x.p.nome).indexOf(t)>-1||(n&&r.x.l.gs.indexOf(n)>-1))});
 }
+function contC(m){var s=subC;subC=m;var n=conLinhas().length;subC=s;return n}
 function abaConexoes(){
   var all=conLinhas(),cnt={};SITS.forEach(function(s){cnt[s]=all.filter(function(r){return r.sit===s}).length});
-  return '<div class="fe-cont mk-cont">'+SITS.map(function(s){return '<div class="fe-k"><small>'+s+'</small><b class="'+(s==='Com erro'||s==='Vencida'?(cnt[s]?'pend':''):'')+'">'+cnt[s]+'</b></div>'}).join('')+'</div>'+
-   '<div class="fe-barra"><div class="rc-filtros"><label class="sel-p"><span>Marketplace</span><select class="sel" id="mk-f1"><option value="">Todos</option>'+MKTS.map(function(m){return '<option'+(fMkt===m?' selected':'')+'>'+m+'</option>'}).join('')+'</select></label><label class="sel-p"><span>Situação</span><select class="sel" id="mk-f2"><option value="">Todas</option>'+SITS.map(function(s){return '<option'+(fSit===s?' selected':'')+'>'+s+'</option>'}).join('')+'</select></label><label class="sel-p"><span>Responsável</span><select class="sel" id="mk-f3"><option value="">Todos</option>'+respOp()+'</select></label><label class="busca-p mk-busca"><span class="sr">Buscar</span>'+ic('search')+'<input id="mk-q" type="search" placeholder="Buscar por loja, GS ou responsável" value="'+esc(fq)+'"></label></div>'+
+  return subTabs([['Todas','Todas',contC('Todas')]].concat(MKTS.map(function(m){return [m,m,contC(m)]})),subC,'subc','Conexões por marketplace')+'<div class="fe-cont mk-cont">'+SITS.map(function(s){return '<div class="fe-k"><small>'+s+'</small><b class="'+(s==='Com erro'||s==='Vencida'?(cnt[s]?'pend':''):'')+'">'+cnt[s]+'</b></div>'}).join('')+'</div>'+
+   '<div class="fe-barra"><div class="rc-filtros"><label class="sel-p"><span>Situação</span><select class="sel" id="mk-f2"><option value="">Todas</option>'+SITS.map(function(s){return '<option'+(fSit===s?' selected':'')+'>'+s+'</option>'}).join('')+'</select></label><label class="sel-p"><span>Responsável</span><select class="sel" id="mk-f3"><option value="">Todos</option>'+respOp()+'</select></label><label class="busca-p mk-busca"><span class="sr">Buscar</span>'+ic('search')+'<input id="mk-q" type="search" placeholder="Buscar por loja, GS ou responsável" value="'+esc(fq)+'"></label></div>'+
    '<div class="fe-filtros"><button class="btn sec" data-mk="convite" style="width:auto;padding:0 14px">Enviar convite ao cliente</button><button class="btn" data-mk="nova" style="width:auto;padding:0 14px">Nova conexão</button></div></div>'+
    '<div class="tab-cartao"><table class="tab-fe tab-ml"><colgroup><col style="width:21%"><col style="width:15%"><col style="width:11%"><col style="width:12%"><col style="width:9%"><col style="width:11%"><col style="width:10%"><col style="width:11%"></colgroup><thead><tr><th>Loja (GS)</th><th>Responsável</th><th>Marketplace</th><th>Situação</th><th>Autorizada em</th><th>Validade</th><th>Última atualização</th><th></th></tr></thead><tbody>'+
    (all.length?all.map(function(r){var c=r.c;return '<tr><td data-rot="Loja (GS)"><div class="lj-n">'+esc(r.x.l.n)+'</div><div class="lj-gs">'+esc(r.x.l.gs)+'</div></td><td data-rot="Responsável" class="rp">'+esc(r.x.p.nome)+'</td><td data-rot="Marketplace">'+logo(r.mkt)+'</td><td data-rot="Situação">'+chip(r.sit,SITC[r.sit])+'</td><td data-rot="Autorizada em">'+(c&&c.autEm?fiso(c.autEm):'<span class="nt">—</span>')+'</td><td data-rot="Validade">'+(c?validTxt(c):'<span class="nt">—</span>')+'</td><td data-rot="Última atualização">'+(c&&c.at?'<div>'+esc(c.at.t)+'</div><div class="nt">'+esc(c.at.q)+'</div>':'<span class="nt">—</span>')+'</td><td class="rc-ac" data-rot="Ação"><button class="btn sec" data-mk="editar" data-gs="'+r.x.l.gs+'" data-m="'+esc(r.mkt)+'" style="width:auto;padding:0 10px;height:30px">'+(c?'Abrir':'Cadastrar')+'</button></td></tr>'}).join(''):'<tr><td colspan="8" class="vazio-t"><b>Nenhuma conexão neste filtro.</b></td></tr>')+'</tbody></table></div>';
@@ -334,8 +329,9 @@ function convite(){
 }
 /* ---------- aba Lojas ---------- */
 function abaLojas(){
-  var t=so(fq.trim()),n=nums(fq),L=lojas().filter(function(x){return (!fMkt||x.l.plat===fMkt)&&(!fResp||String(x.p.id)===String(fResp))&&(!t||so(x.l.n).indexOf(t)>-1||so(x.p.nome).indexOf(t)>-1||(n&&x.l.gs.indexOf(n)>-1))});
-  return '<div class="fe-barra"><div class="rc-filtros"><label class="sel-p"><span>Marketplace</span><select class="sel" id="mk-f1"><option value="">Todos</option>'+MKTS.map(function(m){return '<option'+(fMkt===m?' selected':'')+'>'+m+'</option>'}).join('')+'</select></label><label class="sel-p"><span>Responsável</span><select class="sel" id="mk-f3"><option value="">Todos</option>'+respOp()+'</select></label><label class="busca-p mk-busca"><span class="sr">Buscar</span>'+ic('search')+'<input id="mk-q" type="search" placeholder="Buscar por loja, GS ou responsável" value="'+esc(fq)+'"></label></div><div class="fe-info"><b>'+L.length+'</b> lojas</div></div>'+
+  var t=so(fq.trim()),n=nums(fq),L=lojas().filter(function(x){return (subL==='Todas'||x.l.plat===subL)&&(!fResp||String(x.p.id)===String(fResp))&&(!t||so(x.l.n).indexOf(t)>-1||so(x.p.nome).indexOf(t)>-1||(n&&x.l.gs.indexOf(n)>-1))});
+  var cl=function(m){return lojas().filter(function(x){return m==='Todas'||x.l.plat===m}).length};
+  return subTabs([['Todas','Todas',cl('Todas')]].concat(MKTS.map(function(m){return [m,m,cl(m)]})),subL,'subl','Lojas por marketplace')+'<div class="fe-barra"><div class="rc-filtros"><label class="sel-p"><span>Responsável</span><select class="sel" id="mk-f3"><option value="">Todos</option>'+respOp()+'</select></label><label class="busca-p mk-busca"><span class="sr">Buscar</span>'+ic('search')+'<input id="mk-q" type="search" placeholder="Buscar por loja, GS ou responsável" value="'+esc(fq)+'"></label></div><div class="fe-info"><b>'+L.length+'</b> lojas</div></div>'+
    '<div class="tab-cartao"><table class="tab-fe tab-ml tab-click"><colgroup><col style="width:26%"><col style="width:16%"><col style="width:14%"><col style="width:20%"><col style="width:14%"><col style="width:10%"></colgroup><thead><tr><th>Loja</th><th>GS</th><th>Marketplace</th><th>Responsável</th><th>Conexão</th><th>Última análise</th></tr></thead><tbody>'+
    (L.length?L.map(function(x){var o=lj(x.l.gs),an=o.snaps.length?o.snaps.slice().sort(function(a,b){return a.data<b.data?1:-1})[0].data:null,s=sitLoja(x);
      return '<tr class="mk-lin" tabindex="0" data-gs="'+x.l.gs+'"><td data-rot="Loja"><div class="lj-n">'+esc(x.l.n)+'</div></td><td data-rot="GS" class="mono">'+esc(x.l.gs)+'</td><td data-rot="Marketplace">'+logo(x.l.plat)+'</td><td data-rot="Responsável" class="rp">'+esc(x.p.nome)+'</td><td data-rot="Conexão">'+chip(s,SITC[s])+'</td><td data-rot="Última análise">'+(an?fiso(an):'<span class="nt">Nunca</span>')+'</td></tr>'}).join(''):'<tr><td colspan="6" class="vazio-t"><b>Nenhuma loja neste filtro.</b></td></tr>')+'</tbody></table></div>';
@@ -359,7 +355,7 @@ function passa(gs){var x=lojaPor(gs);return (!fLoja||gs===fLoja)&&(!fMk2||x.l.pl
 function pagina(tot){var n=Math.max(1,Math.ceil(tot/PG));if(pg1>n)pg1=n;return {n:n,ini:(pg1-1)*PG}}
 function pager(n){return '<div class="rc-pag"><button class="btn sec" data-mk="pg" data-v="-1" style="width:auto;padding:0 14px"'+(pg1<=1?' disabled':'')+'>Anterior</button><span>Página '+pg1+' de '+n+'</span><button class="btn sec" data-mk="pg" data-v="1" style="width:auto;padding:0 14px"'+(pg1>=n?' disabled':'')+'>Próxima</button></div>'}
 function abaFat(){
-  var h='<div class="fe-barra">'+filtrosF()+'<div class="fe-filtros">'+[['pedidos','Pedidos'],['notas','Notas fiscais'],['resumo','Resumo do mês']].map(function(s){return '<button class="chip-f" data-sub="'+s[0]+'" aria-pressed="'+(sub===s[0])+'">'+s[1]+'</button>'}).join('')+'</div></div>';
+  var h=subTabs([['pedidos','Pedidos'],['notas','Notas fiscais'],['resumo','Resumo do mês']],sub,'sub','Faturamento')+'<div class="fe-barra">'+filtrosF()+'</div>';
   var P=DB.ped[fComp].filter(function(p){return passa(p.gs)}),N2=DB.nf[fComp].filter(function(p){return passa(p.gs)});
   if(sub==='pedidos'){var pp=pagina(P.length),v=P.slice(pp.ini,pp.ini+PG);
     h+='<div class="fe-barra"><div class="fe-info"><b>'+P.length+'</b> pedidos</div><button class="btn sec" data-mk="addped" style="width:auto;padding:0 14px">Adicionar pedido</button></div><div class="tab-cartao"><table class="tab-fe tab-ml"><thead><tr><th>Data</th><th>Nº do pedido</th><th>Loja</th><th>Situação</th><th class="n">Valor dos produtos</th><th class="n">Frete</th><th class="n">Desconto</th><th class="n">Total</th><th>Pós-venda</th></tr></thead><tbody>'+
@@ -377,7 +373,7 @@ function abaFat(){
 /* ---------- aba Aplicativos ---------- */
 var ADR={};
 function abaApps(){
-  return '<div class="mk-apps">'+MKTS.map(function(m){
+  return subTabs(MKTS.map(function(m){return [m,m,DB.con.filter(function(c){return c.mkt===m&&sitEf(c)==='Conectada'}).length]}),subA,'suba','Aplicativos por marketplace')+'<div class="mk-apps">'+[subA].map(function(m){
     var a=DB.apps[m],n=DB.con.filter(function(c){return c.mkt===m&&sitEf(c)==='Conectada'}).length,dr=ADR[m]||{};var v=function(k){return dr[k]!==undefined?dr[k]:a[k]};
     return '<div class="cx"><div class="cx-cab">'+logo(m)+'<span class="c" style="margin-left:auto">'+n+(n===1?' loja conectada':' lojas conectadas')+'</span></div><div class="cf-corpo">'+
      '<div class="campo cf-c"><label for="ap-'+m+'-id">Identificador do app</label><input id="ap-'+m+'-id" data-ap="'+m+'" data-f="id" value="'+esc(v('id'))+'"></div>'+
@@ -386,7 +382,7 @@ function abaApps(){
      '<div class="campo cf-c"><label for="ap-'+m+'-url">Endereço de retorno da autorização</label><input id="ap-'+m+'-url" data-ap="'+m+'" data-f="url" value="'+esc(v('url'))+'"><small class="erro" id="ap-'+m+'-url-e" hidden></small></div>'+
      '<div class="campo cf-c"><label for="ap-'+m+'-ips">IPs liberados (um por linha)</label><textarea class="cb-area" rows="3" id="ap-'+m+'-ips" data-ap="'+m+'" data-f="ips">'+esc(v('ips'))+'</textarea>'+(m==='Shein'?'<small class="nt">Obrigatório em produção na Shein.</small>':'')+'</div>'+
      '<div class="campo cf-c"><label for="ap-'+m+'-sit">Situação da aprovação pelo marketplace</label><select class="sel" id="ap-'+m+'-sit" data-ap="'+m+'" data-f="sit">'+['Não solicitado','Em revisão','Aprovado','Reprovado'].map(function(x){return '<option'+(v('sit')===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select></div>'+
-     '<div class="f-kv"><span>Data de criação</span><b>'+esc(a.criado)+'</b></div><div class="f-kv"><span>Última troca do segredo</span><b>'+esc(a.troca)+'</b></div><div class="f-kv"><span>Lojas conectadas neste app</span><b>'+n+'</b></div></div>'+
+     '<div class="mk-kv3"><div class="f-kv"><span>Data de criação</span><b>'+esc(a.criado)+'</b></div><div class="f-kv"><span>Última troca do segredo</span><b>'+esc(a.troca)+'</b></div><div class="f-kv"><span>Lojas conectadas neste app</span><b>'+n+'</b></div></div></div>'+
      '<div class="cf-salvar"><span class="nt" id="ap-'+m+'-p">'+(Object.keys(dr).filter(function(k){return k!=='trocar'}).length?'Alteração pendente.':'Nenhuma alteração pendente.')+'</span><div class="cf-sv-b"><button class="btn sec" data-mk="apdesc" data-m="'+esc(m)+'" style="width:auto;padding:0 14px"'+(Object.keys(dr).filter(function(k){return k!=='trocar'}).length?'':' disabled')+'>Descartar</button><button class="btn" data-mk="apsalvar" data-m="'+esc(m)+'" style="width:auto;padding:0 16px"'+(Object.keys(dr).filter(function(k){return k!=='trocar'}).length?'':' disabled')+'>Salvar</button></div></div></div>'}).join('')+'</div>';
 }
 /* ---------- tela ---------- */
@@ -394,19 +390,23 @@ function render(alvo){
   if(alvo)el=alvo;iniciar();
   var nc=DB.con.filter(function(c){return sitEf(c)==='Conectada'}).length;
   el.innerHTML='<div class="dash fe-w rc-w"><div class="pag-topo"><div><h1>Marketplaces</h1><p class="sub">Conexões, lojas, faturamento e aplicativos. Tudo é preenchido à mão por enquanto.</p></div><div class="fe-info mk-legenda"><span class="mo manual">Manual</span><span class="mo api">API</span><span class="mo calc">Calculado</span><span class="nt">Selo de origem de cada campo. Quando o motor for ligado, Manual vira API.</span></div></div>'+
-   '<div class="rc-abas mk-abas-p" role="tablist">'+[['conexoes','Conexões',DB.con.length],['lojas','Lojas',lojas().length],['fat','Faturamento',null],['apps','Aplicativos',null]].map(function(a){return '<button role="tab" class="rc-aba" data-aba="'+a[0]+'" aria-selected="'+(aba===a[0])+'">'+a[1]+(a[2]!==null?' <b>'+a[2]+'</b>':'')+'</button>'}).join('')+'</div>'+
+   '<div class="rc-abas mk-abas-p" role="tablist">'+[['conexoes','Conexões',contC('Todas')],['lojas','Lojas',lojas().length],['fat','Faturamento',null],['apps','Aplicativos',null]].map(function(a){return '<button role="tab" class="rc-aba" data-aba="'+a[0]+'" aria-selected="'+(aba===a[0])+'">'+a[1]+(a[2]!==null?' <b>'+a[2]+'</b>':'')+'</button>'}).join('')+'</div>'+
    '<section class="bloco"><div class="fe-painel" id="mk-corpo">'+corpo()+'</div></section><div class="aviso">Dados de exemplo. Servem só para desenhar a tela.</div></div>';
   U.icones();
 }
-function corpo(){return aba==='conexoes'?abaConexoes():aba==='lojas'?abaLojas():aba==='fat'?abaFat():abaApps()}
+function corpo(){return aba==='conexoes'?abaConexoes():aba==='lojas'?(fichaGs?fichaView():abaLojas()):aba==='fat'?abaFat():abaApps()}
 function pintar(){var c=document.getElementById('mk-corpo');if(c){c.innerHTML=corpo();U.icones()}}
 function refaz(){var y=window.scrollY;render();window.scrollTo(0,y)}
 /* ---------- eventos ---------- */
-function noEl(e){return el&&el.isConnected&&el.contains(e.target)}
+function noEl(e){return el&&el.isConnected&&el.contains(e.target)&&el.dataset.modulo==='marketplaces'}
 document.addEventListener('click',function(e){
   if(!noEl(e))return;var t=e.target,b;
-  if((b=t.closest('[data-aba]'))){aba=b.dataset.aba;pg1=1;fq='';refaz();return}
+  if((b=t.closest('[data-aba]'))){aba=b.dataset.aba;pg1=1;fq='';fichaGs=null;refaz();return}
+  if((b=t.closest('[data-subc]'))){subC=b.dataset.subc;pintar();return}
+  if((b=t.closest('[data-subl]'))){subL=b.dataset.subl;pintar();return}
+  if((b=t.closest('[data-suba]'))){subA=b.dataset.suba;pintar();return}
   if((b=t.closest('[data-sub]'))){sub=b.dataset.sub;pg1=1;pintar();return}
+  if(fichaGs&&aba==='lojas'){if(t.closest('[data-voltar]')){fichaGs=null;pintar();return}if(fichaClique(e))return}
   if((b=t.closest('tr.mk-lin'))){abrirFicha(b.dataset.gs);return}
   if(!(b=t.closest('[data-mk]')))return;var a=b.dataset.mk;
   if(a==='nova')cadastroCon(null,null);else if(a==='editar')cadastroCon(b.dataset.gs,b.dataset.m);else if(a==='convite')convite();
@@ -433,7 +433,8 @@ document.addEventListener('input',function(e){
 });
 document.addEventListener('change',function(e){
   if(!noEl(e))return;var t=e.target;
-  if(t.id==='mk-f1'){fMkt=t.value;pintar()}else if(t.id==='mk-f2'){fSit=t.value;pintar()}else if(t.id==='mk-f3'){fResp=t.value;pintar()}
+  if(fichaGs&&aba==='lojas'&&fichaMudou(e))return;
+  if(t.id==='mk-f2'){fSit=t.value;pintar()}else if(t.id==='mk-f3'){fResp=t.value;pintar()}
   else if(t.id==='fa-c'){fComp=t.value;pg1=1;pintar()}else if(t.id==='fa-l'){fLoja=t.value;pg1=1;pintar()}else if(t.id==='fa-m'){fMk2=t.value;pg1=1;pintar()}else if(t.id==='fa-r'){fResp2=t.value;pg1=1;pintar()}
 });
 return {render:render};

@@ -227,7 +227,7 @@ function fechar(){
     onOk:function(){c.fechada=true;c.fechadaEm=agora()+' por '+EU;render();U.toast('Competência fechada.')}});
 }
 /* ---------- eventos ---------- */
-function noEl(e){return el&&el.isConnected&&el.contains(e.target)}
+function noEl(e){return el&&el.isConnected&&el.contains(e.target)&&el.dataset.modulo==='fechamento'}
 document.addEventListener('click',function(e){
   if(!noEl(e))return;var t=e.target,b,c=C();
   if((b=t.closest('[data-etapa]'))){etapa=+b.dataset.etapa;render();return}

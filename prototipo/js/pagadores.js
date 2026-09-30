@@ -93,7 +93,7 @@ function aviso(msg){var t=document.getElementById('toast');if(!t){t=document.cre
 document.addEventListener('input',function(e){if(e.target.id==='pag-q'){q=e.target.value;pintar()}});
 document.addEventListener('change',function(e){if(e.target.id==='pag-loja'){fLoja=e.target.value;pintar()}if(e.target.id==='pag-fin'){fFin=e.target.value;pintar()}});
 document.addEventListener('click',function(e){
-  if(!el||!el.isConnected||!el.contains(e.target))return;
+  if(!el||!el.isConnected||!el.contains(e.target)&&el.dataset.modulo==='pagadores')return;
   if(e.target.closest('#novo')){novo();return}
   if(e.target.closest('#limpar')){q='';fLoja='';fFin='';render();return}
   var z=e.target.closest('[data-zap]');

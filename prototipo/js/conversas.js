@@ -194,7 +194,7 @@ function render(alvo){
     var lf=filtradas(),primeiro=lf.filter(function(c){return !c.grupo&&c.un>0})[0]||lf[0];if(primeiro&&window.matchMedia('(min-width:641px)').matches)abrirConversa(primeiro,false)}
 }
 /* eventos */
-function noEl(e){return el&&el.isConnected&&el.contains(e.target)}
+function noEl(e){return el&&el.isConnected&&el.contains(e.target)&&el.dataset.modulo==='conversas'}
 document.addEventListener('click',function(e){
   if(!noEl(e))return;var t=e.target;var b;
   if((b=t.closest('[data-mn]'))){e.stopPropagation();menuConv(b,+b.dataset.mn);return}

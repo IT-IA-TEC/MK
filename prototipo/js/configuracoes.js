@@ -259,7 +259,7 @@ function historico(){
   U.modal({titulo:'Histórico de alterações',ok:'Fechar',cancel:'Fechar',html:CFG.log.length?'<div class="hist">'+CFG.log.map(function(h){return '<div class="h-lin"><b>'+esc(h.o)+'</b><div>'+esc(h.de)+' → '+esc(h.para)+'</div><div class="nt">'+esc(h.q)+' · '+esc(h.t)+'</div></div>'}).join('')+'</div>':'<p class="dica-m">Nenhuma alteração registrada.</p>'});
 }
 /* ---------- eventos ---------- */
-function noEl(e){return el&&el.isConnected&&el.contains(e.target)}
+function noEl(e){return el&&el.isConnected&&el.contains(e.target)&&el.dataset.modulo==='configuracoes'}
 document.addEventListener('click',function(e){
   if(!noEl(e))return;var t=e.target,b;
   if((b=t.closest('[data-aba]'))){if(aba!==b.dataset.aba){DRAFT={};aba=b.dataset.aba;render()}return}

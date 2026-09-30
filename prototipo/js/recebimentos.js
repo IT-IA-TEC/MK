@@ -293,7 +293,7 @@ function menuFila(a,f){
     if(id==='alterar')alterar(f);else if(id==='dividir')dividir(f);else if(id==='rejeitar')rejeitar(f);else U.toast('Abriria a conversa de '+nomeDe(f.pid)+' na tela Conversas. Ainda sem função.')});
 }
 /* ---------- eventos ---------- */
-function noEl(e){return el&&el.isConnected&&el.contains(e.target)}
+function noEl(e){return el&&el.isConnected&&el.contains(e.target)&&el.dataset.modulo==='recebimentos'}
 document.addEventListener('click',function(e){
   if(!noEl(e))return;var t=e.target,b;
   if((b=t.closest('[data-aba]'))){if(aba==='lancar')lerForm();aba=b.dataset.aba;pag1=1;refaz();return}

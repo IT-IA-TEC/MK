@@ -341,7 +341,7 @@ function maisMenu(a,p){
     if(id==='conversa')U.toast('Abriria a conversa de '+p.nome+' na tela Conversas. Ainda sem função.');else if(id==='promessa')promessa(p);else if(id==='acordo')criarAcordo(p);else if(id==='bloqueio')pedirBloqueio(it);else F.abrir(p)});
 }
 /* ---------- eventos ---------- */
-function noEl(e){return el&&el.isConnected&&el.contains(e.target)}
+function noEl(e){return el&&el.isConnected&&el.contains(e.target)&&el.dataset.modulo==='inadimplencia'}
 function P(id){return pagador(+id)}
 document.addEventListener('click',function(e){
   if(!noEl(e))return;var t=e.target,b;
