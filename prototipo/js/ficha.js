@@ -13,11 +13,12 @@ function selo(p){
 function base(p){return 1800+p.id*730}
 function valorMes(p){return p.lojas.map(function(l,i){return [l.n,Math.round(base(p)*(1+((i*3+p.id)%5)/10))]})}
 function cobranca(p){var it=valorMes(p);return {comp:'setembro/2026',itens:it,total:it.reduce(function(a,x){return a+x[1]},0)}}
+function dOff(off){var d=new Date();d.setDate(d.getDate()+off);return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear()}
 function acordoDe(p){
   if(!p.acordo&&p.fin==='acordo'){
-    var v=Math.round(cobranca(p).total/3),ps=[];
-    for(var i=1;i<=5;i++)ps.push({n:i,venc:('0'+(5+i)).slice(-2)+'/'+(i<3?'09':'10')+'/2026',valor:v,st:i<2?'paga':i===2&&p.id%2?'atrasada':i===2?'paga':'aberta'});
-    p.acordo={parcelas:ps};
+    var v=Math.round(cobranca(p).total/3),ps=[],b=p.id===9?-5:p.id===4?0:5;
+    for(var i=1;i<=5;i++)ps.push({n:i,venc:dOff(b+(i-2)*30),valor:v,st:i<2?'paga':(i===2&&p.id===9)?'atrasada':'aberta'});
+    p.acordo={parcelas:ps,estado:'ativo'};
   }
   return p.acordo;
 }
@@ -86,14 +87,14 @@ function mount(el,p){
           if(hooks.grupo)hooks.grupo(txt);refaz();U.toast('Enviado ao grupo de bloqueio.')}});
     }else if(acao==='resultado'){
       U.menu(a,[{id:'reagendado',t:'Reagendado'},{id:'naoatendeu',t:'Não atendeu'},{id:'recusou',t:'Recusou'},{id:'numero',t:'Número errado'}],function(id){
-        var t={reagendado:'Retorno reagendado',naoatendeu:'Contato sem resposta: não atendeu',recusou:'Pagador recusou pagar',numero:'Número informado está errado'}[id];
+        var t={reagendado:'Retorno reagendado',naoatendeu:'Contato sem resposta: não atendeu',recusou:'Pagador recusou pagar',numero:'Número informado está errado'}[id];p.sit={reagendado:'promessa reagendada',naoatendeu:'sem retorno',recusou:'recusou',numero:'número errado'}[id];p.contato=0;
         if(id==='recusou')delete p.promessa;evento(p,t);refaz();U.toast('Resultado registrado.')});
     }else if(acao==='acordo'){
       U.modal({titulo:'Criar acordo',ok:'Criar acordo',html:'<div class="campo"><label for="ac-n">Número de parcelas</label><select class="sel" id="ac-n">'+[2,3,4,5,6].map(function(n){return '<option>'+n+'</option>'}).join('')+'</select></div><div class="campo" style="margin-top:12px"><label for="ac-d">Vencimento da primeira parcela</label><input id="ac-d" type="date"></div><small class="erro" id="ac-e" hidden>Informe o vencimento da primeira parcela.</small>',
         onOk:function(m){var d=m.querySelector('#ac-d').value;if(!d){m.querySelector('#ac-e').hidden=false;return false}
           var n=+m.querySelector('#ac-n').value,tot=financeiro(p).aberto||cobranca(p).total,v=Math.round(tot/n),ps=[],dt=d.split('-');
           for(var i=0;i<n;i++){var mes=((+dt[1]-1+i)%12)+1,ano=+dt[0]+Math.floor((+dt[1]-1+i)/12);ps.push({n:i+1,venc:dt[2]+'/'+('0'+mes).slice(-2)+'/'+ano,valor:v,st:'aberta'})}
-          p.acordo={parcelas:ps};p.fin='acordo';delete p.dias;evento(p,'Acordo criado em '+n+' parcelas');refaz();U.toast('Acordo criado.')}});
+          p.acordo={parcelas:ps,estado:'ativo'};p.fin='acordo';delete p.dias;evento(p,'Acordo criado em '+n+' parcelas');refaz();U.toast('Acordo criado.')}});
     }else if(acao==='conferir'){
       var c=comprovantes(p)[+a.dataset.i];c.st='conferido';evento(p,'Comprovante '+c.arq+' conferido');refaz();U.toast('Comprovante conferido.');
     }
@@ -113,5 +114,5 @@ function abrir(p){
   function tecla(e){if(e.key==='Escape'&&!document.querySelector('.modal')&&!document.getElementById('pop-ativo'))fechar()}
   document.addEventListener('keydown',tecla);v.addEventListener('click',fechar);var x=g.querySelector('.fechar');x.addEventListener('click',fechar);x.focus();
 }
-return {abrir:abrir,mount:mount,selo:selo,cobranca:cobranca,comprovantes:comprovantes,evento:evento,quandoMudar:function(f){ouvintes.push(f)},hooks:hooks,R:R,agora:agora};
+return {acordo:acordoDe,financeiro:financeiro,abrir:abrir,mount:mount,selo:selo,cobranca:cobranca,comprovantes:comprovantes,evento:evento,quandoMudar:function(f){ouvintes.push(f)},hooks:hooks,R:R,agora:agora};
 })();

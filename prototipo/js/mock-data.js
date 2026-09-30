@@ -107,26 +107,26 @@ window.MK_DASH={
 
 /* ---- Pagadores e Lojas: dados de exemplo ---- */
 window.MK_PAG=[
-  {id:1,nome:"ADRIANO APARECIDO SANTOS PEREIRA",fone:"(11) 98214-3307",fin:"dia",lojas:[{n:"49.962.836 KARINE CONCEICAO PEREIRA",gs:"49962836000166",st:"ativa",plat:"Shein",ini:"12/03/2024"},{n:"ADRIANO APARECIDO SANTOS PEREIRA",gs:"37930011000180",st:"ativa",plat:"Shein",ini:"05/08/2023"},{n:"LOJA KP MODAS LTDA",gs:"56011980000182",st:"inativa",plat:"Mercado Livre",ini:"20/01/2025"}]},
+  {id:1,nome:"ADRIANO APARECIDO SANTOS PEREIRA",fone:"(11) 98214-3307",fin:"atraso",lojas:[{n:"49.962.836 KARINE CONCEICAO PEREIRA",gs:"49962836000166",st:"ativa",plat:"Shein",ini:"12/03/2024"},{n:"ADRIANO APARECIDO SANTOS PEREIRA",gs:"37930011000180",st:"ativa",plat:"Shein",ini:"05/08/2023"},{n:"LOJA KP MODAS LTDA",gs:"56011980000182",st:"inativa",plat:"Mercado Livre",ini:"20/01/2025"}]},
   {id:2,nome:"ADRIANO BESERRA DE MELO",fone:"(21) 99471-0825",fin:"atraso",lojas:[{n:"55.610.150 ADRIANO BESERRA DE MELO",gs:"55610150000109",st:"bloqueada",plat:"Shein",ini:"02/10/2024"}]},
   {id:3,nome:"ADRIANO PEREIRA DA SILVA",fone:"(31) 98833-4172",fin:"avencer",lojas:[{n:"46.843.469 ADRIANO PEREIRA DA SILVA",gs:"46843469000193",st:"ativa",plat:"Shein",ini:"17/06/2024"}]},
   {id:4,nome:"ADRIELE ALVES LOPES",fone:"(41) 99120-6654",fin:"acordo",lojas:[{n:"59.164.241 MARIA LEIDE ALVES DE SAO JOSE PAES",gs:"59164241000119",st:"ativa",plat:"Shein",ini:"08/02/2025"},{n:"50.941.212 ADRIELE ALVES LOPES",gs:"50941212000141",st:"bloqueada",plat:"Shopee",ini:"30/09/2024"}]},
-  {id:5,nome:"AGNES RUESCAS",fone:"(11) 97652-2049",fin:"dia",lojas:[{n:"AR MODAS LTDA",gs:"42744784000102",st:"ativa",plat:"Shein",ini:"14/11/2023"}]},
+  {id:5,nome:"AGNES RUESCAS",fone:"(11) 97652-2049",fin:"dia",lojas:[{n:"AR MODAS LTDA",gs:"42744784000102",st:"bloqueada",plat:"Shein",ini:"14/11/2023"}]},
   {id:6,nome:"AIRAM MATOS SOUZA",fone:"(71) 98705-1936",fin:"atraso",lojas:[{n:"AIRAM MATOS SOUZA",gs:"59837967000175",st:"ativa",plat:"Amazon",ini:"25/04/2025"}]},
-  {id:7,nome:"ALAN ARRUDA MARQUES OLIVEIRA",fone:"(62) 99388-7410",fin:"dia",lojas:[{n:"REVORA LTDA",gs:"57774714000174",st:"ativa",plat:"Shein",ini:"11/12/2024"},{n:"OLIVEIRA COMERCIO & SERVICOS LTDA",gs:"64678234000175",st:"ativa",plat:"Magalu",ini:"03/07/2025"}]},
+  {id:7,nome:"ALAN ARRUDA MARQUES OLIVEIRA",fone:"(62) 99388-7410",fin:"atraso",lojas:[{n:"REVORA LTDA",gs:"57774714000174",st:"ativa",plat:"Shein",ini:"11/12/2024"},{n:"OLIVEIRA COMERCIO & SERVICOS LTDA",gs:"64678234000175",st:"ativa",plat:"Magalu",ini:"03/07/2025"}]},
   {id:8,nome:"ALANA SOUZA OLIVEIRA",fone:"(85) 98246-5581",fin:"dia",lojas:[{n:"ASO MODAS LTDA",gs:"54967390000100",st:"ativa",plat:"Shein",ini:"19/05/2024"}]},
   {id:9,nome:"ALBERTO NUNES DE CARVALHO",fone:"(19) 99764-3018",fin:"acordo",lojas:[{n:"ANC COMERCIO DE CALCADOS LTDA",gs:"48120356000131",st:"bloqueada",plat:"Shein",ini:"22/08/2023"},{n:"ALBERTO NUNES DE CARVALHO",gs:"33851204000158",st:"inativa",plat:"Shopee",ini:"09/01/2024"}]},
   {id:10,nome:"ALESSANDRA REZENDE PRADO",fone:"(27) 98157-9243",fin:"avencer",lojas:[{n:"ARP BOUTIQUE LTDA",gs:"61094425000147",st:"ativa",plat:"Shein",ini:"28/03/2025"}]},
   {id:11,nome:"ALEXANDRE TEIXEIRA GOMES",fone:"(51) 99602-8837",fin:"atraso",lojas:[{n:"ATG STORE LTDA",gs:"52736810000120",st:"bloqueada",plat:"Shein",ini:"15/07/2024"},{n:"GOMES E TEIXEIRA COMERCIO LTDA",gs:"58204971000166",st:"ativa",plat:"Mercado Livre",ini:"01/02/2025"},{n:"ALEXANDRE TEIXEIRA GOMES",gs:"29417803000112",st:"ativa",plat:"Shein",ini:"10/04/2023"}]},
-  {id:12,nome:"ALICE FERNANDES CAMPOS",fone:"(48) 98413-2276",fin:"dia",lojas:[{n:"AFC MODA FEMININA LTDA",gs:"60318742000190",st:"ativa",plat:"Shein",ini:"06/06/2025"}]},
+  {id:12,nome:"ALICE FERNANDES CAMPOS",fone:"(48) 98413-2276",fin:"atraso",lojas:[{n:"AFC MODA FEMININA LTDA",gs:"60318742000190",st:"ativa",plat:"Shein",ini:"06/06/2025"}]},
   {id:13,nome:"ALINE BARROS DE ANDRADE",fone:"(81) 99235-6690",fin:"atraso",lojas:[{n:"ABA CONFECCOES LTDA",gs:"47905263000138",st:"ativa",plat:"Shein",ini:"13/09/2023"},{n:"ALINE BARROS DE ANDRADE",gs:"41628359000104",st:"inativa",plat:"Amazon",ini:"27/02/2024"}]},
   {id:14,nome:"ALISSON MOREIRA DUARTE",fone:"(16) 98879-1504",fin:"acordo",lojas:[{n:"AMD IMPORTADOS LTDA",gs:"56482130000177",st:"ativa",plat:"Shein",ini:"21/10/2024"}]}
 ];
 
 /* estado extra dos pagadores (atraso, promessa, retorno) */
 (function(){
-  var dias={2:11,6:6,11:24,13:15},prom={2:"03/10/2026",11:"05/10/2026",13:"02/10/2026"},ret={2:"02/10 às 14h",13:"01/10 às 10h30"};
-  window.MK_PAG.forEach(function(p){if(dias[p.id])p.dias=dias[p.id];if(prom[p.id])p.promessa={data:prom[p.id]};if(ret[p.id])p.retorno=ret[p.id]});
+  var dias={1:63,2:11,6:6,7:47,11:24,12:96,13:40},prom={2:"03/10/2026",11:"05/10/2026",13:"02/10/2026"},ret={2:"02/10 às 14h",13:"01/10 às 10h30"},sit={7:'sem retorno',12:'recusou'},cont={1:9,2:1,6:0,7:12,11:0,12:35,13:1,9:2,4:0};
+  window.MK_PAG.forEach(function(p){if(dias[p.id])p.dias=dias[p.id];if(prom[p.id])p.promessa={data:prom[p.id]};if(ret[p.id])p.retorno=ret[p.id];if(sit[p.id])p.sit=sit[p.id];if(cont[p.id]!==undefined)p.contato=cont[p.id]});
 })();
 
 /* ---- Conversas: dados de exemplo ---- */
@@ -178,11 +178,11 @@ window.MK_CONV=[
     {de:"p",t:"txt",x:"Tô esperando resposta desde ontem.",h:"08:10",d:"Hoje"},
     {de:"p",t:"txt",x:"Alguém pode me atender?",h:"08:11",d:"Hoje"}]},
   {id:12,pag:12,dono:"Marina",etq:[],un:0,msgs:[
-    {de:"e",t:"txt",x:"Alice, seu pagamento foi confirmado. Obrigada!",h:"16:00",d:"Ontem"},
-    {de:"p",t:"txt",x:"Obrigada!",h:"16:05",d:"Ontem"},
-    {de:"e",t:"txt",x:"Sempre à disposição.",h:"16:06",d:"Ontem"}]},
+    {de:"e",t:"txt",x:"Alice, as cobranças de junho a agosto seguem em aberto. Podemos combinar um acordo?",h:"16:00",d:"Ontem"},
+    {de:"p",t:"txt",x:"Não vou pagar, quero encerrar as lojas.",h:"16:05",d:"Ontem"},
+    {de:"e",t:"txt",x:"Entendido, vamos registrar o pedido e falar do saldo.",h:"16:06",d:"Ontem"}]},
   {id:13,pag:13,dono:"Juliana",etq:["Negociação"],un:1,msgs:[
-    {de:"e",t:"txt",x:"Aline, a cobrança está com 15 dias de atraso. Quando consegue pagar?",h:"08:00",d:"Hoje"},
+    {de:"e",t:"txt",x:"Aline, a cobrança está com 40 dias de atraso. Quando consegue pagar?",h:"08:00",d:"Hoje"},
     {de:"p",t:"txt",x:"Prometo pagar até 02/10, pode ficar tranquilo.",h:"08:40",d:"Hoje"}]},
   {id:14,pag:14,dono:"Carlos",etq:[],un:0,msgs:[
     {de:"e",t:"txt",x:"Alisson, a parcela do acordo vence dia 05/10.",h:"10:00",d:"Ontem"},

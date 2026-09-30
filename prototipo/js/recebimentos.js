@@ -20,6 +20,8 @@ function total(c){return c.lojas.reduce(function(a,l){return a+Math.round(l.valo
 function pagoDe(c){return total(c)-saldo(c)}
 function statusC(c){var s=saldo(c);return s<=.02?['Quitada','vd']:pagoDe(c)>.005?['Parcial','at']:['Em aberto','ok']}
 function abertas(pid){return DB.cobs.filter(function(c){return c.pid===pid&&saldo(c)>.02}).sort(function(a,b){return a.ord-b.ord})}
+function dataOff(off){var d=new Date(HOJE.getFullYear(),HOJE.getMonth(),HOJE.getDate()+off);return d2(d.getDate())+'/'+d2(d.getMonth()+1)+'/'+d.getFullYear()}
+function rotDe(off){var d=new Date(HOJE.getFullYear(),HOJE.getMonth(),HOJE.getDate()+off);d.setMonth(d.getMonth()-1);return d2(d.getMonth()+1)+'/'+d.getFullYear()}
 function mkCob(p,rot,ord,venc,acordo){
   var ls=acordo?[{n:'Parcela do acordo',gs:'',valor:Math.round((1800+p.id*730)/3*100)/100,pago:0}]:p.lojas.map(function(l,i){return {n:l.n,gs:l.gs,valor:Math.round((1800+p.id*730)*(1+((i*3+p.id)%5)/10)*100)/100,pago:0}});
   var c={id:'c'+(nid++),pid:p.id,rot:rot,ord:ord,venc:venc,lojas:ls,acordo:!!acordo};DB.cobs.push(c);return c;
@@ -49,11 +51,12 @@ function iniciar(){
   if(pronto)return;pronto=true;var r=lcg(77),hojeTs=HOJE.getTime();
   function ts(dias,h,m){var d=new Date(HOJE.getFullYear(),HOJE.getMonth(),HOJE.getDate()-dias,h||10,m||0);return d.getTime()}
   PAGS.forEach(function(p){
-    var open=p.fin!=='dia',c7=mkCob(p,'07/2026',7,'20/08/2026',false);
-    if(p.id===11||p.id===13){/* 07 fica em aberto */}else{c7.lojas.forEach(function(l){l.pago=l.valor});pagar(p.id,total(c7),c7,ts(40+p.id,9+p.id%6,10+p.id),'Pix','Itaú','E'+(7000+p.id*13))}
-    if(p.fin==='acordo'){mkCob(p,'Parcela 2 do acordo',8,'05/09/2026',true);mkCob(p,'Parcela 3 do acordo',9,'05/10/2026',true)}
-    else{var c8=mkCob(p,'08/2026',8,p.fin==='avencer'?'05/10/2026':'20/09/2026',false);
-      if(!open){c8.lojas.forEach(function(l){l.pago=l.valor});var dh=p.id===5?0:(p.id%3+3);pagar(p.id,total(c8),c8,ts(dh,9+p.id%5,20+p.id),'Pix','Itaú','E'+(9000+p.id*17))}}
+    if(p.fin==='atraso'){var k=1+Math.floor((p.dias||1)/31);for(var i=0;i<k;i++){var off=-(p.dias||1)+31*i;mkCob(p,rotDe(off),Date.now()+off,dataOff(off),false)}return}
+    var c7=mkCob(p,'07/2026',7,'20/08/2026',false);
+    c7.lojas.forEach(function(l){l.pago=l.valor});pagar(p.id,total(c7),c7,ts(40+p.id,9+p.id%6,10+p.id),'Pix','Itaú','E'+(7000+p.id*13));
+    if(p.fin==='acordo'){mkCob(p,'Parcela 2 do acordo',8,dataOff(p.id===9?-5:p.id===4?0:5),true);mkCob(p,'Parcela 3 do acordo',9,dataOff(p.id===9?26:p.id===4?31:36),true)}
+    else{var c8=mkCob(p,'08/2026',8,p.fin==='avencer'?dataOff(5):'20/09/2026',false);
+      if(p.fin==='dia'){c8.lojas.forEach(function(l){l.pago=l.valor});var dh=p.id===5?0:(p.id%3+3);pagar(p.id,total(c8),c8,ts(dh,9+p.id%5,20+p.id),'Pix','Itaú','E'+(9000+p.id*17))}}
   });
   function pagar(pid,v,c,t,forma,banco,tid){var al=c.lojas.map(function(l,i){return {cob:c,i:i,v:l.valor}});DB.pags.push({id:nid++,pid:pid,valor:v,ts:t,forma:forma,banco:banco,tid:tid,aloc:al,estado:'ligado'});DB.hist.push({id:nid++,pgId:nid-2,pid:pid,valor:v,ts:t+3600000,quem:['Marina','Carlos','Rafael','Juliana'][pid%4],comp:c.rot,tipo:'baixa'})}
   /* pagamentos de hoje e do mês (para os contadores) */
@@ -62,7 +65,7 @@ function iniciar(){
   /* fila de comprovantes */
   var vc=function(pid,f){var p=plano(pid,0,null,'');var ab=abertas(pid)[0];return ab?f(saldo(ab)):100};
   var VHSS='Pix da VHSS · Itaú 4471';
-  var fila=[[2,1,0,0,'comprovante-pix-2.pdf',function(s){return s},0,0,9,12],[6,1,0,0,'comprovante-6.jpg',function(s){return Math.round(s/2*100)/100},0,0,10,20],[13,1,0,0,'pix-aline.pdf',function(s){return Math.round((s+540)*100)/100},0,0,8,45],[11,1,0,1,'transferencia-alexandre.jpg',function(s){return Math.round(s/3*100)/100},1,0,9,55],[4,1,0,0,'parcela-adriele.jpg',function(s){return s},0,0,11,20],[9,1,0,0,'boleto-parcela3.pdf',function(s){return s},0,1,9,30],[1,1,0,0,'pix-adriano.pdf',function(){return 1500},0,0,7,58],[10,1,0,0,'pix-alessandra.pdf',function(s){return s},0,0,10,3]];
+  var fila=[[2,1,0,0,'comprovante-pix-2.pdf',function(s){return s},0,0,9,12],[6,1,0,0,'comprovante-6.jpg',function(s){return Math.round(s/2*100)/100},0,0,10,20],[13,1,0,0,'pix-aline.pdf',function(s){return Math.round((s+540)*100)/100},0,0,8,45],[11,1,0,1,'transferencia-alexandre.jpg',function(s){return Math.round(s/3*100)/100},1,0,9,55],[4,1,0,0,'parcela-adriele.jpg',function(s){return s},0,0,11,20],[9,1,0,0,'boleto-parcela3.pdf',function(s){return s},0,1,9,30],[8,1,0,0,'pix-alana.pdf',function(){return 1500},0,0,7,58],[10,1,0,0,'pix-alessandra.pdf',function(s){return s},0,0,10,3]];
   fila.forEach(function(x,i){
     var p=pagador(x[0]);var ab=abertas(x[0])[0];var v=x[5](ab?saldo(ab):0);
     var f={id:nid++,pid:x[0],ts:ts(0,x[8],x[9]),arq:x[4],valor:v,pagou:i===3?'ALEXANDRE T. GOMES (conta pessoal)':p.nome,ok:!x[6],conta:x[6]?'Conta de terceiro · Nubank 8812':VHSS,dup:!!x[7],alvo:null,tid:'E'+(3000+i*7)};
@@ -319,5 +322,5 @@ document.addEventListener('change',function(e){
   if(e.target.id==='lc-pid'){lerForm();lanc.sel={};pintar();var f=document.getElementById('lc-valor');if(f)f.focus()}
 });
 document.addEventListener('submit',function(e){if(e.target.id==='lc-form'){e.preventDefault();gravar()}});
-return {render:render};
+return {render:render,api:function(){iniciar();return {DB:DB,saldo:saldo,total:total,abertas:abertas,R:R,plano:plano,rotulos:rotulos,fdata:fdata,fhora:fhora,alocar:alocar}}};
 })();
