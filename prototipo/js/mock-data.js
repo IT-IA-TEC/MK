@@ -10,7 +10,13 @@ window.MK_DADOS={
     {canal:"MG",titulo:"Luminária de mesa articulada",cod:"#MGL-90231 · 1 UN",etapa:"Travado",tipo:"travado",prazo:"sem CFOP",valor:"R$ 98,50"}
   ],
   menu:[
-    {grupo:"Operação",itens:[{id:"painel",nome:"Painel",icone:"layout-dashboard"},{id:"pedidos",nome:"Pedidos",icone:"package",cnt:62},{id:"notas",nome:"Notas",icone:"file-text",cnt:2}]},
-    {grupo:"Catálogo",itens:[{id:"anuncios",nome:"Anúncios",icone:"store"},{id:"publicacoes",nome:"Publicações",icone:"upload-cloud"},{id:"automacoes",nome:"Automações",icone:"zap"},{id:"integracoes",nome:"Integrações",icone:"plug"}]}
+    {id:"dashboard",nome:"Dashboard",icone:"layout-dashboard"},
+    {id:"conversas",nome:"Conversas",icone:"messages-square"},
+    {id:"pagadores",nome:"Pagadores e Lojas",icone:"store"},
+    {id:"fechamento",nome:"Fechamento do mês",icone:"calendar-check"},
+    {id:"recebimentos",nome:"Recebimentos",icone:"wallet"},
+    {id:"inadimplencia",nome:"Inadimplência e Acordos",icone:"handshake"},
+    {id:"painel",nome:"Painel",icone:"monitor"},
+    {id:"configuracoes",nome:"Configurações",icone:"settings"}
   ]
 };
