@@ -9,7 +9,7 @@
 .rc-sug{display:flex;flex-direction:column;gap:3px;align-items:flex-start}
 .rc-sug b{font-size:13.5px}.rc-sug small{font-size:12.5px;color:var(--apoio)}
 .rc-al{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
-.tab-rc tr.rc-alerta td{background:#FFF8F6}
+.tab-rc tr.rc-alerta td{background:var(--alerta-suave)}
 .tab-rc tr.rc-alerta td:first-child{box-shadow:inset 3px 0 0 var(--travado-t)}
 .tab-rc td.rc-ac{white-space:normal}
 .rc-ac{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
@@ -25,7 +25,7 @@
 .lc-tit{font:600 14px var(--f-corpo);margin-bottom:12px}.lc-lado .lc-tit{margin-bottom:2px}
 .lc-pe{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
 .lc-cob{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 10px;border:1px solid var(--borda);border-radius:var(--raio-bloco);cursor:pointer}
-.lc-cob:hover{background:#F8FBF9}.lc-cob input{width:16px;height:16px;accent-color:var(--verde-marca)}
+.lc-cob:hover{background:var(--hover)}.lc-cob input{width:16px;height:16px;accent-color:var(--verde-marca)}
 .lc-cob b{font-size:13.5px}.lc-cob small{display:block;font-size:12px;color:var(--apoio);overflow-wrap:anywhere}.lc-cob .n{font-variant-numeric:tabular-nums}
 .lc-saldo{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:auto}
 .lc-saldo>div{background:var(--pagina);border:1px solid var(--borda);border-radius:var(--raio-bloco);padding:10px 12px}

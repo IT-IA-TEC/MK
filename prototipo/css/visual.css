@@ -1,0 +1,155 @@
+/* IT.MK - camada visual: profundidade, relevo, sombras, degradês e movimento.
+   Só usa variáveis de tokens.css. Não muda posição nem ordem de nada. */
+
+/* ---------- base ---------- */
+html{scroll-behavior:smooth}
+body{background:var(--grad-pagina);background-attachment:fixed;text-rendering:optimizeLegibility}
+::selection{background:var(--verde-claro);color:var(--tinta)}
+h1,h2,h3,.dash-topo h1,.pag-topo h1{text-wrap:balance}
+.dash-topo h1,.pag-topo h1{color:var(--tinta);text-shadow:0 1px 0 var(--branco)}
+.dash-topo h1::after,.pag-topo h1::after{content:"";display:block;width:36px;height:3px;margin-top:6px;border-radius:99px;background:linear-gradient(90deg,var(--verde-vivo),var(--verde-claro))}
+.pag-topo h1::after{margin-top:5px}
+/* textos corridos justificados, com hifenização em português */
+p,.sub,.dica-m,.fe-aviso span,.fe-info,.fe-vazio,.mk-pe,.aviso-txt,.nt.just,.modal-corpo p,.cf-corpo p,.lado-conteudo p,.f-vazio,.rl-leg+.fe-aviso span{text-align:justify;text-justify:inter-word;hyphens:auto;-webkit-hyphens:auto;text-wrap:pretty}
+.nt{text-wrap:pretty}
+.vazio-t{text-align:center}
+.login-form h1,.login-form .sub{text-align:left}
+/* barras de rolagem discretas */
+*{scrollbar-width:thin;scrollbar-color:var(--borda-forte) transparent}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--borda-forte);border-radius:99px;border:2px solid var(--pagina)}::-webkit-scrollbar-thumb:hover{background:var(--apoio-claro)}
+/* entrada suave de cada tela */
+@keyframes sobe{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#conteudo>.dash>*,#conteudo>.conv-w>.conv{animation:sobe var(--t-lento) var(--curva) both}
+#conteudo>.dash>*:nth-child(2){animation-delay:40ms}#conteudo>.dash>*:nth-child(3){animation-delay:80ms}#conteudo>.dash>*:nth-child(4){animation-delay:120ms}#conteudo>.dash>*:nth-child(n+5){animation-delay:160ms}
+
+/* ---------- menu lateral: verde profundo com vidro e brilho ---------- */
+.menu{background:var(--grad-menu);border-right:0;box-shadow:var(--sombra-3);z-index:30}
+.menu::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(260px 200px at 0 0,var(--vidro) 0%,transparent 70%);opacity:.6}
+.menu>*{position:relative;z-index:1}
+.menu .marca-nome{color:var(--branco)}.menu .marca-nome span{color:var(--verde-claro)}
+.menu .marca-logo{background:var(--grad-ativo);color:var(--tinta);box-shadow:var(--brilho-verde),var(--relevo)}
+.btn-recolher{background:var(--vidro);border-color:var(--menu-linha);color:var(--menu-texto);box-shadow:var(--relevo-escuro)}
+.btn-recolher:hover{background:var(--menu-linha);color:var(--branco)}
+.item{color:var(--menu-texto);transition:background var(--t-rapido) var(--curva),transform var(--t-rapido) var(--curva),box-shadow var(--t-rapido) var(--curva),color var(--t-rapido) var(--curva)}
+.item:hover{background:var(--vidro);color:var(--branco);transform:translateX(3px)}
+.item.ativo{background:var(--grad-ativo);color:var(--tinta);box-shadow:var(--brilho-verde),var(--relevo);transform:none}
+.item svg{transition:transform var(--t-base) var(--curva)}.item:hover svg{transform:scale(1.12)}
+.recolhido .item:hover{transform:none}
+@media(max-width:720px){.menu{box-shadow:0 -6px 20px rgba(var(--sombra-cor),.25)}.item:hover{transform:none}}
+
+/* ---------- cartões e painéis: camadas com sombra ---------- */
+.cartao-b,.andamento,.fila,.cx,.alerta,.fe-k,.ev-col,.hist,.mk-seg,.mk-fv,.mk-kv3,.f-kv,.rl-c,.rl-s,.vc,.vc-lj,.tab-cartao,.f-bloco,.lc-form,.lc-lado,.lc-saldo>div,.dv-lista,.cf-salvar,.cf-sw,.md-pv,.conv,.pdf-pag{
+  background:var(--grad-cartao);border-color:var(--borda);box-shadow:var(--sombra-1),var(--relevo);
+  transition:box-shadow var(--t-base) var(--curva),transform var(--t-base) var(--curva),border-color var(--t-base) var(--curva)}
+.cx,.andamento,.fila,.tab-cartao,.mk-fv,.rl-s,.vc,.f-bloco,.lc-form,.lc-lado{box-shadow:var(--sombra-2),var(--relevo)}
+.cx:hover,.andamento:hover,.tab-cartao:hover,.rl-s:hover,.vc-lj:hover,.fe-k:hover,.rl-c:hover{box-shadow:var(--sombra-3),var(--relevo);border-color:var(--borda-forte)}
+.fe-k,.rl-c,.vc-lj{position:relative;overflow:hidden}
+.fe-k::before,.rl-c::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--verde-vivo),var(--verde-claro));opacity:.85}
+.fe-k:hover,.rl-c:hover{transform:var(--salto)}
+.cx-cab,.tab-cartao>.cx-cab{background:var(--grad-cabeca);border-top-left-radius:inherit;border-top-right-radius:inherit}
+.cx-cab svg{filter:drop-shadow(0 1px 0 var(--branco))}
+.bloco-cab h2{color:var(--tinta);display:flex;align-items:center;gap:8px}
+.bloco-cab h2::before{content:"";width:4px;height:16px;border-radius:99px;background:linear-gradient(180deg,var(--verde-vivo),var(--verde-claro))}
+.fe-aviso{box-shadow:var(--sombra-1),var(--relevo);border:1px solid var(--atencao-f)}
+/* cartões clicáveis saltam ao passar o mouse */
+.num-card{background:var(--grad-cartao);box-shadow:var(--sombra-1),var(--relevo);position:relative;overflow:hidden;transition:transform var(--t-base) var(--curva),box-shadow var(--t-base) var(--curva),border-color var(--t-base) var(--curva)}
+.num-card::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:linear-gradient(90deg,var(--verde-vivo),var(--verde-claro));opacity:0;transition:opacity var(--t-base) var(--curva)}
+.num-card:hover{transform:var(--salto);box-shadow:var(--sombra-3),var(--relevo);border-color:var(--verde-vivo)}
+.num-card:hover::before{opacity:1}
+.num-card:active{transform:none;box-shadow:var(--sombra-1)}
+.num-card.perigo::before{background:linear-gradient(90deg,var(--travado-t),var(--travado-f));opacity:1}
+.fe-et{box-shadow:var(--sombra-1),var(--relevo);transition:transform var(--t-base) var(--curva),box-shadow var(--t-base) var(--curva)}
+.fe-et:hover{transform:var(--salto);box-shadow:var(--sombra-3)}
+.fe-et.feita .fe-n{box-shadow:var(--brilho-verde)}
+.fe-n{box-shadow:var(--sombra-1)}
+
+/* ---------- botões: relevo e "afundar" ao clicar ---------- */
+.btn,.btn-principal{background:var(--grad-marca);color:var(--branco);box-shadow:var(--sombra-1),var(--relevo-escuro);text-shadow:0 1px 0 var(--texto-sombra);
+  transition:transform var(--t-rapido) var(--curva),box-shadow var(--t-base) var(--curva),background var(--t-rapido) var(--curva)}
+.btn:hover,.btn-principal:hover{background:var(--grad-marca-hover);transform:var(--salto);box-shadow:var(--brilho-verde),var(--relevo-escuro)}
+.btn:active,.btn-principal:active{transform:translateY(1px);box-shadow:var(--sombra-interna);background:var(--grad-marca)}
+.btn.sec{background:var(--grad-botao-sec);color:var(--tinta);border:1px solid var(--borda-forte);text-shadow:none;box-shadow:var(--sombra-1),var(--relevo)}
+.btn.sec:hover{background:var(--branco);border-color:var(--verde-vivo);box-shadow:var(--sombra-2),var(--relevo)}
+.btn.sec:active{background:var(--hover);box-shadow:var(--sombra-interna)}
+.btn.esc{background:var(--grad-tinta)}
+.btn.esc:hover{background:var(--grad-tinta);box-shadow:var(--sombra-3),var(--relevo-escuro)}
+.btn:disabled,.btn[disabled]{opacity:.5;transform:none;box-shadow:none;cursor:not-allowed}
+.btn.perigo,.btn.per{background:linear-gradient(180deg,var(--travado-t),var(--sh-t));box-shadow:var(--sombra-1),var(--relevo-escuro)}
+.ib,.btn-zap,.btn-voltar,.fechar,.ver{background:var(--grad-botao-sec);box-shadow:var(--sombra-1),var(--relevo);transition:transform var(--t-rapido) var(--curva),box-shadow var(--t-base) var(--curva),border-color var(--t-rapido) var(--curva),background var(--t-rapido) var(--curva)}
+.ib:hover,.btn-zap:hover,.btn-voltar:hover,.fechar:hover{transform:var(--salto);box-shadow:var(--sombra-2),var(--relevo);border-color:var(--verde-vivo);background:var(--branco)}
+.ib:active,.btn-zap:active,.btn-voltar:active,.fechar:active{transform:none;box-shadow:var(--sombra-interna)}
+.ver{box-shadow:none;background:none}.ver:hover{transform:none;box-shadow:none}
+.link{transition:color var(--t-rapido) var(--curva)}.link:hover{color:var(--tinta)}
+
+/* ---------- abas, filtros e pílulas ---------- */
+.cv-tab,.chip-f,.mk-aba,.mk-sub,.mk-modo,.f-aba{background:var(--grad-botao-sec);box-shadow:var(--sombra-1),var(--relevo);border-color:var(--borda-forte);
+  transition:transform var(--t-rapido) var(--curva),box-shadow var(--t-base) var(--curva),background var(--t-rapido) var(--curva),color var(--t-rapido) var(--curva)}
+.cv-tab:hover,.chip-f:hover,.mk-aba:hover,.mk-sub:hover,.mk-modo:hover,.f-aba:hover{background:var(--branco);transform:var(--salto);box-shadow:var(--sombra-2),var(--relevo)}
+.cv-tab[aria-pressed="true"],.chip-f[aria-pressed="true"],.mk-aba[aria-selected="true"]{background:var(--grad-ativo);border-color:var(--verde-medio);box-shadow:var(--brilho-verde),var(--relevo);transform:none}
+.mk-sub[aria-selected="true"],.mk-modo[aria-selected="true"],.f-aba[aria-selected="true"]{background:var(--grad-tinta);border-color:var(--tinta);box-shadow:var(--sombra-2),var(--relevo-escuro);transform:none}
+.cv-tab:active,.chip-f:active,.mk-aba:active,.mk-sub:active,.mk-modo:active,.f-aba:active{transform:translateY(1px);box-shadow:var(--sombra-interna)}
+.rc-abas{border-bottom-color:var(--borda-forte)}
+.rc-aba{transition:color var(--t-rapido) var(--curva),background var(--t-rapido) var(--curva),border-color var(--t-rapido) var(--curva);border-top-left-radius:var(--raio-controle);border-top-right-radius:var(--raio-controle)}
+.rc-aba:hover{background:var(--hover)}
+.rc-aba[aria-selected="true"]{border-bottom-width:3px;background:linear-gradient(180deg,transparent 40%,var(--ok-suave) 100%);box-shadow:0 6px 10px -8px var(--verde-sombra)}
+.rc-aba[aria-selected="true"] b{box-shadow:var(--sombra-1)}
+
+/* ---------- etiquetas (chips) com filete e leve relevo ---------- */
+.fs,.atraso,.selo,.mo,.vc-tag,.dl{box-shadow:inset 0 0 0 1px rgba(var(--sombra-cor),.08),var(--sombra-1)}
+.fs,.atraso,.selo{border-radius:99px;padding-inline:10px}
+.mo{border-radius:99px;padding-inline:9px}
+.fs.vd,.atraso.vd,.selo.ativa{background:linear-gradient(180deg,var(--verde-claro),var(--verde-claro-2))}
+.mo.calc{background:linear-gradient(180deg,var(--verde-claro),var(--verde-claro-2))}
+.cv-un,.ib em{box-shadow:var(--brilho-verde);background:var(--grad-marca)}
+.mk-l i{box-shadow:var(--sombra-1),var(--relevo-escuro)}
+
+/* ---------- campos de formulário: fundo afundado e brilho no foco ---------- */
+.campo input,.senha-caixa,.cf-in,.busca-p,.sel,.campo select,.campo textarea,.cb-area,.mf input[type=date],.mf .mf-v input:not(.cf-in input),textarea,select{
+  background:var(--branco);border-color:var(--borda-forte);box-shadow:var(--sombra-interna);transition:box-shadow var(--t-base) var(--curva),border-color var(--t-base) var(--curva)}
+.campo input:hover,.cf-in:hover,.busca-p:hover,.sel:hover,select:hover,textarea:hover{border-color:var(--apoio-claro)}
+.campo input:focus-visible,.cf-in:focus-within,.busca-p:focus-within,.sel:focus-visible,select:focus-visible,textarea:focus-visible,.cb-area:focus-visible,.senha-caixa:focus-within{outline:none;border-color:var(--verde-vivo);box-shadow:var(--sombra-interna),var(--anel-foco)}
+:focus-visible{outline-color:var(--verde-vivo)}
+.btn:focus-visible,.ib:focus-visible,.item:focus-visible,.num-card:focus-visible,.cv-tab:focus-visible,.chip-f:focus-visible{outline:none;box-shadow:var(--anel-foco-forte)}
+.sw span{box-shadow:var(--sombra-interna)}.sw input:checked+span{background:var(--grad-marca);box-shadow:var(--brilho-verde)}
+.sw span::after{box-shadow:var(--sombra-2)}
+
+/* ---------- tabelas ---------- */
+.tab-fe th,.tab-pag th{background:var(--grad-cabeca);box-shadow:inset 0 -1px 0 var(--borda-forte);color:var(--texto-2)}
+.tab-fe tbody tr,.tab-pag tbody tr{transition:background var(--t-rapido) var(--curva),box-shadow var(--t-rapido) var(--curva)}
+.tab-fe tbody tr:nth-child(even) td{background:linear-gradient(180deg,rgba(var(--sombra-cor),.012),rgba(var(--sombra-cor),.012))}
+.tab-fe tbody tr:hover td,.tab-pag tbody tr:hover td{background:var(--hover)}
+.tab-click .mk-lin:hover,.pag-lin:hover,.ev-lin:hover,.cv-item:hover,.fb-cab:hover,.md-i:hover,.lc-cob:hover{background:var(--hover);box-shadow:inset 3px 0 0 var(--verde-vivo)}
+.cv-item.sel,.ev-lin.sel{background:linear-gradient(90deg,var(--verde-claro),var(--ok-suave));box-shadow:inset 3px 0 0 var(--verde-marca)}
+.tab-fe tr.dif td,.tab-ml tr.dif td,.tab-rc tr.rc-alerta td{background:var(--alerta-suave)}
+.tab-cartao{overflow:hidden}
+
+/* ---------- camadas flutuantes ---------- */
+.veu{background:var(--veu-cor);-webkit-backdrop-filter:var(--desfoque);backdrop-filter:var(--desfoque)}
+.modal,.pdf-jan{box-shadow:var(--sombra-4);border:1px solid var(--borda);background:var(--grad-cartao);border-radius:var(--raio-cartao)}
+.modal-cab,.pdf-cab,.gaveta-cab{background:var(--grad-cabeca);border-top-left-radius:inherit;border-top-right-radius:inherit}
+.modal-pe{background:var(--grad-cabeca);border-bottom-left-radius:inherit;border-bottom-right-radius:inherit}
+.gaveta{box-shadow:var(--sombra-4);background:var(--grad-cartao)}
+.pop{box-shadow:var(--sombra-4);-webkit-backdrop-filter:var(--desfoque);backdrop-filter:var(--desfoque)}
+.pop-i{transition:background var(--t-rapido) var(--curva),transform var(--t-rapido) var(--curva)}.pop-i:hover{background:var(--ok-suave);transform:translateX(2px)}
+.toast{background:var(--grad-tinta);box-shadow:var(--sombra-4),var(--relevo-escuro);border:1px solid var(--menu-linha);border-radius:99px;padding-inline:20px}
+.pdf-fundo{background:var(--grad-pagina)}
+.pdf-pag{box-shadow:var(--sombra-3)}
+
+/* ---------- login ---------- */
+.login-lado{background:var(--grad-lado);position:relative;overflow:hidden}
+.login-lado::before{content:"";position:absolute;width:520px;height:520px;right:-180px;top:-200px;border-radius:50%;background:radial-gradient(circle,var(--vidro) 0%,transparent 70%)}
+.login-lado::after{content:"";position:absolute;width:420px;height:420px;left:-160px;bottom:-200px;border-radius:50%;background:radial-gradient(circle,var(--verde-halo) 0%,transparent 70%)}
+.lado-conteudo{position:relative;z-index:1}
+.lc{background:var(--vidro);border-color:var(--menu-linha);box-shadow:var(--relevo-escuro);-webkit-backdrop-filter:var(--desfoque);backdrop-filter:var(--desfoque);transition:transform var(--t-base) var(--curva),box-shadow var(--t-base) var(--curva)}
+.lc:hover{transform:var(--salto);box-shadow:var(--sombra-3),var(--relevo-escuro)}
+.login-form-lado{background:var(--grad-pagina)}
+.login-form{background:var(--grad-cartao);border:1px solid var(--borda);border-radius:var(--raio-cartao);padding:32px 28px;box-shadow:var(--sombra-3),var(--relevo)}
+
+/* ---------- conversa (balões) e ficha ---------- */
+.m-p{box-shadow:var(--sombra-1)}
+.f-topo{background:var(--grad-cabeca)}
+.fb{background:var(--grad-cartao)}
+.fb-cab[aria-expanded="true"]{background:var(--ok-suave);box-shadow:inset 3px 0 0 var(--verde-vivo)}
+
+@media(prefers-reduced-motion:reduce){.item:hover,.btn:hover,.num-card:hover,.fe-et:hover,.ib:hover,.fe-k:hover,.rl-c:hover,.cv-tab:hover,.chip-f:hover,.mk-aba:hover,.mk-sub:hover,.mk-modo:hover,.f-aba:hover,.lc:hover{transform:none}}
+@media print{body.imprimindo *{box-shadow:none!important;animation:none!important}}

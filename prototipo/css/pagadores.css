@@ -16,7 +16,7 @@
 .tab-pag td{border-bottom:2px solid var(--borda);vertical-align:middle}
 .tab-pag tbody tr:last-child td{border-bottom:0}
 .pag-lin{cursor:pointer;transition:background var(--t-rapido) var(--curva)}
-.pag-lin:hover,.pag-lin:focus-visible{background:#F8FBF9;outline:none}
+.pag-lin:hover,.pag-lin:focus-visible{background:var(--hover);outline:none}
 .pag-lin:focus-visible td:first-child{box-shadow:inset 3px 0 0 var(--verde-marca)}
 .c-resp{padding:12px 16px;font-weight:600;font-size:13.5px;color:var(--tinta);border-right:1px solid var(--borda);overflow-wrap:anywhere}
 .c-fone{padding:12px 16px;border-right:1px solid var(--borda)}
