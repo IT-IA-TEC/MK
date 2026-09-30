@@ -1,8 +1,8 @@
 /* Tela Configurações. Tudo que muda o comportamento da 40% fica aqui. Dados de exemplo. */
 window.MKConfiguracoes=(function(){
 var U=window.MKUI,esc=U.esc,ic=U.ic,el=null,aba='usuarios',pronto=false,EU='Marina Costa';
-var MODS=[['dashboard','Dashboard'],['conversas','Conversas'],['pagadores','Pagadores e Lojas'],['fechamento','Fechamento do mês'],['recebimentos','Recebimentos'],['inadimplencia','Inadimplência e Acordos'],['configuracoes','Configurações']];
-var MODC={dashboard:'Dashboard',conversas:'Conversas',pagadores:'Pagadores',fechamento:'Fechamento',recebimentos:'Recebimentos',inadimplencia:'Inadimplência',configuracoes:'Configurações'};
+var MODS=[['dashboard','Dashboard'],['conversas','Conversas'],['pagadores','Pagadores e Lojas'],['marketplaces','Marketplaces'],['fechamento','Fechamento do mês'],['recebimentos','Recebimentos'],['inadimplencia','Inadimplência e Acordos'],['configuracoes','Configurações']];
+var MODC={dashboard:'Dashboard',conversas:'Conversas',pagadores:'Pagadores',marketplaces:'Marketplaces',fechamento:'Fechamento',recebimentos:'Recebimentos',inadimplencia:'Inadimplência',configuracoes:'Configurações'};
 var CFG=window.MK_CFG=window.MK_CFG||null;
 var DRAFT={};
 function agora(){var d=new Date();return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
@@ -20,7 +20,7 @@ function iniciar(){
     usuarios:[
       {id:1,nome:'Marina Costa',email:'marina@itmk.com.br',mods:todos.slice(),valores:true,atende:true},
       {id:2,nome:'Rafael Lima',email:'rafael@itmk.com.br',mods:todos.slice(),valores:true,atende:true},
-      {id:3,nome:'Juliana Prado',email:'juliana@itmk.com.br',mods:['dashboard','conversas','pagadores','inadimplencia'],valores:true,atende:true},
+      {id:3,nome:'Juliana Prado',email:'juliana@itmk.com.br',mods:['dashboard','conversas','pagadores','marketplaces','inadimplencia'],valores:true,atende:true},
       {id:4,nome:'Carlos Nogueira',email:'carlos@itmk.com.br',mods:['dashboard','conversas','pagadores','recebimentos'],valores:true,atende:true},
       {id:5,nome:'Patrícia Alves',email:'patricia@itmk.com.br',mods:['dashboard','fechamento','recebimentos','inadimplencia'],valores:true,atende:false}
     ],
@@ -89,7 +89,7 @@ function abaUsuarios(){
   var n={};window.MK_CONV.forEach(function(c){if(!c.arq&&c.dono)n[c.dono]=(n[c.dono]||0)+1});
   var sd=window.MK_CONV.filter(function(c){return !c.arq&&!c.dono}).length;
   var t='<div class="fe-barra"><div class="fe-info">Cada item do menu tem seu próprio controle. Toda conversa fica visível a quem tem o módulo Conversas, com ou sem dono.</div><button class="btn" data-cf="novouser" style="width:auto;padding:0 14px">Adicionar usuário</button></div>'+
-   '<div class="tab-cartao"><table class="tab-fe tab-cf"><colgroup><col style="width:16%">'+MODS.map(function(){return '<col style="width:9%">'}).join('')+'<col style="width:7%"><col style="width:7%"><col style="width:7%"></colgroup><thead><tr><th>Usuário</th>'+MODS.map(function(m){return '<th class="c">'+MODC[m[0]]+'</th>'}).join('')+'<th class="c">Ver valores em R$</th><th class="c">Atende conversas</th><th></th></tr></thead><tbody>'+
+   '<div class="tab-cartao"><table class="tab-fe tab-cf"><colgroup><col style="width:15%">'+MODS.map(function(){return '<col style="width:8%">'}).join('')+'<col style="width:7%"><col style="width:7%"><col style="width:7%"></colgroup><thead><tr><th>Usuário</th>'+MODS.map(function(m){return '<th class="c">'+MODC[m[0]]+'</th>'}).join('')+'<th class="c">Ver valores em R$</th><th class="c">Atende conversas</th><th></th></tr></thead><tbody>'+
    CFG.usuarios.map(function(u){return '<tr><td data-rot="Usuário"><div class="lj-n">'+esc(u.nome)+'</div><div class="nt">'+esc(u.email)+'</div></td>'+MODS.map(function(m){return '<td class="c" data-rot="'+esc(m[1])+'">'+sw('u.'+u.id+'.m.'+m[0],u.mods.indexOf(m[0])>-1,u.nome+': '+m[1])+'</td>'}).join('')+'<td class="c" data-rot="Ver valores em R$">'+sw('u.'+u.id+'.valores',u.valores,u.nome+': ver valores')+'</td><td class="c" data-rot="Atende conversas">'+sw('u.'+u.id+'.atende',u.atende,u.nome+': atende conversas')+'</td><td class="c"><button class="btn sec" data-cf="rmuser" data-id="'+u.id+'" style="width:auto;padding:0 10px;height:30px">Remover</button></td></tr>'}).join('')+'</tbody></table></div>'+
    '<div class="cx"><div class="cx-cab">'+ic('users')+'<h3>Dono das conversas: quem atende quem</h3><span class="c">'+sd+' sem dono</span></div>'+CFG.usuarios.filter(function(u){return u.atende}).map(function(u){var k=u.nome.split(' ')[0];return '<div class="ac-lin cf-dono"><div><div class="pg">'+esc(u.nome)+'</div><div class="nt">'+(n[k]||0)+(n[k]===1?' conversa':' conversas')+'</div></div><div></div><div></div><div class="ac-bt"><button class="btn sec" data-cf="transf" data-id="'+u.id+'">Transferir conversas</button></div></div>'}).join('')+'</div>';
   return t;

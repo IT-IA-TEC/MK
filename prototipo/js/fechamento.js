@@ -119,7 +119,7 @@ function etapa1(c){
   var linhas=c.lojas.map(function(l){
     var s=sit(c,l),p=pagador(l.pid),sm=l.fat===0||l.nao;
     return '<tr class="'+(sm?'sm':'')+'"><td data-rot="Loja (GS)"><div class="lj-n">'+esc(l.n)+(l.tag?' <span class="fs '+(l.tag==='Nova'?'ok':'at')+'">'+l.tag+'</span>':'')+'</div><div class="lj-gs">'+esc(l.gs)+'</div></td><td data-rot="Responsável" class="rp">'+(semResp(l)?'<i class="sr-r">Sem responsável</i>':esc(p.nome))+'</td>'+
-     '<td data-rot="Total faturado" class="n">'+(l.fat===null?'—':R(l.fat))+'</td><td data-rot="Imposto" class="n">'+(l.imp===null?'—':R(l.imp))+'</td><td data-rot="Alíquota %" class="n">'+(l.fat===null?'—':l.aliq+'%')+'</td><td data-rot="40% (valor a pagar)" class="n v40">'+(l.fat>0&&!l.nao?R(v40(l)):'—')+'</td><td data-rot="Situação">'+chip(s[0],s[1])+'</td>'+
+     '<td data-rot="Total faturado" class="n">'+(l.fat===null?'—':R(l.fat))+(l.origem?'<div class="nt">'+esc(l.origem)+'</div>':'')+'</td><td data-rot="Imposto" class="n">'+(l.imp===null?'—':R(l.imp))+'</td><td data-rot="Alíquota %" class="n">'+(l.fat===null?'—':l.aliq+'%')+'</td><td data-rot="40% (valor a pagar)" class="n v40">'+(l.fat>0&&!l.nao?R(v40(l)):'—')+'</td><td data-rot="Situação">'+chip(s[0],s[1])+'</td>'+
      '<td class="ac"><button class="ib" data-fe="editar" data-r="'+l.rid+'" aria-label="Editar '+esc(l.n)+'" title="Editar">'+ic('pencil')+'</button><button class="ib" data-fe="hist" data-r="'+l.rid+'" aria-label="Histórico de '+esc(l.n)+'" title="Histórico">'+ic('history')+(l.hist.length?'<em>'+l.hist.length+'</em>':'')+'</button></td></tr>';
   }).join('');
   return '<div class="fe-nota">O valor da 40% é o imposto vezes o percentual da loja (padrão 40%). Muda faturado, imposto ou percentual, o valor é refeito. Loja sem faturado vira “Sem movimento” e não gera cobrança.</div>'+
@@ -252,5 +252,13 @@ document.addEventListener('change',function(e){
   if(e.target.dataset&&e.target.dataset.selenv){selEnv[e.target.dataset.selenv]=e.target.checked;var y=window.scrollY;render();window.scrollTo(0,y)}
 });
 document.addEventListener('keydown',function(e){if(noEl(e)&&e.key==='Enter'&&e.target.dataset&&e.target.dataset.prev){var v=e.target.dataset.prev;prevPid=/^x/.test(v)?v:+v;refaz()}});
-return {render:render};
+function usarFaturado(key,gs,valor,orig){
+  iniciar();var c=comps[key];if(!c)return 'Competência não encontrada no Fechamento.';
+  if(c.fechada)return 'A competência '+c.rotulo.toLowerCase()+' está fechada. Altere pelo Fechamento, com motivo.';
+  var l=c.lojas.filter(function(x){return x.gs===gs})[0];if(!l)return 'Esta loja não está no Fechamento desta competência.';
+  var de=l.fat===null?'—':R(l.fat);l.hist.unshift({t:agora(),q:EU,c:'Faturado',de:de,para:R(valor),m:'Vindo de Marketplaces ('+orig+')'});
+  l.fat=valor;l.origem='Marketplaces · '+orig;l.conf=null;return '';
+}
+function compsApi(){iniciar();return Object.keys(comps).map(function(k){return {key:k,rotulo:comps[k].rotulo,fechada:comps[k].fechada}})}
+return {render:render,usarFaturado:usarFaturado,comps:compsApi};
 })();

@@ -2,7 +2,7 @@
 .cf-abas .rc-aba{flex:1 1 auto}
 .cf-abas .rc-aba{font-size:13.5px;padding:0 6px;text-align:center;line-height:1.2}
 .tab-cf th.c,.tab-cf td.c{text-align:center}
-.tab-cf th{font-size:10.5px;letter-spacing:.02em}.tab-cf th.c{padding-inline:3px}
+.tab-cf th{font-size:10px;letter-spacing:0}.tab-cf th.c{padding-inline:2px}
 .tab-cf td .btn{padding:0 8px!important;font-size:12px}
 .tab-cf td{vertical-align:middle}
 .tab-cf .sel{width:100%;height:34px}
