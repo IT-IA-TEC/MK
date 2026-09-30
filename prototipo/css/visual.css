@@ -171,3 +171,46 @@ p,.sub,.dica-m,.fe-aviso span,.fe-info,.fe-vazio,.mk-pe,.aviso-txt,.nt.just,.mod
 .grupo-f-cab{justify-content:center;text-align:center;padding-left:16px}
 .grupo-f-cab h3{text-align:center}
 .grupo-f-cab .c{margin-left:0}
+
+/* ---------- relatório da loja: seções identificadas, colunas largas, linhas alinhadas ---------- */
+.rl-cols{column-width:480px;column-gap:18px}
+.rl-s{padding:0;overflow:hidden;margin-bottom:18px;border-color:var(--borda-forte);box-shadow:var(--sombra-2),var(--relevo)}
+.rl-s h4{display:flex;align-items:center;gap:10px;margin:0;padding:11px 14px;font:700 13px var(--f-display);letter-spacing:.03em;text-transform:uppercase;color:var(--gc);background:linear-gradient(90deg,var(--gc-f),var(--branco));border-bottom:1px solid var(--borda-forte);box-shadow:inset 5px 0 0 var(--gc)}
+.rl-s h4 i{font:600 11.5px var(--f-maquina);font-style:normal;min-width:22px;height:22px;display:inline-grid;place-items:center;border-radius:50%;background:var(--gc);color:var(--branco);box-shadow:var(--sombra-1),var(--relevo-escuro)}
+.rs-0{--gc:var(--cat0);--gc-f:var(--cat0-f)}.rs-1{--gc:var(--cat1);--gc-f:var(--cat1-f)}.rs-2{--gc:var(--cat2);--gc-f:var(--cat2-f)}.rs-3{--gc:var(--cat3);--gc-f:var(--cat3-f)}.rs-4{--gc:var(--cat4);--gc-f:var(--cat4-f)}
+.rl-b{padding:2px 0}
+.rl-l{grid-template-columns:minmax(0,42%) minmax(0,1fr) auto;align-items:center;padding:9px 14px;border-top:0;border-bottom:1px solid var(--borda);text-align:left;hyphens:none}
+.rl-l:last-child{border-bottom:0}
+.rl-l:nth-child(even){background:var(--hover)}
+.rl-l:hover{background:var(--ok-suave)}
+.rl-k{font-size:12.5px;color:var(--apoio);text-align:left}
+.rl-v{font-size:13.5px;color:var(--tinta);text-align:left;justify-self:start;width:100%}
+.rl-v small{font-size:11.5px;color:var(--apoio);margin-top:1px}
+.rl-d{justify-self:end}
+.rl-s .tab-cartao{border:0;box-shadow:none;border-radius:0}
+.rl-s .tab-rl td,.rl-s .tab-rl th{padding:8px 12px}
+.rl-ind{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+@container (max-width:520px){.rl-l{grid-template-columns:minmax(0,1fr) auto}.rl-l .rl-v{grid-column:1 / -1;order:3}}
+
+/* ---------- ficha da loja (Preencher): campos em cartões, rótulo em cima, valor embaixo ---------- */
+.mk-corpo{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;align-items:stretch;padding:16px 20px}
+.mk-corpo>.ml,.mk-corpo>.f-sub,.mk-corpo>.fe-aviso,.mk-corpo>.tab-cartao,.mk-corpo>.nt,.mk-corpo>.fe-barra,.mk-corpo>.cmp-sel,.mk-corpo>.rl,.mk-corpo>.cx{grid-column:1 / -1}
+.mk-corpo>.f-sub{font:700 12px var(--f-display);text-transform:uppercase;letter-spacing:.06em;color:var(--verde-marca);padding:6px 2px 0;margin:0!important;border-bottom:2px solid var(--verde-claro)}
+.mk-corpo .mf{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"l o" "v v" "n n";gap:8px 10px;align-items:center;align-content:start;padding:12px 14px;border:1px solid var(--borda);border-radius:var(--raio-bloco);background:var(--grad-cartao);box-shadow:var(--sombra-1),var(--relevo);transition:box-shadow var(--t-base) var(--curva),border-color var(--t-base) var(--curva)}
+.mk-corpo .mf:last-child{border-bottom:1px solid var(--borda)}
+.mk-corpo .mf:hover,.mk-corpo .mf:focus-within{box-shadow:var(--sombra-2),var(--relevo);border-color:var(--verde-medio)}
+.mk-corpo .mf>label,.mk-corpo .mf>.mf-l{grid-area:l;font-size:12.5px;font-weight:700;color:var(--texto-2);text-align:left;hyphens:none}
+.mk-corpo .mf>.mf-v{grid-area:v;order:0;font-size:14px;color:var(--tinta)}
+.mk-corpo .mf>.mf-v b{font-size:14px}
+.mk-corpo .mf>.mo{grid-area:o;justify-self:end}
+.mk-corpo .mf>small.nt{grid-area:n;font-size:11.5px;color:var(--apoio);text-align:left;border-top:1px dashed var(--borda);padding-top:6px}
+.mk-corpo .mf.na{grid-template-areas:"l" "v";grid-template-columns:1fr;background:var(--hover)}
+.mk-corpo .mf.na b{color:var(--apoio)}
+.mk-corpo .mf .mf-calc{display:block;padding:8px 10px;background:var(--ok-suave);border-radius:var(--raio-controle);border:1px dashed var(--verde-medio)}
+.mk-corpo .ml{border:1px solid var(--borda);border-radius:var(--raio-bloco);background:var(--grad-cartao);box-shadow:var(--sombra-1),var(--relevo);padding:12px 14px}
+.mk-corpo .ml-cab{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.mk-corpo .ml-cab b{flex:1 1 200px;font-size:13px}
+/* abas das seções e modos com mais clareza */
+.mk-abas{gap:8px;background:var(--grad-cabeca);border-bottom:1px solid var(--borda-forte)}
+.mk-aba{font-weight:600}
+@media(max-width:720px){.mk-corpo{grid-template-columns:1fr;padding:12px 14px}}

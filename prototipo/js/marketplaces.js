@@ -312,7 +312,7 @@ function relLinha(f,key,da,db,tmp){
   return '<div class="rl-l"><span class="rl-k">'+esc(f.l)+'</span><span class="rl-v">'+txt+(dl&&db&&vb!==undefined&&vb!==''&&!f.lista?'<small class="nt">antes: '+esc(f.suf==='R$'?R(num(vb)):vb)+'</small>':'')+'</span><span class="rl-d">'+dlHtml(dl)+'</span></div>';
 }
 function relSecoes(gs,da,db){
-  var m=mkt(gs),h='';
+  var m=mkt(gs),h='',nsec=0;
   blocos(m).forEach(function(b){
     if(b.id==='cad')return;var rows='';
     if(b.p3){
@@ -323,7 +323,7 @@ function relSecoes(gs,da,db){
       if(f.t==='calc'&&(f.k==='desemp.faixa'))return;
       rows+=relLinha(f,f.k,da,db);
     });
-    if(rows)h+='<section class="rl-s"><h4>'+esc(b.t)+'</h4>'+rows+'</section>';
+    if(rows){h+='<section class="rl-s rs-'+(nsec%5)+'"><h4><i>'+(nsec+1)+'</i>'+esc(b.t)+'</h4><div class="rl-b">'+rows+'</div></section>';nsec++}
   });
   return h||'<div class="fe-vazio">Esta análise ainda não tem nenhum campo preenchido.</div>';
 }
