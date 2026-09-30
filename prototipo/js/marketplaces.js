@@ -338,12 +338,13 @@ function abaLojas(){
 }
 /* ---------- aba Faturamento ---------- */
 function compsF(){return window.MKFechamento.comps()}
+function chaveAl(r){var s='';for(var i=0;i<40;i++)s+=Math.floor(r()*10);return s}
 function gerarFat(key){
   if(DB.ped[key])return;var r=lcg(+key.replace('-','')),P=[],N=[],sits=['Entregue','Entregue','Entregue','Enviado','Cancelado','Devolvido'],pv=['Sem ocorrência','Sem ocorrência','Sem ocorrência','Devolução','Reclamação'],ano=+key.split('-')[0],mes=+key.split('-')[1];
   lojas().forEach(function(x){
     for(var i=0;i<4;i++){var dia=1+Math.floor(r()*27),prod=Math.round((60+r()*420)*100)/100,fr=Math.round((8+r()*24)*100)/100,de=r()<.3?Math.round(prod*.08*100)/100:0,tot=Math.round((prod+fr-de)*100)/100,st=sits[Math.floor(r()*sits.length)],num='PED'+key.replace('-','')+(10000+P.length);
       P.push({id:DB.nid++,data:ano+'-'+d2(mes)+'-'+d2(dia),num:num,gs:x.l.gs,sit:st,prod:prod,frete:fr,desc:de,total:tot,pv:st==='Devolvido'?'Devolução':pv[Math.floor(r()*pv.length)]});
-      if(st!=='Cancelado'){var dif=r()<.12?Math.round((tot*.02)*100)/100:0;N.push({id:DB.nid++,data:ano+'-'+d2(mes)+'-'+d2(Math.min(28,dia+1)),num:String(5000+N.length),serie:'1',chave:'35'+String(ano).slice(2)+d2(mes)+String(Math.floor(r()*1e30)).padStart(30,'0')+String(Math.floor(r()*1e10)).padStart(10,'0'),pedido:num,gs:x.l.gs,valor:Math.round((tot-dif)*100)/100})}}
+      if(st!=='Cancelado'){var dif=r()<.12?Math.round((tot*.02)*100)/100:0;N.push({id:DB.nid++,data:ano+'-'+d2(mes)+'-'+d2(Math.min(28,dia+1)),num:String(5000+N.length),serie:'1',chave:'35'+String(ano).slice(2)+d2(mes)+chaveAl(r),pedido:num,gs:x.l.gs,valor:Math.round((tot-dif)*100)/100})}}
   });
   DB.ped[key]=P;DB.nf[key]=N;
 }

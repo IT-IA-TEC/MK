@@ -1,0 +1,23 @@
+/* Tabelas: as colunas se distribuem pelo conteúdo e ocupam toda a largura. Ações ficam alinhadas à direita. */
+.tab-fe:not(.tab-cf):not(.tab-p3){table-layout:auto;width:100%}
+.tab-fe:not(.tab-cf):not(.tab-p3) col{width:auto!important}
+.tab-fe td.rc-ac,.tab-fe td.ac{text-align:right}
+.tab-fe td.rc-ac .btn,.tab-fe td.rc-ac select,.tab-fe td.ac .ib{vertical-align:middle}
+.tab-fe td.rc-ac .btn:last-child{margin-right:0}
+.tab-fe th:last-child:empty{width:1%}
+.tab-fe td.n,.tab-fe th.n{white-space:nowrap}
+.tab-fe td.nw,.tab-fe td.mono{white-space:nowrap}
+.tab-fe td.c,.tab-fe th.c{text-align:center}
+@container (max-width:980px){.tab-fe td.rc-ac,.tab-fe td.ac{text-align:left!important;display:block!important;white-space:normal}.tab-fe td.rc-ac select.mk-usar{width:100%;max-width:100%;display:block;margin:4px 0}.tab-fe td.rc-ac .btn{white-space:normal}}
+.tab-fe td,.tab-fe th{overflow-wrap:break-word}
+.tab-fe td.chave{word-break:break-all}
+.tab-fe td[data-rot="Data"],.tab-fe td[data-rot="Quando"],.tab-fe td[data-rot="Nº da nota"],.tab-fe td[data-rot="Série"],.tab-fe td[data-rot="Nº do pedido"],.tab-fe td[data-rot="Vencimento"],.tab-fe td[data-rot="Data do pedido"]{white-space:nowrap}
+.tab-fe td.rc-ac select.mk-usar{width:200px;max-width:none}
+.tab-fe td.rc-ac .btn{margin:2px 0 2px 6px;white-space:nowrap}
+.tab-fe td.rc-ac .btn:first-child{margin-left:0}
+@container (min-width:1300px){.tab-fe td.rc-ac{white-space:nowrap}.tab-fe td.rc-ac .btn{white-space:nowrap}}
+.tab-fe:not(.tab-cf):not(.tab-p3) td:first-child{min-width:150px}
+.tab-fe:not(.tab-cf) td.rc-ac{padding-right:12px}
+@container (max-width:980px){.tab-fe:not(.tab-cf):not(.tab-p3) td:first-child{min-width:0}}
+.tab-cf td .btn{padding:0 6px!important}
+.tab-cf th.c{font-size:9.5px;letter-spacing:0;padding-inline:0;overflow-wrap:normal;word-break:normal}

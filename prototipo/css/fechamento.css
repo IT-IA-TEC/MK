@@ -76,7 +76,7 @@
   .fe-cont{grid-template-columns:repeat(2,minmax(0,1fr))}
   .ev-grade{grid-template-columns:1fr}
 }
-@container (max-width:860px){
+@container (max-width:980px){
   .tab-fe,.tab-fe tbody,.tab-fe tr,.tab-fe td{display:block;width:100%}
   .tab-fe thead,.tab-fe colgroup{display:none}
   .tab-fe tr{padding:10px 0;border-bottom:2px solid var(--borda)}.tab-fe tbody tr:last-child{border-bottom:0}
