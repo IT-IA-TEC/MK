@@ -21,3 +21,7 @@
 
 ## Tecnologia final
 - Java + JavaFX + CSS + Spring. O HTML em `prototipo/` é o desenho aprovado. Depois de fechado, cada tela é refeita em JavaFX com as mesmas cores e medidas.
+
+## Base de método para planos e estrutura
+- Todo plano, estrutura, backlog ou roteiro pedido pelo dono segue `docs/base-po.md` (resumo dos 4 materiais de Product Owner enviados pelo dono) e é sempre voltado ao IT.MK.
+- Use o modelo da seção 10 desse arquivo: visão e meta, partes interessadas, valor, roadmap com datas, histórias e épicos, critérios de aceite, prioridade, plano de versões, riscos e o que não foi verificado, acompanhamento.
