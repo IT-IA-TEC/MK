@@ -195,3 +195,24 @@
 .pn-bl .pn-bar{grid-column:1 / -1}
 
 .mk-abas-p{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+
+/* faturamento: totais por base e quadro da base de cada loja */
+.mk-bases{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.mk-bases .fe-k b{display:block;font-size:19px;overflow-wrap:anywhere}
+.mk-bq summary{cursor:pointer;list-style:none}.mk-bq summary::-webkit-details-marker{display:none}
+.mk-bq summary .c{margin-left:auto;font:500 11px var(--f-maquina);color:var(--apoio)}
+.mk-bq[open] summary{border-bottom:1px solid var(--borda)}
+.mk-bq-g{display:flex;flex-wrap:wrap}
+.mk-bq-i{flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:6px;padding:10px 16px;border-bottom:1px solid var(--borda);border-right:1px solid var(--borda)}
+.mk-bq-m{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.mk-bq-n{padding:10px 16px}
+@container (max-width:1000px){.mk-bases{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@container (max-width:520px){.mk-bases{grid-template-columns:1fr}}
+@container (max-width:1040px) and (min-width:981px){
+  .tab-ml,.tab-ml tbody,.tab-ml tr,.tab-ml td{display:block;width:100%}
+  .tab-ml thead,.tab-ml colgroup{display:none}
+  .tab-ml tr{padding:10px 0;border-bottom:2px solid var(--borda)}.tab-ml tbody tr:last-child{border-bottom:0}
+  .tab-ml td{border:0;padding:3px 14px;text-align:left!important}
+  .tab-ml td::before{content:attr(data-rot);display:block;font:500 11px var(--f-maquina);text-transform:uppercase;letter-spacing:.05em;color:var(--apoio)}
+}
+.tab-ml td{min-width:0;max-width:100%;overflow-wrap:anywhere}

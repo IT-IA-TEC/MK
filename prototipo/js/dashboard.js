@@ -20,9 +20,11 @@ function dias(d){
 function lojas(l){return '<div class="lojas">'+l.map(function(x){return '<span class="tag">'+esc(x)+'</span>'}).join('')+'</div>'}
 function botao(txt,p,cls){return '<button class="btn '+(cls||'')+'" data-acao="'+esc(txt)+'" data-pg="'+esc(p)+'">'+esc(txt)+'</button>'}
 
+var PIXHOJE={q:6,v:11840.5};
+function aguardando(){return (window.MK_CONV||[]).filter(function(c){return !c.arq&&!c.dono}).length}
 function numeros(){
   var d=D.periodos[periodo];
-  function card(id,rot,v,nota,cls){return '<button class="num-card '+(cls||'')+'" data-lista="'+id+'"><small>'+rot+ic('arrow-up-right')+'</small><span class="n">'+v+'</span><span class="nota">'+nota+'</span></button>'}
+  function card(id,rot,v,nota,cls){return '<button class="num-card '+(cls||'')+'" '+(id==='conversas'?'data-ir="conversas"':'data-lista="'+id+'"')+'><small>'+rot+ic('arrow-up-right')+'</small><span class="n">'+v+'</span><span class="nota">'+nota+'</span></button>'}
   return '<section class="bloco"><div class="bloco-cab"><h2>Números do período</h2>'+
    '<label class="leg" for="sel-periodo" style="display:flex;align-items:center;gap:10px">Período <select class="sel" id="sel-periodo">'+
    Object.keys(D.periodos).map(function(k){return '<option value="'+k+'"'+(k===periodo?' selected':'')+'>'+D.periodos[k].rotulo+'</option>'}).join('')+'</select></label></div>'+
@@ -32,6 +34,8 @@ function numeros(){
    card('avencer','A vencer',R0(d.avencer[0]),d.avencer[1]+' cobranças enviadas')+
    card('vencido','Vencido',R0(d.vencido[0]),d.vencido[1]+' em atraso · sem passivo baixado','perigo')+
    card('pont','Pontualidade',d.pont[0]+'%',d.pont[1]+' de '+d.pont[2]+' pagos em dia')+
+   card('pixhoje','Pix pagos hoje',R0(PIXHOJE.v),PIXHOJE.q+' Pix pagos · confirmados pelo aviso automático')+
+   card('conversas','Conversas aguardando uma pessoa',String(aguardando()),'O robô passou a conversa para a equipe atender')+
    '</div></section>';
 }
 function andamento(){
@@ -121,10 +125,12 @@ function gaveta(id){
     recebido:['Recebido no mês','Pagamentos confirmados',c.filter(function(x){return x.st==='pago'}),d.recebido[1]],
     avencer:['A vencer','Cobranças enviadas que ainda não venceram',c.filter(function(x){return x.st==='avencer'}),d.avencer[1]],
     vencido:['Vencido','Em atraso, sem contar o passivo baixado',c.filter(function(x){return x.st==='vencido'}),d.vencido[1]],
-    pont:['Pontualidade','Pagamentos do mês e se chegaram em dia',c.filter(function(x){return x.st==='pago'}),d.pont[2]]
+    pont:['Pontualidade','Pagamentos do mês e se chegaram em dia',c.filter(function(x){return x.st==='pago'}),d.pont[2]],
+    pixhoje:['Pix pagos hoje','Pagamentos por Pix confirmados hoje pelo aviso automático',c.filter(function(x){return x.st==='pago'}).slice(0,PIXHOJE.q),PIXHOJE.q]
   }[id];
   titulo=mapa[0];sub=mapa[1];linhas=mapa[2];tot=mapa[3];
   function status(x){
+    if(id==='pixhoje')return 'Pix pago hoje às '+('0'+(8+(x.v|0)%10)).slice(-2)+':'+('0'+(x.v|0)%60).slice(-2)+' · baixa automática';
     if(x.st==='pago')return 'Pago '+x.em+(x.d>0?' · '+x.d+' dias depois do vencimento':' · em dia');
     if(x.st==='avencer')return 'Vence em '+(-x.d)+(-x.d===1?' dia':' dias');
     return x.d+' dias de atraso';
@@ -150,6 +156,7 @@ document.addEventListener('click',function(e){
   if(!el||!el.isConnected||!el.contains(e.target)&&el.dataset.modulo==='dashboard')return;
   var t=e.target;
   var b=t.closest('[data-filtro]');if(b){filtro=b.dataset.filtro;render();return}
+  b=t.closest('[data-ir]');if(b){if(window.MKApp&&MKApp.ir)MKApp.ir(b.dataset.ir);return}
   b=t.closest('[data-lista]');if(b){gaveta(b.dataset.lista);return}
   b=t.closest('#btn-falta');if(b){var f=document.getElementById('falta'),abre=f.hidden;f.hidden=!abre;b.setAttribute('aria-expanded',abre);return}
   b=t.closest('[data-acao]');if(b){aviso('Exemplo: "'+b.dataset.acao+'" para '+b.dataset.pg+'. Ainda sem função.')}

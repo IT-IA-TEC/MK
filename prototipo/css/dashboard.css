@@ -8,8 +8,11 @@
 select.sel{height:34px;border:1px solid var(--borda);border-radius:var(--raio-controle);background:var(--cartao);color:var(--texto);font:inherit;font-size:13px;padding:0 10px}
 .cartao-b,.andamento,.fila,.cx,.num-card,.alerta{background:var(--cartao);border:1px solid var(--borda);border-radius:var(--raio-cartao)}
 /* números */
-.numeros{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
-@media(max-width:1100px){.numeros{grid-template-columns:repeat(6,minmax(0,1fr))}.numeros .num-card{grid-column:span 2}.numeros .num-card:nth-child(n+4){grid-column:span 3}}
+.numeros{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px}
+.numeros .num-card{grid-column:span 3}
+.numeros .num-card:nth-child(n+5){grid-column:span 4}
+@media(min-width:1500px){.numeros{grid-template-columns:repeat(7,minmax(0,1fr))}.numeros .num-card,.numeros .num-card:nth-child(n+5){grid-column:auto}}
+@media(max-width:1100px){.numeros .num-card{grid-column:span 4}.numeros .num-card:nth-child(n+4){grid-column:span 3}}
 .num-card{all:unset;box-sizing:border-box;cursor:pointer;background:var(--cartao);border:1px solid var(--borda);border-radius:var(--raio-cartao);padding:14px 16px;display:flex;flex-direction:column;gap:2px;min-width:0;transition:border-color var(--t-rapido) var(--curva)}
 .num-card:hover{border-color:var(--verde-vivo)}
 .num-card:focus-visible{outline:2px solid var(--verde-marca);outline-offset:2px}
@@ -132,7 +135,7 @@ select.sel{height:34px;border:1px solid var(--borda);border-radius:var(--raio-co
 @media(max-width:720px){
   .dash{padding:16px;gap:20px}
   .numeros{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .numeros .num-card,.numeros .num-card:nth-child(n+4){grid-column:auto}
+  .numeros .num-card,.numeros .num-card:nth-child(n+4),.numeros .num-card:nth-child(n+5){grid-column:auto}
   .numeros .num-card:last-child{grid-column:1 / -1}
   .filtros{padding-inline:12px}
   .alerta{grid-template-columns:36px minmax(0,1fr)}.alerta .fim{grid-column:1 / -1;justify-content:space-between}

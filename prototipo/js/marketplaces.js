@@ -206,12 +206,24 @@ function campoHtml(f,o,key,i){
   else h+='<div class="cf-in"><input id="mf-'+esc(key)+'" data-mf="'+esc(key)+'" value="'+esc(v)+'"'+(f.padrao&&!v?' placeholder="Padrão '+f.padrao+'"':'')+'>'+(f.suf?'<span>'+f.suf+'</span>':'')+'</div>';
   return h+'</div>'+chipO('manual')+'<small class="nt">'+metaTxt(o,key)+(f.info?' · '+esc(f.info):'')+'</small></div>';
 }
-function listaHtml(f,o){
+function listaHtml(f,o,ro){
   var arr=o.d[f.k]||[];
-  return '<div class="ml"><div class="ml-cab"><b>'+esc(f.l)+'</b>'+chipO('manual')+'<button class="btn sec" data-mk="addlista" data-k="'+f.k+'" style="width:auto;padding:0 12px;height:30px">'+esc(f.add)+'</button></div>'+
-   (arr.length?'<div class="tab-cartao"><table class="tab-fe tab-ml"><thead><tr>'+f.cols.map(function(c){return '<th>'+esc(c.l)+'</th>'}).join('')+'<th></th></tr></thead><tbody>'+arr.map(function(x,i){return '<tr>'+f.cols.map(function(c){var v=x[c.c]||'';return '<td data-rot="'+esc(c.l)+'">'+esc(c.t==='data'?fiso(v):v||'—')+'</td>'}).join('')+'<td class="c"><button class="ib" data-mk="rmlista" data-k="'+f.k+'" data-i="'+i+'" aria-label="Remover linha" title="Remover">'+ic('trash-2')+'</button></td></tr>'}).join('')+'</tbody></table></div>':'<div class="fe-vazio">Nada registrado.</div>')+'</div>';
+  return '<div class="ml"><div class="ml-cab"><b>'+esc(f.l)+'</b>'+chipO(ro?'api':'manual')+(ro?'':'<button class="btn sec" data-mk="addlista" data-k="'+f.k+'" style="width:auto;padding:0 12px;height:30px">'+esc(f.add)+'</button>')+'</div>'+
+   (arr.length?'<div class="tab-cartao"><table class="tab-fe tab-ml"><thead><tr>'+f.cols.map(function(c){return '<th>'+esc(c.l)+'</th>'}).join('')+(ro?'':'<th></th>')+'</tr></thead><tbody>'+arr.map(function(x,i){return '<tr>'+f.cols.map(function(c){var v=x[c.c]||'';return '<td data-rot="'+esc(c.l)+'">'+esc(c.t==='data'?fiso(v):v||'—')+'</td>'}).join('')+(ro?'':'<td class="c"><button class="ib" data-mk="rmlista" data-k="'+f.k+'" data-i="'+i+'" aria-label="Remover linha" title="Remover">'+ic('trash-2')+'</button></td>')+'</tr>'}).join('')+'</tbody></table></div>':'<div class="fe-vazio">Nada registrado.</div>')+'</div>';
+}
+function tipoShein(gs){var c=conDe(gs,'Shein');return c?c.tipo:''}
+function devApi(gs){
+  var n=(parseInt(gs.slice(-3),10)||1)%3,d=function(k){var x=new Date(hoje());x.setDate(x.getDate()-k);return iso(x)};
+  var L=[{data:d(3),pedido:'SH'+gs.slice(-4)+'01',produto:'Vestido midi floral',motivo:'Tamanho errado'},{data:d(6),pedido:'SH'+gs.slice(-4)+'02',produto:'Blusa manga longa',motivo:'Defeito'},{data:d(9),pedido:'SH'+gs.slice(-4)+'03',produto:'Vestido midi floral',motivo:'Não gostou'},{data:d(14),pedido:'SH'+gs.slice(-4)+'04',produto:'Saia plissada',motivo:'Tamanho errado'}];
+  return L.slice(0,2+n);
 }
 function blocoHtml(b,o,gs){
+  var pre='',ro=false;
+  if(b.id==='dev'&&mkt(gs)==='Shein'){
+    var tp=tipoShein(gs);ro=tp==='Auto-operada'||tp==='Semi-gerenciada';
+    pre='<div class="fe-aviso"><span><b>Origem: '+(ro?'API':'Manual')+'.</b> '+(ro?'Na loja '+tp.toLowerCase()+', a Shein envia as devoluções sozinha. Os registros abaixo vêm da API e não podem ser editados.':tp==='Full-gerenciada'?'Na loja full-gerenciada, a Shein não envia as devoluções. Preencha à mão.':'Esta loja ainda não tem o tipo de loja na conexão. Enquanto isso, preencha à mão. O tipo se informa em Conexões.')+'</span></div>';
+    if(ro)o={d:Object.assign({},o.d,{'dev.lista':devApi(gs)}),m:o.m,snaps:o.snaps};
+  }
   var h='';
   if(b.p3){
     var itens=b.it.filter(function(f){return !f.g}),glob=b.it.filter(function(f){return f.g});
@@ -230,10 +242,10 @@ function blocoHtml(b,o,gs){
     else if(f.sec)h+='<div class="f-sub" style="margin-top:6px">'+esc(f.sec)+'</div>';
     else if(f.na)h+='<div class="mf na"><span class="mf-l">'+esc(f.l)+'</span><b>Não se aplica</b></div>';
     else if(f.fx)h+='<div class="mf"><span class="mf-l">'+esc(f.fx)+'</span><div class="mf-v"><b>'+esc(f.v({gs:gs,ini:lojaPor(gs).l.ini,resp:lojaPor(gs).p.nome}))+'</b></div><span class="mo cad">Cadastro</span><small class="nt">Vem do cadastro da loja</small></div>';
-    else if(f.lista)h+=listaHtml(f,o);
+    else if(f.lista)h+=listaHtml(f,o,ro);
     else h+=campoHtml(f,o,f.k);
   });
-  return h;
+  return pre+h;
 }
 function todosCampos(gs){ /* lista plana para comparar análises */
   var m=mkt(gs),out=[];
@@ -575,9 +587,23 @@ function filtrosF(){
 function passa(gs){var x=lojaPor(gs);return (!fLoja||gs===fLoja)&&(!fMk2||x.l.plat===fMk2)&&(!fResp2||String(x.p.id)===String(fResp2))}
 function pagina(tot){var n=Math.max(1,Math.ceil(tot/PG));if(pg1>n)pg1=n;return {n:n,ini:(pg1-1)*PG}}
 function pager(n){return '<div class="rc-pag"><button class="btn sec" data-mk="pg" data-v="-1" style="width:auto;padding:0 14px"'+(pg1<=1?' disabled':'')+'>Anterior</button><span>Página '+pg1+' de '+n+'</span><button class="btn sec" data-mk="pg" data-v="1" style="width:auto;padding:0 14px"'+(pg1>=n?' disabled':'')+'>Próxima</button></div>'}
+function somaF(a,k){return Math.round(a.reduce(function(t,x){return t+x[k]},0)*100)/100}
+function basesTopo(P,N2){
+  var nc=P.filter(function(p){return p.sit!=='Cancelado'}),ent=P.filter(function(p){return p.sit==='Entregue'});
+  var K=[['Faturamento total',somaF(nc,'total'),nc.length+' pedidos, sem os cancelados'],['Valor dos produtos',somaF(nc,'prod'),'Sem frete e sem desconto · '+nc.length+' pedidos'],['Pedidos concluídos',somaF(ent,'total'),ent.length+' pedidos entregues'],['Notas fiscais emitidas',somaF(N2,'valor'),N2.length+' notas']];
+  return '<div class="mk-bases">'+K.map(function(k){return '<div class="fe-k"><small>'+k[0]+'</small><b>'+R(k[1])+'</b><small class="nt">'+k[2]+'</small></div>'}).join('')+'</div>';
+}
+function quadroBases(){
+  var L=lojas().filter(function(x){return passa(x.l.gs)}),F=window.MKFechamento;
+  return '<details class="cx mk-bq" open><summary class="cx-cab">'+ic('layers')+'<h3>Base que cada loja usa</h3><span class="c">'+L.length+(L.length===1?' loja':' lojas')+'</span></summary><div class="mk-bq-g">'+
+   (L.length?L.map(function(x){var b=F&&F.baseDe?F.baseDe(x.l.gs):null,nm=b?(b.nome||b):'Faturamento total',man=/manual/i.test(nm);
+     return '<div class="mk-bq-i"><div class="lj-n">'+esc(x.l.n)+'</div><div class="mk-bq-m">'+logo(x.l.plat)+chip(esc(nm),man?'at':'ok')+'</div></div>'}).join(''):'<div class="fe-vazio">Nenhuma loja neste filtro.</div>')+
+   '</div><div class="nt mk-bq-n">A base é escolhida no Fechamento do mês, etapa Faturado. Lojas sem conexão ativa só aceitam valor manual.</div></details>';
+}
 function abaFat(){
-  var h=subTabs([['pedidos','Pedidos'],['notas','Notas fiscais'],['resumo','Resumo do mês']],sub,'sub','Faturamento')+'<div class="fe-barra">'+filtrosF()+'</div>';
+  var fl='<div class="fe-barra">'+filtrosF()+'</div>';
   var P=DB.ped[fComp].filter(function(p){return passa(p.gs)}),N2=DB.nf[fComp].filter(function(p){return passa(p.gs)});
+  var h=fl+basesTopo(P,N2)+quadroBases()+subTabs([['pedidos','Pedidos'],['notas','Notas fiscais'],['resumo','Resumo do mês']],sub,'sub','Faturamento');
   if(sub==='pedidos'){var pp=pagina(P.length),v=P.slice(pp.ini,pp.ini+PG);
     h+='<div class="fe-barra"><div class="fe-info"><b>'+P.length+'</b> pedidos</div><button class="btn sec" data-mk="addped" style="width:auto;padding:0 14px">Adicionar pedido</button></div><div class="tab-cartao"><table class="tab-fe tab-ml"><thead><tr><th>Data</th><th>Nº do pedido</th><th>Loja</th><th>Situação</th><th class="n">Valor dos produtos</th><th class="n">Frete</th><th class="n">Desconto</th><th class="n">Total</th><th>Pós-venda</th></tr></thead><tbody>'+
      (v.length?v.map(function(p){var x=lojaPor(p.gs);return '<tr><td data-rot="Data">'+fiso(p.data)+'</td><td data-rot="Nº do pedido" class="mono">'+esc(p.num)+'</td><td data-rot="Loja" class="rp">'+esc(x.l.n)+'</td><td data-rot="Situação">'+chip(p.sit,p.sit==='Entregue'?'vd':p.sit==='Enviado'?'ok':p.sit==='Cancelado'?'cn':'at')+'</td><td data-rot="Valor dos produtos" class="n">'+R(p.prod)+'</td><td data-rot="Frete" class="n">'+R(p.frete)+'</td><td data-rot="Desconto" class="n">'+(p.desc?R(p.desc):'—')+'</td><td data-rot="Total" class="n v40">'+R(p.total)+'</td><td data-rot="Pós-venda">'+(p.pv==='Sem ocorrência'?'<span class="nt">Sem ocorrência</span>':chip(p.pv,'gr'))+'</td></tr>'}).join(''):'<tr><td colspan="9" class="vazio-t"><b>Nenhum pedido neste filtro.</b></td></tr>')+'</tbody></table></div>'+pager(pp.n);

@@ -66,3 +66,5 @@
   .tab-cf td .cf-quando,.tab-cf td .sel{flex:1;max-width:100%}
   .cf-dono{grid-template-columns:minmax(0,1fr) auto}.cf-dono>div:nth-child(2),.cf-dono>div:nth-child(3){display:none}}
 .f-sub .btn{font-family:var(--f-corpo);text-transform:none;letter-spacing:0}
+.cf-col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.cf-col>.cx:last-child{flex:1}

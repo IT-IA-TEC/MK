@@ -56,8 +56,11 @@ function iniciar(){
     plataformas:['Shein','Mercado Livre','TikTok','Kwai','Shopee'],
     motivos:{baixa:['Passivo antigo sem chance de cobrança','Pagamento não registrado','Cobrança lançada por engano'],rejeicao:['Comprovante ilegível','Valor não confere','Não é pagamento da VHSS','Duplicado'],cancelamento:['Pagador desistiu','Pedido feito por engano','Loja continua ativa']},
     dados:{cnpj:'00.000.000/0001-00',recebedor:'VHSS Store',banco:'Itaú',suporteNome:'Atendimento IT.MK',suporteFone:'(11) 4002-8922',suporteEmail:'suporte@itmk.com.br',horario:'Segunda a sexta, das 9h às 18h',contas:[{id:1,banco:'Itaú',ag:'0312',conta:'44710-3',tipo:'Conta principal (Pix)'},{id:2,banco:'Itaú',ag:'0312',conta:'44711-1',tipo:'Conta de reserva'}]},
+    recebimento:{provedor:'Asaas',ambiente:'teste',chavePix:'00.000.000/0001-00',validadeLinkDias:30,jurosMultaLigado:false,multaPct:2,jurosPct:1,modoPix:'pagador',basePadrao:'faturamento_total',
+      acesso:{'Asaas':{t:'12/08/2026 10:05',q:'Rafael Lima'},'Banco Inter':null},cert:null,certSenha:null,aviso:{sit:'Recebendo',ultimo:{t:'29/09/2026 14:32',v:'R$ 2.478,84'}}},
     log:[{t:'01/09/2026 08:40',q:'Marina Costa',o:'Regras padrão · Tolerância de comprovante',de:'R$ 0,05',para:'R$ 0,02'},{t:'25/08/2026 17:12',q:'Rafael Lima',o:'Régua · Atraso 2 · Dia',de:'7',para:'10'}]
   };
+  CFG.usuarios.forEach(function(u){u.aprovaRobo=true});
   sincAtend();
 }
 /* ---------- componentes ---------- */
@@ -89,15 +92,15 @@ function abaUsuarios(){
   var n={};window.MK_CONV.forEach(function(c){if(!c.arq&&c.dono)n[c.dono]=(n[c.dono]||0)+1});
   var sd=window.MK_CONV.filter(function(c){return !c.arq&&!c.dono}).length;
   var t='<div class="fe-barra"><div class="fe-info">Cada item do menu tem seu próprio controle. Toda conversa fica visível a quem tem o módulo Conversas, com ou sem dono.</div><button class="btn" data-cf="novouser" style="width:auto;padding:0 14px">Adicionar usuário</button></div>'+
-   '<div class="tab-cartao"><table class="tab-fe tab-cf"><colgroup><col style="width:14%">'+MODS.map(function(){return '<col style="width:7.9%">'}).join('')+'<col style="width:6.6%"><col style="width:6.6%"><col style="width:9.6%"></colgroup><thead><tr><th>Usuário</th>'+MODS.map(function(m){return '<th class="c">'+MODC[m[0]]+'</th>'}).join('')+'<th class="c">Ver valores em R$</th><th class="c">Atende conversas</th><th></th></tr></thead><tbody>'+
-   CFG.usuarios.map(function(u){return '<tr><td data-rot="Usuário"><div class="lj-n">'+esc(u.nome)+'</div><div class="nt">'+esc(u.email)+'</div></td>'+MODS.map(function(m){return '<td class="c" data-rot="'+esc(m[1])+'">'+sw('u.'+u.id+'.m.'+m[0],u.mods.indexOf(m[0])>-1,u.nome+': '+m[1])+'</td>'}).join('')+'<td class="c" data-rot="Ver valores em R$">'+sw('u.'+u.id+'.valores',u.valores,u.nome+': ver valores')+'</td><td class="c" data-rot="Atende conversas">'+sw('u.'+u.id+'.atende',u.atende,u.nome+': atende conversas')+'</td><td class="c"><button class="btn sec" data-cf="rmuser" data-id="'+u.id+'" style="width:auto;padding:0 10px;height:30px">Remover</button></td></tr>'}).join('')+'</tbody></table></div>'+
+   '<div class="tab-cartao"><table class="tab-fe tab-cf"><colgroup><col style="width:14%">'+MODS.map(function(){return '<col style="width:6.4%">'}).join('')+'<col style="width:6.2%"><col style="width:6.2%"><col style="width:7.4%"><col style="width:9.2%"></colgroup><thead><tr><th>Usuário</th>'+MODS.map(function(m){return '<th class="c">'+MODC[m[0]]+'</th>'}).join('')+'<th class="c">Ver valores em R$</th><th class="c">Atende conversas</th><th class="c">Aprova a fila do robô</th><th></th></tr></thead><tbody>'+
+   CFG.usuarios.map(function(u){return '<tr><td data-rot="Usuário"><div class="lj-n">'+esc(u.nome)+'</div><div class="nt">'+esc(u.email)+'</div></td>'+MODS.map(function(m){return '<td class="c" data-rot="'+esc(m[1])+'">'+sw('u.'+u.id+'.m.'+m[0],u.mods.indexOf(m[0])>-1,u.nome+': '+m[1])+'</td>'}).join('')+'<td class="c" data-rot="Ver valores em R$">'+sw('u.'+u.id+'.valores',u.valores,u.nome+': ver valores')+'</td><td class="c" data-rot="Atende conversas">'+sw('u.'+u.id+'.atende',u.atende,u.nome+': atende conversas')+'</td><td class="c" data-rot="Aprova a fila do robô">'+sw('u.'+u.id+'.aprova',u.aprovaRobo!==false,u.nome+': aprova a fila do robô')+'</td><td class="c"><button class="btn sec" data-cf="rmuser" data-id="'+u.id+'" style="width:auto;padding:0 10px;height:30px">Remover</button></td></tr>'}).join('')+'</tbody></table></div>'+
    '<div class="cx"><div class="cx-cab">'+ic('users')+'<h3>Dono das conversas: quem atende quem</h3><span class="c">'+sd+' sem dono</span></div>'+CFG.usuarios.filter(function(u){return u.atende}).map(function(u){var k=u.nome.split(' ')[0];return '<div class="ac-lin cf-dono"><div><div class="pg">'+esc(u.nome)+'</div><div class="nt">'+(n[k]||0)+(n[k]===1?' conversa':' conversas')+'</div></div><div></div><div></div><div class="ac-bt"><button class="btn sec" data-cf="transf" data-id="'+u.id+'">Transferir conversas</button></div></div>'}).join('')+'</div>';
   return t;
 }
 function abaRegras(){
-  function cx(tit,ico,ks){return '<div class="cx"><div class="cx-cab">'+ic(ico)+'<h3>'+tit+'</h3></div><div class="cf-corpo">'+campos('regras',ks)+'</div></div>'}
+  function cx(tit,ico,ks,ex){return '<div class="cx"><div class="cx-cab">'+ic(ico)+'<h3>'+tit+'</h3></div><div class="cf-corpo">'+campos('regras',ks)+(ex||'')+'</div></div>'}
   return '<div class="fe-info">Mudança de regra vale daqui para frente. As cobranças já fechadas não são recalculadas.</div><div class="cf-grade2">'+
-   cx('Percentual e vencimento','percent',['regras.pct','regras.venc'])+cx('Fechamento e meses sem movimento','calendar-check',['regras.abre','regras.ultimo','regras.semMov'])+cx('Comprovantes e baixas','receipt-text',['regras.tol','regras.baixaDias'])+cx('Parcelamento','handshake',['regras.parcela','regras.maxParc','regras.period'])+'</div>'+barraSalvar();
+   cx('Percentual, base e vencimento','percent',['regras.pct','regras.venc'],rcCampo('basePadrao','Base padrão da cobrança',rcSel('basePadrao',BASESL().map(function(b){return [b.id,b.nome]}),CFG.recebimento.basePadrao),'Vale para todas as lojas. No Fechamento do mês, cada loja pode usar outra base.'))+cx('Fechamento e meses sem movimento','calendar-check',['regras.abre','regras.ultimo','regras.semMov'])+cx('Comprovantes e baixas','receipt-text',['regras.tol','regras.baixaDias'])+cx('Parcelamento','handshake',['regras.parcela','regras.maxParc','regras.period'])+'</div>'+barraSalvar();
 }
 var ACOES={equipe:'Só avisar a equipe',rev:'Enviar mensagem com revisão',auto:'Enviar mensagem sem revisão'};
 function quando(d){return d<0?'antes':d===0?'no dia':'depois'}
@@ -155,9 +158,81 @@ function abaEtiquetas(){
    '<div class="cx"><div class="cx-cab">'+ic('store')+'<h3>Plataformas</h3><button class="btn sec cx-bt" data-cf="novaplat" style="width:auto;padding:0 12px;height:30px">Nova plataforma</button></div><p class="nt" style="padding:10px 16px 0">Lista única. Não aceita a mesma plataforma com outra grafia.</p>'+CFG.plataformas.map(function(p,i){return '<div class="cf-lin"><b>'+esc(p)+'</b><div class="cf-ac"><button class="ib" data-cf="edplat" data-i="'+i+'" aria-label="Editar '+esc(p)+'" title="Editar">'+ic('pencil')+'</button><button class="ib" data-cf="rmplat" data-i="'+i+'" aria-label="Excluir '+esc(p)+'" title="Excluir">'+ic('trash-2')+'</button></div></div>'}).join('')+'</div>'+
    '<div class="cx"><div class="cx-cab">'+ic('list-checks')+'<h3>Motivos padronizados</h3></div>'+[['baixa','Baixa'],['rejeicao','Rejeição de comprovante'],['cancelamento','Cancelamento']].map(function(g){return '<div class="f-sub" style="padding:10px 16px 0;display:flex;justify-content:space-between;align-items:center">'+g[1]+'<button class="btn sec" data-cf="novomot" data-g="'+g[0]+'" style="width:auto;padding:0 10px;height:26px;font-size:12px">Novo motivo</button></div>'+mot[g[0]].map(function(x,i){return '<div class="cf-lin"><span>'+esc(x)+'</span><div class="cf-ac"><button class="ib" data-cf="edmot" data-g="'+g[0]+'" data-i="'+i+'" aria-label="Editar motivo" title="Editar">'+ic('pencil')+'</button><button class="ib" data-cf="rmmot" data-g="'+g[0]+'" data-i="'+i+'" aria-label="Excluir motivo" title="Excluir">'+ic('trash-2')+'</button></div></div>'}).join('')}).join('')+'</div></div>';
 }
+/* ---------- recebimento por Pix (grava na hora, sem botão Salvar) ---------- */
+var RCUI={};
+var REC_NOMES={provedor:'Provedor do Pix',ambiente:'Ambiente',chavePix:'Chave Pix recebedora',validadeLinkDias:'Validade do link após o vencimento',jurosMultaLigado:'Juros e multa',multaPct:'Multa',jurosPct:'Juros ao mês',modoPix:'Modo padrão do Pix',basePadrao:'Base padrão da cobrança'};
+var REC_TXT={teste:'Teste',producao:'Produção',pagador:'Um Pix por pagador',loja:'Um Pix por loja'};
+function BASESL(){return (window.MKFechamento&&MKFechamento.bases&&MKFechamento.bases())||[{id:'faturamento_total',nome:'Faturamento total'},{id:'produtos',nome:'Valor dos produtos (sem frete)'},{id:'pedidos',nome:'Pedidos concluídos'},{id:'notas',nome:'Notas fiscais emitidas'},{id:'manual',nome:'Valor manual'}]}
+function baseNomeC(id){var b=BASESL().filter(function(x){return x.id===id})[0];return b?b.nome:id}
+function rcSel(k,ops,v){return '<select class="sel" id="rc-'+k+'" data-rc="'+k+'">'+ops.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===v?' selected':'')+'>'+esc(o[1])+'</option>'}).join('')+'</select>'}
+function rcCampo(k,l,ctl,d){return '<div class="campo cf-c"><label for="rc-'+k+'">'+l+'</label>'+ctl+(d?'<small class="nt">'+d+'</small>':'')+'</div>'}
+function rcNum(k,v,suf){return '<div class="cf-in"><input id="rc-'+k+'" data-rc="'+k+'" inputmode="decimal" value="'+esc(String(v).replace('.',','))+'">'+(suf?'<span>'+suf+'</span>':'')+'</div>'}
+function segRow(k,rot,meta){
+  var abre=RCUI[k]||!meta;
+  return '<div class="mk-seg"><div><b>'+rot+'</b><div class="nt">'+(meta?'Cadastrado em '+esc(meta.t)+' por '+esc(meta.q):'Não cadastrado')+'</div></div>'+
+   (abre?'<div class="mk-seg-in"><input type="password" autocomplete="new-password" id="rc-seg-'+k+'" placeholder="Cole o valor. Ele nunca é exibido" aria-label="'+esc(rot)+'"><button class="btn sec" data-cf="rcgravar" data-s="'+k+'" style="width:auto;padding:0 12px">Gravar</button></div>':'<button class="btn sec" data-cf="rctrocar" data-s="'+k+'" style="width:auto;padding:0 12px">Trocar</button>')+'</div>';
+}
+function configurado(R){
+  if(!R.acesso[R.provedor])return 'Falta cadastrar a chave de acesso.';
+  if(R.provedor==='Banco Inter'){if(!R.cert)return 'Falta enviar o certificado.';if(!R.certSenha)return 'Falta cadastrar a senha do certificado.'}
+  return '';
+}
+function cardsReceb(){
+  var R=CFG.recebimento,inter=R.provedor==='Banco Inter',av=R.aviso,ok=av.sit==='Recebendo';
+  var c1='<div class="cx"><div class="cx-cab">'+ic('plug-zap')+'<h3>Provedor do Pix</h3></div><div class="cf-corpo">'+
+   rcCampo('provedor','Provedor do Pix',rcSel('provedor',[['Asaas','Asaas'],['Banco Inter','Banco Inter']],R.provedor))+
+   rcCampo('ambiente','Ambiente',rcSel('ambiente',[['teste','Teste'],['producao','Produção']],R.ambiente),R.ambiente==='teste'?'No teste nenhum Pix vale de verdade.':'Em produção, os Pix são reais.')+
+   segRow('acesso','Chave de acesso',R.acesso[R.provedor])+
+   (inter?'<div class="mk-seg"><div><b>Certificado</b><div class="nt">'+(R.cert?esc(R.cert.nome)+' · enviado em '+esc(R.cert.t)+' por '+esc(R.cert.q):'Nenhum arquivo enviado')+'</div></div><input type="file" id="rc-cert" data-rc="cert" accept=".pfx,.p12,.pem" aria-label="Certificado do Banco Inter"></div>'+segRow('senha','Senha do certificado',R.certSenha):'')+
+   rcCampo('chavePix','Chave Pix recebedora','<input id="rc-chavePix" data-rc="chavePix" value="'+esc(R.chavePix)+'">','Chave que recebe o dinheiro dos Pix.')+'</div></div>';
+  var c2='<div class="cx"><div class="cx-cab">'+ic('radio')+'<h3>Aviso automático de pagamento</h3></div><div class="cf-corpo">'+
+   '<div class="cf-sw"><div><b>Situação do aviso automático de pagamento</b><small>O provedor avisa o sistema assim que um Pix é pago.</small></div><span class="fs '+(ok?'vd':'gr')+'" id="rc-sit">'+(ok?'Recebendo':'Não está recebendo')+'</span></div>'+
+   '<div class="cf-sw"><div><b>Último Pix recebido</b><small>'+esc(av.ultimo.t)+'</small></div><b>'+esc(av.ultimo.v)+'</b></div>'+
+   '<button class="btn" data-cf="rctestar" style="width:auto;padding:0 16px;align-self:flex-start">Testar conexão</button></div></div>';
+  var c3='<div class="cx"><div class="cx-cab">'+ic('timer')+'<h3>Link, juros e multa</h3></div><div class="cf-corpo">'+
+   rcCampo('validadeLinkDias','Validade do link após o vencimento (dias)',rcNum('validadeLinkDias',R.validadeLinkDias,'dias'),'Depois desse prazo o Pix expira.')+
+   '<div class="cf-sw"><div><b>Juros e multa</b><small>Desligado por padrão. Quando ligado, o Pix passa a cobrar os dois depois do vencimento.</small></div><label class="sw"><input type="checkbox" role="switch" data-rc="jurosMultaLigado"'+(R.jurosMultaLigado?' checked':'')+' aria-label="Juros e multa"><span></span></label></div>'+
+   (R.jurosMultaLigado?'<div class="f-grade">'+rcCampo('multaPct','Multa (uma vez)',rcNum('multaPct',R.multaPct,'%'))+rcCampo('jurosPct','Juros (ao mês)',rcNum('jurosPct',R.jurosPct,'%'))+'</div>':'')+'</div></div>';
+  var c4='<div class="cx"><div class="cx-cab">'+ic('qr-code')+'<h3>Modo padrão do Pix</h3></div><div class="cf-corpo">'+
+   '<label class="lembrar"><input type="radio" name="rc-modo" data-rc="modoPix" value="pagador"'+(R.modoPix==='pagador'?' checked':'')+'>Um Pix por pagador (padrão): uma cobrança com o total de todas as lojas.</label>'+
+   '<label class="lembrar"><input type="radio" name="rc-modo" data-rc="modoPix" value="loja"'+(R.modoPix==='loja'?' checked':'')+'>Um Pix por loja: cada loja paga o seu valor separado.</label>'+
+   '<p class="nt">Na ficha do pagador, dá para escolher outro modo só para ele.</p></div></div>';
+  return '<div class="cf-col">'+c1+c4+'</div><div class="cf-col">'+c2+c3+'</div>';
+}
+function recebChange(t){
+  var R=CFG.recebimento,k=t.dataset.rc,v,ant=R[k];
+  if(k==='cert'){var f=t.files&&t.files[0];if(!f)return;R.cert={nome:f.name,t:agora(),q:EU};reg('Recebimento · Certificado','—',f.name);pintar();U.toast('Certificado enviado. Ele não fica visível.');return}
+  if(t.type==='checkbox')v=t.checked;else if(t.type==='radio')v=t.value;else v=t.value;
+  if(k==='validadeLinkDias'||k==='multaPct'||k==='jurosPct'){
+    var n=+String(v).replace(',','.');var max=k==='validadeLinkDias'?365:100;
+    if(isNaN(n)||n<(k==='validadeLinkDias'?1:0)||n>max||(k==='validadeLinkDias'&&n%1)){U.toast('Informe um número entre '+(k==='validadeLinkDias'?'1 e 365 dias.':'0 e 100.'));pintar();return}v=n}
+  if(k==='chavePix'&&!String(v).trim()){U.toast('Informe a chave Pix recebedora.');pintar();return}
+  if(v===ant)return;
+  R[k]=v;
+  var d=function(x){return REC_TXT[x]||(k==='basePadrao'?baseNomeC(x):x)};
+  reg('Recebimento · '+REC_NOMES[k],d(ant),d(v));
+  if(k==='provedor'){var f2=configurado(R);R.aviso.sit=f2?'Não está recebendo':'Recebendo'}
+  if(k==='provedor'||k==='ambiente'||k==='jurosMultaLigado')pintar();
+  U.toast('Alteração salva e registrada.'+(k==='provedor'&&configurado(R)?' '+configurado(R):''));
+  var h=document.querySelector('[data-cf="historico"]');if(h)h.textContent='Histórico de alterações ('+CFG.log.length+')';
+}
+function testarConexao(){
+  var R=CFG.recebimento,f=configurado(R),antes=R.aviso.sit;
+  R.aviso.sit=f?'Não está recebendo':'Recebendo';
+  if(!f)R.aviso.testado=agora();
+  reg('Recebimento · Teste de conexão',antes,R.aviso.sit);
+  pintar();U.toast(f?'A conexão não funcionou. '+f:'Conexão com '+R.provedor+' funcionando ('+REC_TXT[R.ambiente].toLowerCase()+'). O aviso automático está recebendo.');
+}
+function gravarSeg(k){
+  var R=CFG.recebimento,i=document.getElementById('rc-seg-'+k);if(!i||!i.value.trim()){U.toast('Cole o valor para gravar.');return}
+  var meta={t:agora(),q:EU};
+  if(k==='acesso')R.acesso[R.provedor]=meta;else R.certSenha=meta;
+  i.value='';delete RCUI[k];reg('Recebimento · '+(k==='acesso'?'Chave de acesso ('+R.provedor+')':'Senha do certificado'),'—','nova (valor não exibido)');
+  pintar();U.toast('Gravado. O valor não fica visível em nenhum lugar.');
+}
 function abaDados(){
   var d=CFG.dados;
-  return '<div class="fe-aviso"><span>Alterar aqui atualiza todos os modelos de mensagem e a conferência de comprovantes ao mesmo tempo.</span></div><div class="cf-grade2"><div class="cx"><div class="cx-cab">'+ic('qr-code')+'<h3>Pix</h3></div><div class="cf-corpo">'+campos('dados',['dados.cnpj','dados.recebedor','dados.banco'])+'<div class="f-sub">Como aparece nas mensagens</div><pre class="pv-txt md-pv" id="dd-pv">'+esc(ddPrev())+'</pre></div></div>'+
+  return '<div class="fe-aviso"><span>Alterar aqui atualiza todos os modelos de mensagem e a conferência de comprovantes ao mesmo tempo.</span></div><div class="cf-grade2">'+cardsReceb()+'<div class="cx"><div class="cx-cab">'+ic('qr-code')+'<h3>Pix</h3></div><div class="cf-corpo">'+campos('dados',['dados.cnpj','dados.recebedor','dados.banco'])+'<div class="f-sub">Como aparece nas mensagens</div><pre class="pv-txt md-pv" id="dd-pv">'+esc(ddPrev())+'</pre></div></div>'+
    '<div class="cx"><div class="cx-cab">'+ic('headphones')+'<h3>Contato de suporte</h3></div><div class="cf-corpo">'+campos('dados',['dados.suporteNome','dados.suporteFone','dados.suporteEmail','dados.horario'])+'<p class="nt">Aparece nas mensagens de atraso e de aviso de bloqueio.</p></div></div></div>'+
    '<div class="cx"><div class="cx-cab">'+ic('landmark')+'<h3>Contas aceitas como destino do comprovante</h3><button class="btn sec cx-bt" data-cf="novaconta" style="width:auto;padding:0 12px;height:30px">Adicionar conta</button></div>'+
    '<div class="cf-tab"><table class="tab-fe tab-cf"><thead><tr><th>Banco</th><th>Agência</th><th>Conta</th><th>Tipo</th><th></th></tr></thead><tbody>'+d.contas.map(function(c){return '<tr><td data-rot="Banco">'+esc(c.banco)+'</td><td data-rot="Agência" class="mono">'+esc(c.ag)+'</td><td data-rot="Conta" class="mono">'+esc(c.conta)+'</td><td data-rot="Tipo">'+esc(c.tipo)+'</td><td class="c"><button class="btn sec" data-cf="rmconta" data-id="'+c.id+'" style="width:auto;padding:0 10px;height:30px">Remover</button></td></tr>'}).join('')+'</tbody></table></div></div>'+barraSalvar();
@@ -232,12 +307,12 @@ function papel(p){
 }
 function confirmarExcluir(tit,txt,fn){U.modal({titulo:tit,ok:'Excluir',perigo:true,html:'<p>'+txt+'</p><p class="dica-m" style="margin-top:8px">A alteração fica registrada no histórico.</p>',onOk:fn})}
 function usuarioNovo(){
-  U.modal({titulo:'Adicionar usuário',ok:'Adicionar usuário',html:'<div class="f-grade"><div class="campo"><label for="nu-n">Nome <i class="obr">*</i></label><input id="nu-n"></div><div class="campo"><label for="nu-e">E-mail <i class="obr">*</i></label><input id="nu-e" type="email"></div></div><div class="campo" style="margin-top:12px"><label>Módulos que pode abrir</label><div class="cf-multi">'+MODS.map(function(m,i){return '<label class="lembrar"><input type="checkbox" data-nm="'+m[0]+'"'+(i<2?' checked':'')+'>'+m[1]+'</label>'}).join('')+'</div></div><label class="lembrar" style="margin-top:12px"><input type="checkbox" id="nu-v" checked>Pode ver valores em R$</label><label class="lembrar" style="margin-top:6px"><input type="checkbox" id="nu-a">Atende conversas</label><small class="erro" id="nu-er" hidden></small>',
+  U.modal({titulo:'Adicionar usuário',ok:'Adicionar usuário',html:'<div class="f-grade"><div class="campo"><label for="nu-n">Nome <i class="obr">*</i></label><input id="nu-n"></div><div class="campo"><label for="nu-e">E-mail <i class="obr">*</i></label><input id="nu-e" type="email"></div></div><div class="campo" style="margin-top:12px"><label>Módulos que pode abrir</label><div class="cf-multi">'+MODS.map(function(m,i){return '<label class="lembrar"><input type="checkbox" data-nm="'+m[0]+'"'+(i<2?' checked':'')+'>'+m[1]+'</label>'}).join('')+'</div></div><label class="lembrar" style="margin-top:12px"><input type="checkbox" id="nu-v" checked>Pode ver valores em R$</label><label class="lembrar" style="margin-top:6px"><input type="checkbox" id="nu-a">Atende conversas</label><label class="lembrar" style="margin-top:6px"><input type="checkbox" id="nu-r" checked>Aprova a fila do robô</label><small class="erro" id="nu-er" hidden></small>',
     onOk:function(m){var n=m.querySelector('#nu-n').value.trim(),e=m.querySelector('#nu-e').value.trim(),er=m.querySelector('#nu-er');
       if(!n||!/^\S+@\S+\.\S+$/.test(e)){er.textContent='Informe o nome e um e-mail válido.';er.hidden=false;return false}
       if(CFG.usuarios.some(function(u){return u.email.toLowerCase()===e.toLowerCase()})){er.textContent='Já existe um usuário com esse e-mail.';er.hidden=false;return false}
       var mods=[].slice.call(m.querySelectorAll('[data-nm]')).filter(function(c){return c.checked}).map(function(c){return c.dataset.nm});
-      CFG.usuarios.push({id:Date.now(),nome:n,email:e,mods:mods,valores:m.querySelector('#nu-v').checked,atende:m.querySelector('#nu-a').checked});sincAtend();reg('Usuários · adicionado','—',n+' ('+mods.map(function(x){return MODC[x]}).join(', ')+')');pintar();U.toast('Usuário adicionado.')}});
+      CFG.usuarios.push({id:Date.now(),nome:n,email:e,mods:mods,valores:m.querySelector('#nu-v').checked,atende:m.querySelector('#nu-a').checked,aprovaRobo:m.querySelector('#nu-r').checked});sincAtend();reg('Usuários · adicionado','—',n+' ('+mods.map(function(x){return MODC[x]}).join(', ')+')');pintar();U.toast('Usuário adicionado.')}});
 }
 function transferir(u){
   var outros=CFG.usuarios.filter(function(x){return x!==u&&x.atende});
@@ -267,6 +342,9 @@ document.addEventListener('click',function(e){
   if((b=t.closest('[data-var]'))){var ta=document.getElementById('md-t');if(ta){var s=ta.selectionStart,v=ta.value;ta.value=v.slice(0,s)+'{'+b.dataset.var+'}'+v.slice(ta.selectionEnd);ta.focus();ta.dispatchEvent(new Event('input',{bubbles:true}))}return}
   if(!(b=t.closest('[data-cf]')))return;
   var a=b.dataset.cf,id=b.dataset.id;
+  if(a==='rctrocar'){RCUI[b.dataset.s]=true;pintar();return}
+  if(a==='rcgravar'){gravarSeg(b.dataset.s);return}
+  if(a==='rctestar'){testarConexao();return}
   if(a==='salvar')salvar();else if(a==='descartar'){DRAFT={};pintar()}
   else if(a==='historico')historico();
   else if(a==='novouser')usuarioNovo();
@@ -297,11 +375,13 @@ document.addEventListener('click',function(e){
 });
 document.addEventListener('change',function(e){
   if(!noEl(e))return;var t=e.target;
+  if(t.dataset.rc!==undefined){recebChange(t);return}
   if(t.dataset.k&&t.dataset.f===undefined){ /* interruptores imediatos */
     var p=t.dataset.k.split('.');
     if(p[0]==='u'){var u=CFG.usuarios.filter(function(x){return String(x.id)===p[1]})[0];
       if(p[2]==='m'){var i=u.mods.indexOf(p[3]);if(t.checked&&i<0)u.mods.push(p[3]);if(!t.checked&&i>-1)u.mods.splice(i,1);reg('Usuários · '+u.nome+' · '+MODC[p[3]],!t.checked,t.checked)}
       else if(p[2]==='valores'){u.valores=t.checked;reg('Usuários · '+u.nome+' · Ver valores em R$',!t.checked,t.checked)}
+      else if(p[2]==='aprova'){u.aprovaRobo=t.checked;reg('Usuários · '+u.nome+' · Aprova a fila do robô',!t.checked,t.checked)}
       else if(p[2]==='atende'){u.atende=t.checked;sincAtend();reg('Usuários · '+u.nome+' · Atende conversas',!t.checked,t.checked);pintar()}}
     else if(p[0]==='et'){var e2=CFG.etapas.filter(function(x){return String(x.id)===p[1]})[0];e2.ativa=t.checked;reg('Régua · '+e2.nome+' · Ativa',!t.checked,t.checked)}
     else if(p[0]==='pausas'){CFG.pausas[p[1]]=t.checked;reg('Régua · Pausa por '+p[1],!t.checked,t.checked)}
@@ -323,5 +403,6 @@ document.addEventListener('input',function(e){
   if(t.dataset.f&&t.type!=='checkbox'&&t.tagName!=='SELECT'){DRAFT[t.dataset.f]=lerCampo(t);atualizaBarra();if(aba==='dados'){var pv=document.getElementById('dd-pv');if(pv)pv.textContent=ddPrev()}}
   if(t.dataset.mt){var id=t.dataset.mt;DRAFT['m.'+id]=t.value;var m=CFG.modelos.filter(function(x){return x.id===id})[0];document.getElementById('md-pv').textContent=previa(t.value);var dirty=t.value!==m.texto;document.getElementById('md-pend').textContent=dirty?'Alteração pendente.':'Nenhuma alteração pendente.';document.querySelectorAll('[data-cf="mdsalvar"],[data-cf="mddescartar"]').forEach(function(b){b.disabled=!dirty})}
 });
+iniciar();
 return {render:render};
 })();
