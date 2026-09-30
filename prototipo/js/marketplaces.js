@@ -1,10 +1,10 @@
 /* Tela Marketplaces: conexões, lojas (ficha), faturamento e aplicativos. Tudo preenchido à mão por enquanto. */
 window.MKMarketplaces=(function(){
-var U=window.MKUI,esc=U.esc,ic=U.ic,PAGS=window.MK_PAG,el=null,pronto=false,EU='Marina Costa';
-var aba='conexoes',subC='Todas',subL='Todas',subA='Shein',fq='',fSit='',fResp='',sub='pedidos',fComp='',fLoja='',fMk2='',fResp2='',pg1=1,PG=25;
-var MKTS=['Shein','Mercado Livre','Kwai'],SITS=['Sem conexão','Aguardando autorização','Conectada','Com erro','Vencida'];
+var F=window.MKFiltro,U=window.MKUI,esc=U.esc,ic=U.ic,PAGS=window.MK_PAG,el=null,pronto=false,EU='Marina Costa';
+var aba='painel',subC='Todas',subL='Todas',subA='Shein',fq='',fSit='',fResp='',sub='pedidos',fComp='',fLoja='',fMk2='',fResp2='',pg1=1,PG=25;
+var MKTS=['Shein','Mercado Livre','Shopee','Kwai'],SITS=['Sem conexão','Aguardando autorização','Conectada','Com erro','Vencida'];
 var SITC={'Sem conexão':'cn','Aguardando autorização':'ok','Conectada':'vd','Com erro':'gr','Vencida':'at'};
-var LOGO={'Shein':['SH','#000000','#FFFFFF'],'Mercado Livre':['ML','#FFE600','#2D3277'],'Kwai':['KW','#FF5000','#FFFFFF']};
+var LOGO={'Shein':['SH','#000000','#FFFFFF'],'Mercado Livre':['ML','#FFE600','#2D3277'],'Shopee':['SP','#EE4D2D','#FFFFFF'],'Kwai':['KW','#FF5000','#FFFFFF']};
 var DB={con:[],lj:{},apps:{},ped:{},nf:{},nid:1};
 function R(v){return 'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function num(s){return +(''+s).replace(/\./g,'').replace(',','.')||0}
@@ -26,7 +26,7 @@ function chip(t,c){return '<span class="fs '+c+'">'+t+'</span>'}
 function validade(c){
   if(c.mkt==='Shein')return null;if(!c.autEm)return undefined;
   var a=c.autEm.split('-'),d=new Date(+a[0],+a[1]-1,+a[2]);
-  if(c.mkt==='Kwai')d.setDate(d.getDate()+365);else d.setMonth(d.getMonth()+6);return d;
+  if(c.mkt==='Kwai')d.setDate(d.getDate()+365);else if(c.mkt==='Shopee')d.setDate(d.getDate()+(+c.validDias||365));else d.setMonth(d.getMonth()+6);return d;
 }
 function sitEf(c){var v=validade(c);if(c.sit==='Conectada'&&v&&v<hoje())return 'Vencida';return c.sit}
 function validTxt(c){
@@ -38,7 +38,7 @@ function sitLoja(x){var c=conDe(x.l.gs,x.l.plat);return c?sitEf(c):'Sem conexão
 /* ---------- dados iniciais ---------- */
 var PERMS_ML=['Pedidos','Reclamações','Promoções','Faturamento','Métricas'],PERMS_KW=['user_info','merchant_item','merchant_order'];
 function novaCon(x,mkt,sit,aut){
-  var p=x.p,l=x.l,c={id:DB.nid++,gs:l.gs,mkt:mkt||l.plat,sit:sit||'Sem conexão',login:'',publico:'',idExt:'',tipo:'',pais:mkt==='Mercado Livre'||l.plat==='Mercado Livre'?'Brasil (MLB)':'',quem:'',autEm:'',perms:[],obs:'',seg:{chave:null,token:null},at:null};
+  var p=x.p,l=x.l,c={id:DB.nid++,gs:l.gs,mkt:mkt||l.plat,sit:sit||'Sem conexão',login:'',publico:'',idExt:'',tipo:'',pais:mkt==='Mercado Livre'||l.plat==='Mercado Livre'?'Brasil (MLB)':'',tipoVend:'',tipoLojaSp:'',validDias:'365',quem:'',autEm:'',perms:[],obs:'',seg:{chave:null,token:null},at:null};
   return c;
 }
 function iniciar(){
@@ -46,11 +46,12 @@ function iniciar(){
   L.forEach(function(x,i){
     var k=i%8,sit=['Conectada','Conectada','Conectada','Sem conexão','Aguardando autorização','Conectada','Com erro','Conectada'][k];
     if(sit==='Sem conexão')return;
-    var c=novaCon(x,null,sit),mk=c.mkt,dias=mk==='Kwai'?(i%3===0?400:90):mk==='Mercado Livre'?(i%2?200:60):120;
+    var c=novaCon(x,null,sit),mk=c.mkt,dias=mk==='Kwai'?(i%3===0?400:90):mk==='Mercado Livre'?(i%2?200:60):mk==='Shopee'?20:120;
     if(sit==='Conectada'&&i%9===0&&mk!=='Shein')dias=mk==='Kwai'?380:210;
     var d=new Date(hoje());d.setDate(d.getDate()-dias);
     c.login=x.l.n.toLowerCase().replace(/[^a-z0-9]+/g,'.').replace(/^\.|\.$/g,'').slice(0,24);c.publico=x.l.n;
-    c.idExt=mk==='Shein'?'SH'+(100000+Math.floor(r()*899999)):mk==='Mercado Livre'?String(200000000+Math.floor(r()*99999999)):'KW'+(700000+Math.floor(r()*299999));
+    c.idExt=mk==='Shein'?'SH'+(100000+Math.floor(r()*899999)):mk==='Mercado Livre'?String(200000000+Math.floor(r()*99999999)):mk==='Shopee'?String(300000000+Math.floor(r()*99999999)):'KW'+(700000+Math.floor(r()*299999));
+    if(mk==='Shopee'){c.tipoVend=i%2?'CPF':'CNPJ';c.tipoLojaSp=i%3?'Local':'Cross-border';c.validDias=['30','90','180','365'][i%4]}
     if(mk==='Shein')c.tipo=tipos[i%3];
     if(sit!=='Aguardando autorização'){c.quem=x.p.nome;c.autEm=iso(d)}
     c.perms=mk==='Kwai'?PERMS_KW.slice():mk==='Mercado Livre'?PERMS_ML.slice(0,4):[];
@@ -62,23 +63,43 @@ function iniciar(){
   DB.apps={
     'Shein':{id:'SHEIN-APP-2208',seg:{t:'12/03/2026 14:10',q:'Rafael Lima'},tipo:'Semi-gerenciada',url:'https://itmk.com.br/marketplaces/shein/retorno',ips:'200.150.10.21\n200.150.10.22',sit:'Aprovado',criado:'10/03/2026',troca:'12/03/2026'},
     'Mercado Livre':{id:'7410025583961204',seg:{t:'05/04/2026 09:35',q:'Rafael Lima'},tipo:'',url:'https://itmk.com.br/marketplaces/ml/retorno',ips:'',sit:'Aprovado',criado:'01/04/2026',troca:'05/04/2026'},
+    'Shopee':{id:'SHOPEE-ERP-5102',seg:{t:'02/06/2026 11:20',q:'Rafael Lima'},tipo:'ERP',url:'https://itmk.com.br/marketplaces/shopee/retorno-teste',urlProd:'https://itmk.com.br/marketplaces/shopee/retorno',ips:'200.150.10.21\n200.150.10.22',sit:'Aprovado',criado:'28/05/2026',troca:'02/06/2026'},
     'Kwai':{id:'KWAI-CLI-3301',seg:{t:'20/05/2026 16:00',q:'Marina Costa'},tipo:'',url:'https://itmk.com.br/marketplaces/kwai/retorno',ips:'',sit:'Em revisão',criado:'18/05/2026',troca:'20/05/2026'}
   };
-  /* ficha de exemplo em duas lojas, com duas análises salvas */
-  var a=L[0].l.gs,b=L[5].l.gs;
-  [a,b].forEach(function(gs,i){var o=lj(gs);var M=mkt(gs);
-    var d=o.d;d['cad.login']='loja.exemplo.'+(i+1);d['cad.publico']=lojaPor(gs).l.n;d['cad.link']='https://'+(M==='Kwai'?'kwai.com':M==='Shein'?'shein.com':'mercadolivre.com.br')+'/loja/'+gs;d['cad.antiga']='2024-0'+(3+i)+'-12';
-    if(M==='Shein'){d['cat.limite']='1000';d['cat.publicados']='742';d['cat.ativos']='690';d['cat.esgotados']='34';d['cat.inativos']='18';d['viol.aval_neg']='4';d['diag.boa']='86%';d['diag.nota']='4,4';d['desemp.nq']='4,6';d['desemp.nl']='4,3';d['desemp.dsr']='4,7';d['desemp.nivel']='Bom';d['desemp.pont']='96%';d['desemp.rank']='32º'}
-    d['viol.lista']=[{data:'2026-09-02',motivo:'Imagem fora do padrão',pen:'Remoção do produto',pts:'2',sit:'Em análise',rec:'Sim',prazo:'2026-10-05'}];
-    d['viol.recursos']=[{data:'2026-09-03',viol:'Imagem fora do padrão',res:'Apresentado'}];
-    d['dev.lista']=[{data:'2026-09-10',pedido:'GS2609'+(1000+i),produto:'Vestido midi floral',motivo:'Tamanho errado'},{data:'2026-09-14',pedido:'GS2609'+(1100+i),produto:'Vestido midi floral',motivo:'Tamanho errado'},{data:'2026-09-20',pedido:'GS2609'+(1200+i),produto:'Blusa manga longa',motivo:'Defeito'}];
-    d['p0.titulo']='Vestido midi floral com manga bufante verão 2026';d['p0.fotos']='8';d['p0.preco']='119,90';d['p0.vendas']='180';d['p0.conc']='Loja Alfa: 129,90\nLoja Beta: 134,00\nLoja Gama: 124,90';d['p0.estoque']='P:12 M:20 G:8';d['p0.var']='3 cores, 3 tamanhos';
-    d['mkt.camp']=[{nome:'Liquida de Verão',tipo:'Clearance',periodo:'01/09 a 15/09'}];d['mkt.cupom']='Sim';d['mkt.cupom_qtd']='2';d['mkt.fonte']='Avant Pro';d['preco.fonte']='Avant Pro';
-    d['diag.cd']=[{produto:'Blusa manga longa',cls:'C2'}];
-    Object.keys(d).forEach(function(k){o.m[k]={q:['Marina Costa','Rafael Lima'][i],t:'1'+i+'/09/2026 11:0'+i}});
-    o.snaps=[{id:DB.nid++,data:'2026-08-12',autor:'Rafael Lima',obs:'Primeira análise',d:JSON.parse(JSON.stringify(d))}];
-    o.snaps[0].d['cat.publicados']=M==='Shein'?'701':'';o.snaps[0].d['desemp.dsr']=M==='Shein'?'4,5':'';
-    o.snaps.push({id:DB.nid++,data:'2026-09-15',autor:'Marina Costa',obs:'Análise de setembro',d:JSON.parse(JSON.stringify(d))});
+  /* fichas de exemplo: nem toda loja tem análise (Sem análise / Em dia / Desatualizada) */
+  var PLANO=[[0,5],[1,40],[2,12],[3,null],[4,60],[5,8],[6,null],[7,3],[8,75],[9,null],[10,20],[11,null],[12,2],[13,48],[14,null],[15,9],[16,33],[17,null],[18,6],[19,null],[20,14],[21,null]];
+  var rr=lcg(77),dt=function(n){var x=new Date(hoje());x.setDate(x.getDate()-n);return iso(x)};
+  function ini(v,d){return String(Math.round(v*(d||1)))}
+  PLANO.forEach(function(pl){
+    var x=L[pl[0]];if(!x||pl[1]===null)return;var gs=x.l.gs,o=lj(gs),M=x.l.plat,i=pl[0],d=o.d;
+    d['cad.login']='loja.exemplo.'+(i+1);d['cad.publico']=x.l.n;d['cad.link']='https://loja.exemplo/'+gs;d['cad.antiga']='2024-0'+(3+i%6)+'-12';
+    d['mkt.camp']=[{nome:'Campanha do mês',tipo:'Desconto',periodo:'01/09 a 15/09'}];d['mkt.cupom']='Sim';d['mkt.cupom_qtd']=String(1+i%3);
+    d['dev.lista']=[{data:dt(pl[1]+4),pedido:'GS'+(1000+i),produto:'Vestido midi floral',motivo:'Tamanho errado',status:'Reembolsada'},{data:dt(pl[1]+6),pedido:'GS'+(1100+i),produto:'Blusa manga longa',motivo:'Defeito',status:'Em disputa'}];
+    d['fat.pedidos']=String(120+i*17);d['fat.total']=String(9000+i*1330).replace(/\B(?=(\d{3})+$)/g,'.');
+    d['p0.titulo']='Vestido midi floral com manga bufante verão 2026';d['p0.fotos']='8';d['p0.preco']='119,90';d['p0.vendas']='180';d['p0.conc']='Loja Alfa: 129,90\nLoja Beta: 134,00';d['p0.estoque']='P:12 M:20 G:8';d['mkt.fonte']='Avant Pro';d['preco.fonte']='Avant Pro';
+    if(M==='Shein'){d['cat.limite']='1000';d['cat.publicados']=String(700+i*9);d['cat.ativos']=String(650+i*8);d['cat.esgotados']='34';d['cat.inativos']='18';d['viol.aval_neg']=String(2+i%4);d['diag.boa']=(80+i%15)+'%';d['diag.nota']='4,'+(2+i%7);d['desemp.nq']='4,'+(3+i%6);d['desemp.nl']='4,3';d['desemp.dsr']='4,'+(4+i%5);d['desemp.nivel']='Bom';d['desemp.pont']=(90+i%9)+'%';d['desemp.rank']=(10+i)+'º';d['desemp.faixa']=['Excelente','Boa','Regular'][i%3];d['fin.comissao']=String(800+i*70);d['fin.servico']='120';d['fin.transacao']='95';d['fin.repasse']=String(6000+i*900);
+      d['viol.lista']=[{data:dt(pl[1]+2),motivo:'Imagem fora do padrão',pen:'Remoção do produto',pts:'2',sit:'Em análise',rec:'Sim',prazo:dt(-5)}];d['viol.recursos']=[{data:dt(pl[1]+1),viol:'Imagem fora do padrão',res:'Apresentado'}];d['diag.cd']=[{produto:'Blusa manga longa',cls:'C2'}];d['diag.prob']=String(3+i%5)}
+    if(M==='Mercado Livre'){d['cat.ativos']=String(300+i*12);d['cat.pausados']='14';d['cat.encerrados']='60';d['cat.rest_classico']='400';d['cat.rest_premium']='250';d['desemp.cor']=['Verde','Amarelo','Verde','Laranja','Vermelho'][i%5];d['desemp.lider']='Sem faixa';d['desemp.recl']=String(1+i%3);d['desemp.canc']='1';d['desemp.atraso']=String(2+i%4);d['fin.comissao']=String(1100+i*60);d['fin.servico']='0';d['fin.transacao']='150';d['fin.repasse']=String(7000+i*800);
+      d['viol.lista']=i%2?[]:[{data:dt(pl[1]+3),motivo:'Anúncio com infração',pen:'Pausa',pts:'1',sit:'Ativa',rec:'Sim',prazo:dt(-7)}];d['diag.prob']=String(2+i%4)}
+    if(M==='Shopee'){d['cat.sp_normal']=String(260+i*11);d['cat.sp_banido']=String(i%3);d['cat.sp_nlistado']='8';d['cat.sp_rev']=String(2+i%3);d['cat.sp_exc_v']='12';d['cat.sp_exc_s']=String(i%2);d['cat.sp_limites']='Moda feminina: 500\nAcessórios: 200';d['cat.estoque']=String(1800+i*40);
+      d['viol.pontos']=String(i%4);d['viol.punicoes']=i%2?[]:[{tipo:'Limite de listagem',inicio:dt(pl[1]+10),fim:dt(-4),lim_list:'50 itens/dia',lim_ped:'—'}];d['viol.itens']=[{item:'Conjunto verão',motivo:'Imagem com marca d\'água',prazo:dt(-6)}];
+      d['diag.sp_nivel']=['Melhorar','Qualificado','Excelente'][i%3];d['diag.sp_tipo']='Descrição curta';d['diag.prob']=String(2+i%5);
+      d['desemp.sp_nota']=String(2+i%3);d['desemp.sp_nao_cumpre']=String(1+i%3);d['desemp.sp_cancel']=String(1+i%2);d['desemp.sp_devol']=String(2+i%3);d['desemp.sp_atraso']=String(2+i%4);d['desemp.sp_preparo']='1,5';d['desemp.sp_chat']=String(85+i%12);d['desemp.sp_notaloja']='4,'+(5+i%4);
+      d['fin.comissao']=String(900+i*50);d['fin.servico']='140';d['fin.transacao']='110';d['fin.repasse']=String(6500+i*700)}
+    if(M==='Kwai'){d['cat.rev_em']='4';d['cat.rev_ap']=String(200+i*5);d['cat.rev_rep']='6';d['cat.rev_viol']='2';d['cat.v_fora']='10';d['cat.v_no']=String(180+i*4);d['desemp.faixa']=['Boa','Regular','Excelente'][i%3];d['desemp.nq']='4,'+(1+i%8);
+      d['viol.lista']=[];d['diag.prob']=String(1+i%3)}
+    Object.keys(d).forEach(function(k){o.m[k]={q:['Marina Costa','Rafael Lima'][i%2],t:fd(new Date(hoje().getTime()-pl[1]*86400000))+' 11:00'}});
+    /* análise anterior: um pouco pior/diferente, 45 dias antes da última */
+    var ant=JSON.parse(JSON.stringify(d));
+    ['cat.ativos','cat.sp_normal','cat.v_no'].forEach(function(k){if(ant[k])ant[k]=String(Math.round(num(ant[k])*0.94))});
+    ['fat.pedidos'].forEach(function(k){ant[k]=String(Math.round(num(ant[k])*0.9))});
+    ant['fat.total']=String(Math.round(num(d['fat.total'])*0.88)).replace(/\B(?=(\d{3})+$)/g,'.');
+    if(ant['viol.lista']&&!ant['viol.lista'].length)ant['viol.lista']=[{data:dt(pl[1]+40),motivo:'Antiga',pen:'Aviso',pts:'1',sit:'Encerrada',rec:'Não',prazo:''}];
+    if(M==='Shopee'){ant['desemp.sp_nota']=String(Math.max(1,num(d['desemp.sp_nota'])-(i%2)));ant['desemp.sp_atraso']=String(num(d['desemp.sp_atraso'])+1)}
+    if(M==='Mercado Livre')ant['desemp.cor']=i%2?'Amarelo':ant['desemp.cor'];
+    if(M==='Shein'){ant['desemp.dsr']='4,1';ant['diag.boa']='78%'}
+    ant['dev.lista']=ant['dev.lista'].slice(0,1);
+    o.snaps=[{id:DB.nid++,data:dt(pl[1]+45),autor:'Rafael Lima',obs:'Primeira análise',d:ant},{id:DB.nid++,data:dt(pl[1]),autor:'Marina Costa',obs:'Análise mais recente',d:JSON.parse(JSON.stringify(d))}];
   });
 }
 function mkt(gs){var x=lojaPor(gs);return x?x.l.plat:'Shein'}
@@ -89,7 +110,7 @@ function tem(d,k){return String(d[k]||'').trim()!==''}
 function top(arr,f,n){var c={};arr.forEach(function(x){var v=f(x);if(v)c[v]=(c[v]||0)+1});return Object.keys(c).sort(function(a,b){return c[b]-c[a]}).slice(0,n).map(function(k){return k+' ('+c[k]+')'}).join('; ')||'—'}
 function semanaAnt(d){var h=hoje(),dow=(h.getDay()+6)%7,fim=new Date(h);fim.setDate(h.getDate()-dow-1);var ini=new Date(fim);ini.setDate(fim.getDate()-6);return [ini,fim]}
 function blocos(m){
-  var S=m==='Shein',M=m==='Mercado Livre',K=m==='Kwai';
+  var S=m==='Shein',M=m==='Mercado Livre',K=m==='Kwai',P=m==='Shopee';
   var NA={na:1,l:'Não se aplica neste marketplace'};
   var out=[];
   out.push({id:'cad',t:'Cadastro',it:[
@@ -99,6 +120,7 @@ function blocos(m){
   var cat=[];
   if(S){cat=[{info:'A cota de SKC da Shein renova todo mês.'},{k:'cat.limite',l:'Limite total de SKC',t:'num'},{k:'cat.publicados',l:'SKC publicados',t:'num'},{k:'cat.saldo',l:'Saldo de SKC',t:'calc',f:function(d){return tem(d,'cat.limite')?String(N(d,'cat.limite')-N(d,'cat.publicados')):'—'}},{k:'cat.ativos',l:'Produtos ativos',t:'num'},{k:'cat.esgotados',l:'Produtos esgotados',t:'num'},{k:'cat.inativos',l:'Produtos inativos',t:'num'},{k:'cat.total',l:'Total de produtos',t:'calc',f:function(d){var t=N(d,'cat.ativos')+N(d,'cat.esgotados')+N(d,'cat.inativos');return t?String(t):'—'}}]}
   else if(M){cat=[{k:'cat.ativos',l:'Anúncios ativos',t:'num'},{k:'cat.pausados',l:'Anúncios pausados',t:'num'},{k:'cat.encerrados',l:'Anúncios encerrados',t:'num'},{k:'cat.rest_classico',l:'Anúncios restantes · Clássico',t:'num'},{k:'cat.rest_premium',l:'Anúncios restantes · Premium',t:'num'}]}
+  else if(P){cat=[{info:'Situação dos itens e limites por categoria vêm da Shopee.'},{k:'cat.sp_normal',l:'Itens normais',t:'num'},{k:'cat.sp_banido',l:'Itens banidos',t:'num'},{k:'cat.sp_nlistado',l:'Itens não listados',t:'num'},{k:'cat.sp_rev',l:'Itens em revisão',t:'num'},{k:'cat.sp_exc_v',l:'Itens excluídos pelo vendedor',t:'num'},{k:'cat.sp_exc_s',l:'Itens excluídos pela Shopee',t:'num'},{k:'cat.sp_limites',l:'Limites por categoria',t:'area'},{k:'cat.estoque',l:'Estoque total (soma dos modelos)',t:'num'}]}
   else{cat=[{info:'A Kwai não tem campo de limite de publicação nesta documentação.'},{sec:'Situação de revisão'},{k:'cat.rev_em',l:'Em revisão',t:'num'},{k:'cat.rev_ap',l:'Aprovado',t:'num'},{k:'cat.rev_rep',l:'Reprovado',t:'num'},{k:'cat.rev_viol',l:'Reprovado por violação',t:'num'},{sec:'Situação de venda'},{k:'cat.v_fora',l:'Fora do ar',t:'num'},{k:'cat.v_no',l:'No ar',t:'num'},{k:'cat.v_fora_rev',l:'Fora do ar em revisão',t:'num'},{k:'cat.v_ban',l:'Banido',t:'num'},{k:'cat.v_edit',l:'Aguardando edição',t:'num'}]}
   out.push({id:'cat',t:'Catálogo',it:cat});
   var viol=[{lista:1,k:'viol.lista',l:'Violações',add:'Adicionar violação',cols:[{c:'data',l:'Data',t:'data'},{c:'motivo',l:'Motivo',t:'txt'},{c:'pen',l:'Penalidade',t:'txt'},{c:'pts',l:'Pontos',t:'txt'},{c:'sit',l:'Situação',t:'txt'},{c:'rec',l:'Permite recurso',t:'sel',op:['Sim','Não']},{c:'prazo',l:'Prazo do recurso',t:'data'}]},
@@ -112,11 +134,19 @@ function blocos(m){
    {k:'viol.taxa',l:'Taxa de aprovação dos recursos da semana anterior',t:'calc',f:function(d){var w=semanaAnt(d),r=(d['viol.recursos']||[]).filter(function(x){if(!x.data)return false;var a=x.data.split('-'),dt=new Date(+a[0],+a[1]-1,+a[2]);return dt>=w[0]&&dt<=w[1]});if(!r.length)return '—';return Math.round(r.filter(function(x){return x.res==='Aprovado'}).length/r.length*100)+'%'}}];
   if(S)viol.push({sec:'Penalidade financeira (extrato)'},{k:'viol.debitado',l:'Valor debitado',t:'num',suf:'R$'},{k:'viol.compensado',l:'Valor compensado',t:'num',suf:'R$'});
   else viol.push({na:1,l:'Penalidade financeira: não se aplica neste marketplace'});
+  if(P)viol=[{k:'viol.pontos',l:'Pontos de penalidade do trimestre',t:'num'},
+   {lista:1,k:'viol.punicoes',l:'Punições (em curso e encerradas)',add:'Adicionar punição',cols:[{c:'tipo',l:'Tipo',t:'txt'},{c:'inicio',l:'Início',t:'data'},{c:'fim',l:'Fim',t:'data'},{c:'lim_list',l:'Limite de listagem',t:'txt'},{c:'lim_ped',l:'Limite de pedidos',t:'txt'}]},
+   {lista:1,k:'viol.itens',l:'Itens com problema',add:'Adicionar item',cols:[{c:'item',l:'Item',t:'txt'},{c:'motivo',l:'Motivo',t:'txt'},{c:'prazo',l:'Prazo para corrigir',t:'data'}]},
+   {na:1,l:'Recurso: a Shopee não tem recurso. Só aparece o efeito na pontuação.'},{sec:'Contadores'},
+   {k:'viol.total',l:'Total de punições',t:'calc',f:function(d){return String((d['viol.punicoes']||[]).length)}},
+   {k:'viol.curso',l:'Punições em curso',t:'calc',f:function(d){var h=iso(hoje());return String((d['viol.punicoes']||[]).filter(function(x){return !x.fim||x.fim>=h}).length)}},
+   {k:'viol.itens_n',l:'Itens com problema',t:'calc',f:function(d){return String((d['viol.itens']||[]).length)}}];
   out.push({id:'viol',t:'Violações e recursos',it:viol});
   out.push({id:'dev',t:'Devoluções e pós-venda',it:[{lista:1,k:'dev.lista',l:'Registros de pós-venda',add:'Adicionar registro',cols:[{c:'data',l:'Data',t:'data'},{c:'pedido',l:'Pedido',t:'txt'},{c:'produto',l:'Produto',t:'txt'},{c:'motivo',l:'Motivo',t:'txt'}]},{sec:'Contadores'},
     {k:'dev.total',l:'Total de registros',t:'calc',f:function(d){return String((d['dev.lista']||[]).length)}},
     {k:'dev.motivos',l:'Motivos mais frequentes',t:'calc',f:function(d){return top(d['dev.lista']||[],function(x){return x.motivo},3)}},
     {k:'dev.produtos',l:'Produtos que mais concentram devoluções e reclamações',t:'calc',f:function(d){return top(d['dev.lista']||[],function(x){return x.produto},3)}}]});
+  if(P)out[out.length-1].it[0].cols.push({c:'status',l:'Status',t:'sel',op:['Solicitada','Em disputa','Reembolsada','Compensada']});
   out.push({id:'prod',t:'Produtos analisados',p3:1,it:[
     {k:'titulo',l:'Título',t:'txt'},{k:'chars',l:'Quantidade de caracteres do título',t:'calc',f:function(d,i){var t=d['p'+i+'.titulo']||'';return t?String(t.length):'—'}},
     {k:'desc',l:'Descrição',t:'area'},{k:'attrs',l:'Atributos preenchidos',t:'txt'},{k:'fotos',l:'Fotos',t:'num'},{k:'img_cor',l:'Imagem própria para cada cor',t:'sel',op:['Sim','Não']},{k:'video',l:'Vídeo',t:'sel',op:['Sim','Não']},
@@ -133,16 +163,36 @@ function blocos(m){
     {sec:'Categorias A e C/D'},{k:'diag.a',l:'Produtos na categoria A',t:'num'},{k:'diag.c',l:'Produtos nas categorias C/D',t:'num'},{k:'diag.tot',l:'Total de produtos avaliados',t:'num'},
     {k:'diag.pa',l:'Proporção em A',t:'calc',f:function(d){return N(d,'diag.tot')?Math.round(N(d,'diag.a')/N(d,'diag.tot')*100)+'%':'—'}},{k:'diag.pc',l:'Proporção em C/D',t:'calc',f:function(d){return N(d,'diag.tot')?Math.round(N(d,'diag.c')/N(d,'diag.tot')*100)+'%':'—'}},
     {lista:1,k:'diag.cd',l:'Produtos classificados como C1, C2, D1 e D2',add:'Adicionar produto',cols:[{c:'produto',l:'Produto',t:'txt'},{c:'cls',l:'Classificação',t:'sel',op:['C1','C2','D1','D2']}]}]});
+  if(P)out[out.length-1].it=[{k:'diag.sp_nivel',l:'Nível do diagnóstico de conteúdo',t:'sel',op:['Melhorar','Qualificado','Excelente']},{k:'diag.sp_tipo',l:'Tipo de problema',t:'area'},{k:'diag.prob',l:'Produtos com problemas',t:'num'},{k:'diag.data',l:'Data de atualização do diagnóstico',t:'data'},{k:'diag.neg',l:'Taxa geral de avaliações negativas',t:'txt'}];
   var des=[];
   if(M)des=[{k:'desemp.cor',l:'Nível: cor da reputação',t:'sel',op:['Verde','Amarelo','Laranja','Vermelho']},{k:'desemp.lider',l:'Faixa de Mercado Líder',t:'sel',op:['Sem faixa','MercadoLíder','MercadoLíder Gold','MercadoLíder Platinum']},{k:'desemp.recl',l:'Taxa de reclamações',t:'num',suf:'%'},{k:'desemp.canc',l:'Taxa de cancelamentos',t:'num',suf:'%'},{k:'desemp.atraso',l:'Taxa de atraso no despacho',t:'num',suf:'%'},{na:1,l:'DSR e ranking de fulfillment: não se aplicam ao Mercado Livre'}];
   else des=[{k:'desemp.nq',l:'Nota de qualidade',t:'txt'},{k:'desemp.nl',l:'Nota de logística',t:'txt'},{k:'desemp.dsr',l:'Pontuação geral do DSR',t:'txt'},{k:'desemp.nivel',l:'Nível de qualidade da loja',t:'txt'},{lista:1,k:'desemp.nao',l:'Critérios marcados como “Não atende”',add:'Adicionar critério',cols:[{c:'crit',l:'Critério',t:'txt'}]},{k:'desemp.pont',l:'Índice de pontualidade da coleta',t:'txt'},{k:'desemp.rank',l:'Ranking de fulfillment',t:'txt'}];
+  if(P)des=[{k:'desemp.sp_nota',l:'Nota da loja (1 a 4)',t:'sel',op:['1','2','3','4']},{k:'desemp.sp_nao_cumpre',l:'Taxa de não cumprimento',t:'num',suf:'%'},{k:'desemp.sp_cancel',l:'Taxa de cancelamento',t:'num',suf:'%'},{k:'desemp.sp_devol',l:'Taxa de devolução',t:'num',suf:'%'},{k:'desemp.sp_atraso',l:'Taxa de atraso de envio',t:'num',suf:'%'},{k:'desemp.sp_preparo',l:'Tempo de preparo',t:'num',suf:'dias'},{k:'desemp.sp_chat',l:'Resposta no chat',t:'num',suf:'%'},{k:'desemp.sp_notaloja',l:'Avaliação dos compradores (nota da loja)',t:'num'},{na:1,l:'Selo “Preferido”: não existe na Shopee'}];
+  if(M)des.unshift({k:'desemp.faixa',l:'Faixa de saúde da loja',t:'calc',f:function(d){return faixaDeCor(d['desemp.cor'])},info:'Convertida da cor da reputação'});
+  else if(P)des.push({k:'desemp.faixa',l:'Faixa de saúde da loja',t:'calc',f:function(d){return faixaDeNota(d['desemp.sp_nota'])},info:'Convertida da nota de 1 a 4'});
+  else des.push({k:'desemp.faixa',l:'Faixa de saúde da loja (preenchida por analista)',t:'sel',op:['Excelente','Boa','Regular','Ruim']});
   out.push({id:'desemp',t:'Desempenho',it:des});
+  var fin=[{k:'fat.pedidos',l:'Pedidos no mês',t:'num'},{k:'fat.total',l:'Faturamento no mês',t:'num',suf:'R$'}];
+  if(K)fin.push({na:1,l:'Taxas e comissões: não existem na Kwai'});
+  else fin.push({sec:'Taxas e comissões'},{k:'fin.comissao',l:M?'Tarifa de venda':'Comissão',t:'num',suf:'R$'},{k:'fin.servico',l:'Taxa de serviço',t:'num',suf:'R$'},{k:'fin.transacao',l:'Taxa de transação',t:'num',suf:'R$'},{k:'fin.repasse',l:'Repasse',t:'num',suf:'R$'});
+  out.push({id:'fin',t:'Financeiro',it:fin});
   return out;
 }
+function faixaDeCor(c){return {'Verde':'Excelente','Amarelo':'Boa','Laranja':'Regular','Vermelho':'Ruim'}[c]||'—'}
+function faixaDeNota(n){n=num(n);return n>=4?'Excelente':n>=3?'Boa':n>=2?'Regular':n>=1?'Ruim':'—'}
+var FX=['Ruim','Regular','Boa','Excelente'],FXC={'Excelente':'vd','Boa':'ok','Regular':'at','Ruim':'gr'};
+function faixaLoja(gs){var d=lj(gs).d,m=mkt(gs);return m==='Mercado Livre'?faixaDeCor(d['desemp.cor']):m==='Shopee'?faixaDeNota(d['desemp.sp_nota']):(d['desemp.faixa']||'—')}
+function ultimaAn(gs){var s=lj(gs).snaps.slice().sort(function(a,b){return a.data<b.data?1:-1});return s[0]||null}
+function seloAn(gs){var u=ultimaAn(gs);if(!u)return {t:'Sem análise',c:'cn',dias:null,data:null};var a=u.data.split('-'),dd=Math.round((hoje()-new Date(+a[0],+a[1]-1,+a[2]))/86400000);return dd<=30?{t:'Em dia',c:'vd',dias:dd,data:u.data}:{t:'Desatualizada',c:'at',dias:dd,data:u.data}}
+function seloHtml(gs){var s=seloAn(gs);return '<span class="fs '+s.c+'" title="'+(s.data?'Última análise em '+fiso(s.data)+' ('+s.dias+' dias)':'Nenhuma análise salva')+'">'+s.t+'</span>'}
+function pN(s){var t=String(s===undefined||s===null?'':s).replace(/[^0-9,.\-]/g,'');if(!t||t==='-')return null;if(t.indexOf(',')>-1)t=t.replace(/\./g,'').replace(',','.');else if((t.match(/\./g)||[]).length>1||/^-?\d{1,3}\.\d{3}$/.test(t))t=t.replace(/\./g,'');var v=parseFloat(t);return isNaN(v)?null:v}
+function nv(d,k){return tem(d,k)?pN(d[k]):null}
+function soma(arr){var t=null;arr.forEach(function(v){if(v!==null&&v!==undefined)t=(t||0)+v});return t}
+function indic(gs){return indicD(lj(gs).d,mkt(gs))}
 function precos(t){return String(t||'').split('\n').map(function(x){var m=x.split(':');return m.length>1?num(m[m.length-1]):0}).filter(function(v){return v>0})}
-var ABAS_F=['cad','cat','viol','dev','prod','preco','mkt','diag','desemp','hist'];
-var NOMES_F={cad:'Cadastro',cat:'Catálogo',viol:'Violações e recursos',dev:'Devoluções e pós-venda',prod:'Produtos analisados',preco:'Preços e concorrência',mkt:'Marketing',diag:'Diagnóstico e qualidade',desemp:'Desempenho',hist:'Histórico de análises'};
-var fichaAba='cad',fichaGs=null,cmpA='',cmpB='atual',cmpTodos=false;
+var ABAS_F=['cad','cat','viol','dev','prod','preco','mkt','diag','desemp','fin','hist'];
+var NOMES_F={cad:'Cadastro',cat:'Catálogo',viol:'Violações e recursos',dev:'Devoluções e pós-venda',prod:'Produtos analisados',preco:'Preços e concorrência',mkt:'Marketing',diag:'Diagnóstico e qualidade',desemp:'Desempenho',fin:'Financeiro',hist:'Histórico de análises'};
+var fichaModo='preencher',relSnap='',fichaAba='cad',fichaGs=null,cmpA='',cmpB='atual',cmpTodos=false;
 /* ---------- desenho da ficha da loja ---------- */
 function chipO(o){return '<span class="mo '+o+'" title="'+(o==='manual'?'Preenchido à mão. Quando o motor for ligado, vira API e deixa de ser editável.':o==='calc'?'Calculado pelo sistema.':'Vem da API.')+'">'+(o==='manual'?'Manual':o==='calc'?'Calculado':'API')+'</span>'}
 function metaTxt(o,k){var m=o.m[k];return m?'Preenchido por '+esc(m.q)+' em '+esc(m.t.indexOf('/')>-1?m.t:fd(new Date())):'Ainda não preenchido'}
@@ -197,29 +247,198 @@ function valSnap(d,c){var v=d[c.k];if(c.lista)return (v&&v.length?v.length+(v.le
 function histHtml(gs,o){
   var sn=o.snaps.slice().sort(function(a,b){return a.data<b.data?1:-1});
   var opt=function(sel,atual){return (atual?'<option value="atual"'+(sel==='atual'?' selected':'')+'>Análise em andamento (não salva)</option>':'')+sn.map(function(s){return '<option value="'+s.id+'"'+(String(s.id)===String(sel)?' selected':'')+'>'+fiso(s.data)+' · '+esc(s.autor)+'</option>'}).join('')};
-  var h='<div class="fe-barra"><div class="fe-info">Cada análise é uma foto da loja, com data e autor. Elas nunca são apagadas.</div><button class="btn" data-mk="salvaranalise" style="width:auto;padding:0 14px">Salvar análise</button></div>';
+  var h='<div class="fe-barra"><div class="fe-info">Cada análise é uma foto da loja, com data e autor. Elas nunca são apagadas. Para ver o relatório ou comparar, use os modos no alto da ficha.</div><button class="btn" data-mk="salvaranalise" style="width:auto;padding:0 14px">Salvar análise</button></div>';
   h+='<div class="tab-cartao"><table class="tab-fe tab-ml"><thead><tr><th>Data da análise</th><th>Autor</th><th>Observação</th></tr></thead><tbody>'+(sn.length?sn.map(function(s){return '<tr><td data-rot="Data da análise">'+fiso(s.data)+'</td><td data-rot="Autor">'+esc(s.autor)+'</td><td data-rot="Observação">'+esc(s.obs||'—')+'</td></tr>'}).join(''):'<tr><td colspan="3" class="vazio-t">Nenhuma análise salva ainda.</td></tr>')+'</tbody></table></div>';
-  if(sn.length){
-    if(!cmpA||!sn.some(function(s){return String(s.id)===String(cmpA)}))cmpA=sn[sn.length>1?1:0].id;
-    var A=sn.filter(function(s){return String(s.id)===String(cmpA)})[0],B=cmpB==='atual'?{d:o.d,data:'',autor:''}:sn.filter(function(s){return String(s.id)===String(cmpB)})[0]||{d:o.d};
-    var rows=todosCampos(gs).map(function(c){return {c:c,a:valSnap(A.d,c),b:valSnap(B.d,c)}});var dif=rows.filter(function(r){return r.a!==r.b});
-    h+='<div class="cx"><div class="cx-cab">'+ic('git-compare')+'<h3>Comparar duas análises</h3></div><div class="cmp-sel"><label class="sel-p"><span>Análise A</span><select class="sel" id="cmp-a">'+opt(cmpA,false)+'</select></label><label class="sel-p"><span>Análise B</span><select class="sel" id="cmp-b">'+opt(cmpB,true)+'</select></label><label class="lembrar"><input type="checkbox" id="cmp-t"'+(cmpTodos?' checked':'')+'>Mostrar todos os campos</label></div>'+
-     '<table class="tab-fe tab-ml"><thead><tr><th>Campo</th><th>Análise A</th><th>Análise B</th></tr></thead><tbody>'+((cmpTodos?rows:dif).length?(cmpTodos?rows:dif).map(function(r){return '<tr class="'+(r.a!==r.b?'dif':'')+'"><td data-rot="Campo">'+esc(r.c.l)+'</td><td data-rot="Análise A">'+esc(r.a)+'</td><td data-rot="Análise B">'+esc(r.b)+'</td></tr>'}).join(''):'<tr><td colspan="3" class="vazio-t">Nenhuma diferença entre as duas análises.</td></tr>')+'</tbody></table></div>';
-  }
   return h;
 }
-function abrirFicha(gs){fichaGs=gs;fichaAba='cad';pintar();window.scrollTo(0,0)}
+/* ---------- indicadores comparáveis (mesma régua em todas as plataformas) ---------- */
+var IND=[{id:'ativos',t:'Produtos ativos',dir:'mais'},{id:'viol',t:'Violações e penalidades',dir:'menos'},{id:'dev',t:'Devoluções',dir:'menos'},{id:'faixa',t:'Faixa de saúde',ord:FX},{id:'fat',t:'Faturamento e pedidos',dir:'mais'},{id:'taxas',t:'Taxas e comissões',dir:'neutro'},{id:'camp',t:'Campanhas e cupons',dir:'neutro'}];
+var ORD={'desemp.faixa':FX,'desemp.cor':['Vermelho','Laranja','Amarelo','Verde'],'diag.sp_nivel':['Melhorar','Qualificado','Excelente']};
+var MENOS=['viol.lista','viol.total','viol.punicoes','viol.itens','viol.itens_n','viol.curso','viol.pontos','viol.aval_neg','viol.rej','viol.debitado','dev.lista','dev.total','desemp.canc','desemp.recl','desemp.atraso','desemp.sp_cancel','desemp.sp_devol','desemp.sp_atraso','desemp.sp_nao_cumpre','desemp.sp_preparo','diag.prob','diag.neg','diag.c','diag.pc','cat.sp_banido','cat.rev_rep','cat.rev_viol','diag.cd'];
+var MAIS=['cat.ativos','cat.sp_normal','cat.v_no','cat.rev_ap','fat.pedidos','fat.total','desemp.nq','desemp.nl','desemp.dsr','desemp.pont','desemp.sp_nota','desemp.sp_chat','desemp.sp_notaloja','diag.boa','diag.nota','diag.a','diag.pa','viol.aprov','viol.taxa'];
+function dirDe(k){return MENOS.indexOf(k)>-1?'menos':MAIS.indexOf(k)>-1?'mais':'neutro'}
+function fmtN(v){return v===null||v===undefined?'—':Number(v).toLocaleString('pt-BR',{maximumFractionDigits:2})}
+function dlt(a,b,dir,ord,pct){
+  if(a===null||a===undefined||b===null||b===undefined||a===''||b==='')return null;
+  var df;if(ord){var ia=ord.indexOf(a),ib=ord.indexOf(b);if(ia<0||ib<0)return null;df=ia-ib;dir='mais'}else df=a-b;
+  var seta=df>0?'▲':df<0?'▼':'=',cls=df===0||!dir||dir==='neutro'?'neu':((dir==='mais')===(df>0)?'mel':'pio');
+  return {seta:seta,cls:cls,txt:ord?(df===0?'igual':'antes: '+b):(df===0?'sem mudança':(df>0?'+':'−')+fmtN(Math.abs(df))+(pct?'%':''))};
+}
+function dlHtml(d){return d?'<span class="dl '+d.cls+'"><b aria-hidden="true">'+d.seta+'</b> '+esc(d.txt)+'<span class="sr"> ('+(d.cls==='mel'?'melhorou':d.cls==='pio'?'piorou':'sem julgamento')+')</span></span>':''}
+function indicD(d,m){
+  var r={};
+  r.ativos=m==='Shopee'?nv(d,'cat.sp_normal'):m==='Kwai'?nv(d,'cat.v_no'):nv(d,'cat.ativos');
+  r.viol=m==='Shopee'?(d['viol.punicoes']||[]).length:(d['viol.lista']||[]).length;
+  r.dev=(d['dev.lista']||[]).length;
+  var fx=m==='Mercado Livre'?faixaDeCor(d['desemp.cor']):m==='Shopee'?faixaDeNota(d['desemp.sp_nota']):(d['desemp.faixa']||'—');r.faixa=fx==='—'?null:fx;
+  r.pedidos=nv(d,'fat.pedidos');r.fat=nv(d,'fat.total');
+  r.taxas=m==='Kwai'?'na':soma([nv(d,'fin.comissao'),nv(d,'fin.servico'),nv(d,'fin.transacao')]);
+  r.camp=(d['mkt.camp']||[]).length;r.cupons=nv(d,'mkt.cupom_qtd');
+  return r;
+}
+function indVal(r,id){
+  switch(id){
+   case 'ativos':return {t:fmtN(r.ativos),n:r.ativos};
+   case 'viol':return {t:fmtN(r.viol),n:r.viol};
+   case 'dev':return {t:fmtN(r.dev),n:r.dev};
+   case 'faixa':return {t:r.faixa||'—',o:r.faixa};
+   case 'fat':return {t:r.fat===null?'—':R(r.fat),n:r.fat,sub:r.pedidos===null?'':fmtN(r.pedidos)+' pedidos'};
+   case 'taxas':return r.taxas==='na'?{t:'Não se aplica',na:1}:{t:r.taxas===null?'—':R(r.taxas),n:r.taxas};
+   case 'camp':return {t:fmtN(r.camp)+(r.camp===1?' campanha':' campanhas'),n:r.camp,sub:r.cupons===null?'cupons não informados':fmtN(r.cupons)+(r.cupons===1?' cupom':' cupons')};
+  }
+}
+function indDelta(ind,ra,rb){var a=indVal(ra,ind.id),b=indVal(rb,ind.id);if(a.na||b.na)return null;return ind.ord?dlt(a.o,b.o,null,ind.ord):dlt(a.n,b.n,ind.dir)}
+/* ---------- relatório de uma loja (uma página, só leitura) ---------- */
+function snapsOrd(gs){return lj(gs).snaps.slice().sort(function(a,b){return a.data<b.data?1:a.data>b.data?-1:b.id-a.id})}
+function relDados(gs){
+  var sn=snapsOrd(gs),o=lj(gs),i=-1;
+  if(relSnap&&relSnap!=='atual')sn.forEach(function(s,k){if(String(s.id)===String(relSnap))i=k});
+  if(relSnap==='atual'||(!sn.length)){return {atual:{id:'atual',d:o.d,data:'',autor:'Análise em andamento (não salva)',obs:''},ant:sn[0]||null,sn:sn}}
+  if(i<0)i=0;return {atual:sn[i],ant:sn[i+1]||null,sn:sn};
+}
+function valCampo(d,f,key){if(f.t==='calc')return f.f(d,0);if(f.lista)return (d[key]||[]).length;return d[key]===undefined?'':d[key]}
+function listaTxt(f,arr){return arr.map(function(x){return esc(f.cols.map(function(c){var v=x[c.c]||'';return v?(c.t==='data'?fiso(v):v):''}).filter(Boolean).join(' · '))}).join('<br>')||'—'}
+function relLinha(f,key,da,db,tmp){
+  var va=valCampo(da,f,key),vb=db?valCampo(db,f,key):undefined;
+  if((va===''||va==='—')&&(vb===undefined||vb===''||vb==='—'))return '';
+  var dl=null,o=ORD[key];
+  if(db&&vb!==undefined&&vb!==''&&va!==''){
+    if(f.lista)dl=dlt(va,vb,dirDe(key));
+    else if(o)dl=dlt(va,vb,null,o);
+    else{var x=pN(va),y=pN(vb);if(x!==null&&y!==null)dl=dlt(x,y,dirDe(key),null,String(va).indexOf('%')>-1&&f.t!=='num');else if(String(va)!==String(vb))dl={seta:'●',cls:'neu',txt:'mudou'}}
+  }
+  var txt=f.lista?listaTxt(f,da[key]||[]):esc(va===''?'—':va+(f.suf&&f.suf!=='R$'&&va!=='—'&&String(va).indexOf(f.suf)<0?' '+f.suf:''));
+  if(f.suf==='R$'&&va!==''&&va!=='—'&&!f.lista)txt=esc(R(num(va)));
+  return '<div class="rl-l"><span class="rl-k">'+esc(f.l)+'</span><span class="rl-v">'+txt+(dl&&db&&vb!==undefined&&vb!==''&&!f.lista?'<small class="nt">antes: '+esc(f.suf==='R$'?R(num(vb)):vb)+'</small>':'')+'</span><span class="rl-d">'+dlHtml(dl)+'</span></div>';
+}
+function relSecoes(gs,da,db){
+  var m=mkt(gs),h='';
+  blocos(m).forEach(function(b){
+    if(b.id==='cad')return;var rows='';
+    if(b.p3){
+      var fs=b.it.filter(function(f){return !f.g}).map(function(f){var vs=[0,1,2].map(function(i){var v=f.t==='calc'?f.f(da,i):(da['p'+i+'.'+f.k]||'');return v===''||v===undefined?'—':String(v)});return vs.some(function(v){return v!=='—'})?'<tr><td data-rot="Campo">'+esc(f.l)+'</td>'+vs.map(function(v,i){return '<td data-rot="Produto '+(i+1)+'">'+esc(v)+'</td>'}).join('')+'</tr>':''}).join('');
+      if(fs)rows='<div class="tab-cartao"><table class="tab-fe tab-ml tab-rl"><thead><tr><th>Campo</th><th>Produto 1</th><th>Produto 2</th><th>Produto 3</th></tr></thead><tbody>'+fs+'</tbody></table></div>';
+    }else b.it.forEach(function(f){
+      if(f.sec||f.na||f.fx||(!f.k&&!f.lista))return;
+      if(f.t==='calc'&&(f.k==='desemp.faixa'))return;
+      rows+=relLinha(f,f.k,da,db);
+    });
+    if(rows)h+='<section class="rl-s"><h4>'+esc(b.t)+'</h4>'+rows+'</section>';
+  });
+  return h||'<div class="fe-vazio">Esta análise ainda não tem nenhum campo preenchido.</div>';
+}
+function relCorpo(gs,R0){
+  var x=lojaPor(gs),m=x.l.plat,r=R0||relDados(gs),A=r.atual,B=r.ant,ia=indicD(A.d,m),ib=B?indicD(B.d,m):null;
+  var cards='<div class="rl-ind">'+IND.map(function(ind){var v=indVal(ia,ind.id),d=ib?indDelta(ind,ia,ib):null;
+    return '<div class="rl-c"><small>'+ind.t+'</small><b class="'+(ind.id==='faixa'&&v.o?'fx-'+FXC[v.o]:'')+'">'+esc(v.t)+'</b>'+(v.sub?'<span class="nt">'+esc(v.sub)+'</span>':'')+(ib?'<span class="rl-cd">'+(dlHtml(d)||'<span class="nt">—</span>')+'</span>':'')+'</div>'}).join('')+'</div>';
+  return '<div class="rl-cab"><div><h3>'+esc(x.l.n)+'</h3><div class="mk-sub">'+logo(m)+'<span class="mono">'+esc(gs)+'</span><span class="nt">Responsável: '+esc(x.p.nome)+'</span></div></div><div class="rl-meta"><div><small>Análise</small><b>'+(A.data?fiso(A.data):'Em andamento')+'</b><span class="nt">'+esc(A.autor)+'</span></div><div><small>Comparada com</small><b>'+(B?fiso(B.data):'—')+'</b><span class="nt">'+(B?esc(B.autor):'Sem análise anterior')+'</span></div></div></div>'+
+   (B?'<div class="rl-leg"><span class="dl mel"><b>▲▼</b> verde: melhorou</span><span class="dl pio"><b>▲▼</b> vermelho: piorou</span><span class="dl neu"><b>▲▼</b> cinza: só mostra a variação</span></div>':'<div class="fe-aviso"><span>Esta é a primeira análise da loja. Nada para comparar ainda.</span></div>')+cards+'<div class="rl-cols">'+relSecoes(gs,A.d,B?B.d:null)+'</div>';
+}
+function relHtml(gs){
+  var r=relDados(gs),opt=r.sn.map(function(s){return '<option value="'+s.id+'"'+(String(s.id)===String(r.atual.id)?' selected':'')+'>'+fiso(s.data)+' · '+esc(s.autor)+'</option>'}).join('')+'<option value="atual"'+(r.atual.id==='atual'?' selected':'')+'>Análise em andamento (não salva)</option>';
+  return '<div class="mk-corpo"><div class="fe-barra"><label class="sel-p"><span>Análise exibida</span><select class="sel" id="rel-s">'+opt+'</select></label><button class="btn sec" data-mk="pdfloja" style="width:auto;padding:0 14px">'+ic('file-down')+'Exportar PDF</button></div><div class="rl fe-w" id="rel-area">'+relCorpo(gs,r)+'</div></div>';
+}
+/* ---------- comparar duas análises ---------- */
+function cmpHtml(gs,o){
+  var sn=snapsOrd(gs);
+  if(!sn.length)return '<div class="mk-corpo"><div class="fe-aviso"><span>Salve ao menos uma análise para poder comparar. Use “Salvar análise” no modo Preencher, na aba Histórico de análises.</span></div></div>';
+  var opt=function(sel,atual){return (atual?'<option value="atual"'+(sel==='atual'?' selected':'')+'>Análise em andamento (não salva)</option>':'')+sn.map(function(s){return '<option value="'+s.id+'"'+(String(s.id)===String(sel)?' selected':'')+'>'+fiso(s.data)+' · '+esc(s.autor)+'</option>'}).join('')};
+  if(!cmpA||!sn.some(function(s){return String(s.id)===String(cmpA)}))cmpA=sn[sn.length>1?1:0].id;
+  var A=sn.filter(function(s){return String(s.id)===String(cmpA)})[0],B=cmpB==='atual'?{d:o.d}:sn.filter(function(s){return String(s.id)===String(cmpB)})[0]||{d:o.d};
+  var rows=todosCampos(gs).map(function(c){var a=valSnap(A.d,c),b=valSnap(B.d,c),x=pN(a),y=pN(b);return {c:c,a:a,b:b,dl:x!==null&&y!==null?dlt(y,x,dirDe(c.k)):(a!==b&&a!=='—'&&b!=='—'?{seta:'●',cls:'neu',txt:'mudou'}:null)}});
+  var dif=rows.filter(function(r){return r.a!==r.b});
+  return '<div class="mk-corpo"><div class="cmp-sel"><label class="sel-p"><span>Análise A (antes)</span><select class="sel" id="cmp-a">'+opt(cmpA,false)+'</select></label><label class="sel-p"><span>Análise B (depois)</span><select class="sel" id="cmp-b">'+opt(cmpB,true)+'</select></label><label class="lembrar"><input type="checkbox" id="cmp-t"'+(cmpTodos?' checked':'')+'>Mostrar todos os campos</label></div>'+
+   '<div class="tab-cartao"><table class="tab-fe tab-ml"><thead><tr><th>Campo</th><th>Análise A</th><th>Análise B</th><th>Variação</th></tr></thead><tbody>'+((cmpTodos?rows:dif).length?(cmpTodos?rows:dif).map(function(r){return '<tr class="'+(r.a!==r.b?'dif':'')+'"><td data-rot="Campo">'+esc(r.c.l)+'</td><td data-rot="Análise A">'+esc(r.a)+'</td><td data-rot="Análise B">'+esc(r.b)+'</td><td data-rot="Variação">'+(dlHtml(r.dl)||'<span class="nt">—</span>')+'</td></tr>'}).join(''):'<tr><td colspan="4" class="vazio-t">Nenhuma diferença entre as duas análises.</td></tr>')+'</tbody></table></div></div>';
+}
+/* ---------- visão do cliente: todas as lojas e plataformas juntas ---------- */
+function agregaPlat(p){
+  var out={};MKTS.forEach(function(m){
+    var ls=p.lojas.filter(function(l){return l.plat===m}),com=ls.filter(function(l){return ultimaAn(l.gs)}),rs=com.map(function(l){return indicD(ultimaAn(l.gs).d,m)});
+    var ag={m:m,n:ls.length,com:com.length,lojas:ls};
+    if(com.length){
+      var sm=function(k){return soma(rs.map(function(r){return r[k]}))};
+      ag.r={ativos:sm('ativos'),viol:sm('viol'),dev:sm('dev'),fat:sm('fat'),pedidos:sm('pedidos'),camp:sm('camp'),cupons:sm('cupons'),
+        taxas:m==='Kwai'?'na':sm('taxas'),faixa:rs.map(function(r){return r.faixa}).filter(Boolean).sort(function(a,b){return FX.indexOf(a)-FX.indexOf(b)})[0]||null};
+    }
+    out[m]=ag;
+  });
+  return out;
+}
+function melhorPior(ind,ags){
+  if(ind.dir==='neutro')return {};
+  var vs=[];MKTS.forEach(function(m){var a=ags[m];if(!a.r)return;var v=indVal(a.r,ind.id);var n=ind.ord?FX.indexOf(v.o):v.n;if(v.na||n===null||n===undefined||n<0)return;vs.push({m:m,n:n})});
+  if(vs.length<2)return {};var mx=Math.max.apply(null,vs.map(function(x){return x.n})),mn=Math.min.apply(null,vs.map(function(x){return x.n}));if(mx===mn)return {};
+  var bom=(ind.dir==='menos')?mn:mx,ruim=(ind.dir==='menos')?mx:mn,r={};vs.forEach(function(x){if(x.n===bom)r[x.m]='mel';else if(x.n===ruim)r[x.m]='pio'});return r;
+}
+function visaoCliente(p){
+  var ags=agregaPlat(p),tem=MKTS.some(function(m){return ags[m].com});
+  var lojas='<div class="vc-lojas">'+MKTS.map(function(m){var a=ags[m];return a.n?'<div class="vc-lj"><div class="vc-lj-t">'+logo(m)+'</div>'+a.lojas.map(function(l){return '<div class="vc-lj-l"><span class="vc-n">'+esc(l.n)+'</span><span>'+seloHtml(l.gs)+'</span>'+(ultimaAn(l.gs)?'<button class="btn sec" data-rel="'+esc(l.gs)+'" data-snap="" style="width:auto;padding:0 10px;height:28px">Relatório</button>':'')+'</div>'}).join('')+'</div>':''}).join('')+'</div>';
+  var linhas=IND.map(function(ind){
+    var mp=melhorPior(ind,ags);
+    return '<div class="vc-r"><div class="vc-i">'+esc(ind.t)+'</div>'+MKTS.map(function(m){var a=ags[m],c;
+      if(!a.n)c='<span class="nt">Sem loja</span>';else if(!a.r)c='<span class="nt">Sem análise</span>';else{var v=indVal(a.r,ind.id);c='<b>'+esc(v.t)+'</b>'+(v.sub?'<small class="nt">'+esc(v.sub)+'</small>':'')+(mp[m]?'<span class="vc-tag '+mp[m]+'">'+(mp[m]==='mel'?'melhor':'pior')+'</span>':'')}
+      return '<div class="vc-c'+(mp[m]?' '+mp[m]:'')+'" data-rot="'+esc(m)+'">'+c+'</div>'}).join('')+'</div>'}).join('');
+  var cab='<div class="vc-r vc-h"><div class="vc-i">Indicador</div>'+MKTS.map(function(m){return '<div class="vc-c">'+logo(m)+'<small class="nt">'+ags[m].com+' de '+ags[m].n+(ags[m].n===1?' loja':' lojas')+' com análise</small></div>'}).join('')+'</div>';
+  return '<div class="vc-w"><div class="fe-barra"><div class="fe-info">Visão do cliente: usa a análise mais recente de cada loja. Valores somados por plataforma.</div><button class="btn sec" data-fa="pdfcliente" style="width:auto;padding:0 14px">'+ic('file-down')+'Exportar PDF</button></div>'+
+   '<div id="vc-area" class="vc-area">'+(tem?'':'<div class="fe-aviso"><span>Nenhuma loja deste cliente tem análise ainda.</span></div>')+'<div class="vc">'+cab+linhas+'</div>'+
+   '<div class="vc-leg"><span class="vc-tag mel">melhor</span><span class="vc-tag pio">pior</span><span class="nt">entre as plataformas do cliente. Indicadores sem julgamento não recebem cor.</span></div>'+lojas+'</div></div>';
+}
+function historicoHtml(p){
+  var it=[];p.lojas.forEach(function(l){lj(l.gs).snaps.forEach(function(s){it.push({l:l,s:s})})});
+  it.sort(function(a,b){return a.s.data<b.s.data?1:a.s.data>b.s.data?-1:0});
+  return it.length?it.map(function(x){return '<div class="f-lin"><div style="min-width:0"><div class="pg">'+logoI(x.l.plat)+' '+esc(x.l.n)+'</div><div class="nt">'+fiso(x.s.data)+' · '+esc(x.s.autor)+(x.s.obs?' · '+esc(x.s.obs):'')+'</div></div><button class="btn sec" style="width:auto;padding:0 10px;height:28px" data-rel="'+esc(x.l.gs)+'" data-snap="'+x.s.id+'">Abrir relatório</button></div>'}).join(''):'<div class="f-vazio">Nenhuma análise salva para este cliente.</div>';
+}
+function nAnalises(p){var n=0;p.lojas.forEach(function(l){n+=lj(l.gs).snaps.length});return n}
+function conHtml(l){var s=sitLoja({l:l});return chip(s,SITC[s])}
+/* ---------- exportar PDF (na prévia só mostra o layout de impressão) ---------- */
+function pdfPrev(arquivo,corpo){
+  var ant=document.activeElement,v=document.createElement('div');v.className='veu';var g=document.createElement('div');g.className='pdf-jan';g.setAttribute('role','dialog');g.setAttribute('aria-modal','true');g.setAttribute('aria-label','Prévia do PDF');
+  g.innerHTML='<div class="pdf-cab"><div style="min-width:0"><h3>Prévia do PDF</h3><div class="nt">Arquivo: '+esc(arquivo)+'</div></div><div class="pdf-bt"><button class="btn sec" data-pdf="fechar" style="width:auto;padding:0 14px">Fechar</button><button class="btn" data-pdf="baixar" style="width:auto;padding:0 14px">Baixar PDF</button></div></div><div class="pdf-fundo"><div class="pdf-pag fe-w" id="pdf-area"><div class="pdf-topo"><b>IT.MK</b><span>40% · Consultoria de marketplaces</span><span>Gerado em '+fd(new Date())+' por '+esc(EU)+'</span></div>'+corpo+'</div></div>';
+  document.body.appendChild(v);document.body.appendChild(g);requestAnimationFrame(function(){v.classList.add('aberto');g.classList.add('aberto')});
+  function fechar(){v.classList.remove('aberto');g.classList.remove('aberto');document.removeEventListener('keydown',tecla);setTimeout(function(){v.remove();g.remove();if(ant&&ant.focus)ant.focus()},240)}
+  function tecla(e){if(e.key==='Escape'&&!document.querySelector('.modal'))fechar()}
+  document.addEventListener('keydown',tecla);v.addEventListener('click',fechar);
+  g.addEventListener('click',function(e){var b=e.target.closest('[data-pdf]');if(!b)return;if(b.dataset.pdf==='fechar')fechar();else{U.toast('Na prévia o arquivo não é gerado. Na versão final este botão baixa “'+arquivo+'”.');document.body.classList.add('imprimindo');try{window.print()}catch(x){}document.body.classList.remove('imprimindo')}});
+  g.querySelector('[data-pdf="fechar"]').focus();
+}
+function nomeArq(t,dt){return t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)+'-'+(dt||iso(hoje()))+'.pdf'}
+function pdfCliente(p){
+  var h=visaoCliente(p),tmp=document.createElement('div');tmp.innerHTML=h;var a=tmp.querySelector('#vc-area');
+  pdfPrev(nomeArq('analise-'+p.nome),'<h3 class="pdf-t">Análise do cliente · '+esc(p.nome)+'</h3>'+(a?a.outerHTML:''));
+}
+/* ---------- Painel ---------- */
+function painel(){
+  var L=lojas(),n=L.length,cont=function(f){return L.filter(f).length};
+  var sel=L.map(function(x){return {x:x,s:seloAn(x.l.gs),c:sitLoja(x)}});
+  var conect=sel.filter(function(r){return r.c==='Conectada'}).length,sem=sel.filter(function(r){return r.s.t==='Sem análise'}).length,des=sel.filter(function(r){return r.s.t==='Desatualizada'}).length;
+  var kpis='<div class="fe-cont pn-k">'+[['Lojas',n,''],['Conectadas',conect,''],['Sem análise',sem,sem?'pend':''],['Desatualizadas (mais de 30 dias)',des,des?'pend':'']].map(function(k){return '<div class="fe-k"><small>'+k[0]+'</small><b class="'+k[2]+'">'+k[1]+'</b></div>'}).join('')+'</div>';
+  var porPlat='<div class="cx"><div class="cx-cab"><h3>Lojas por plataforma</h3></div><div class="pn-b pn-b4">'+MKTS.map(function(m){var q=cont(function(x){return x.l.plat===m});return '<div class="pn-bl"><span>'+logo(m)+'</span><b>'+q+'</b><div class="pn-bar"><i style="width:'+Math.round(q/n*100)+'%;background:'+LOGO[m][1]+'"></i></div></div>'}).join('')+'</div></div>';
+  var conSit='<div class="cx"><div class="cx-cab"><h3>Conexões por situação</h3></div><div class="pn-t"><table class="tab-fe tab-ml"><thead><tr><th>Plataforma</th>'+SITS.map(function(s){return '<th>'+s+'</th>'}).join('')+'</tr></thead><tbody>'+MKTS.map(function(m){return '<tr><td data-rot="Plataforma">'+logo(m)+'</td>'+SITS.map(function(s){var q=sel.filter(function(r){return r.x.l.plat===m&&r.c===s}).length;return '<td data-rot="'+s+'" class="'+(q&&(s==='Com erro'||s==='Vencida')?'pn-alerta':'')+'">'+q+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table></div></div>';
+  var pend=sel.filter(function(r){return r.s.t!=='Em dia'}).sort(function(a,b){return (b.s.dias===null?9999:b.s.dias)-(a.s.dias===null?9999:a.s.dias)});
+  var lista='<div class="cx pn-w"><div class="cx-cab"><h3>Lojas sem análise ou desatualizadas</h3><span class="c" style="margin-left:auto">'+pend.length+'</span></div>'+(pend.length?'<table class="tab-fe tab-ml"><thead><tr><th>Loja</th><th>Plataforma</th><th>Responsável</th><th>Situação da análise</th><th>Última análise</th><th></th></tr></thead><tbody>'+pend.map(function(r){return '<tr><td data-rot="Loja"><div class="lj-n">'+esc(r.x.l.n)+'</div><div class="lj-gs">'+esc(r.x.l.gs)+'</div></td><td data-rot="Plataforma">'+logo(r.x.l.plat)+'</td><td data-rot="Responsável" class="rp">'+esc(r.x.p.nome)+'</td><td data-rot="Situação da análise">'+seloHtml(r.x.l.gs)+'</td><td data-rot="Última análise">'+(r.s.data?fiso(r.s.data)+'<div class="nt">há '+r.s.dias+' dias</div>':'<span class="nt">Nunca</span>')+'</td><td class="rc-ac" data-rot="Ação"><button class="btn sec" data-mk="focar" data-gs="'+esc(r.x.l.gs)+'" style="width:auto;padding:0 10px;height:30px">Abrir ficha</button></td></tr>'}).join('')+'</tbody></table>':'<div class="fe-vazio">Todas as lojas estão com a análise em dia.</div>')+'</div>';
+  var med=function(m,id){var rs=L.filter(function(x){return x.l.plat===m&&ultimaAn(x.l.gs)}).map(function(x){return indicD(ultimaAn(x.l.gs).d,m)});if(!rs.length)return '<span class="nt">Sem análise</span>';
+    var vs=rs.map(function(r){return id==='faixa'?(r.faixa?FX.indexOf(r.faixa):null):id==='taxas'?(r.taxas==='na'?'na':r.taxas):r[id]});if(vs.some(function(v){return v==='na'}))return '<span class="nt">Não se aplica</span>';vs=vs.filter(function(v){return v!==null&&v!==undefined});if(!vs.length)return '<span class="nt">—</span>';
+    var a=vs.reduce(function(s,v){return s+v},0)/vs.length;return id==='faixa'?FX[Math.round(a)]:(id==='fat'||id==='taxas')?R(a):fmtN(Math.round(a*10)/10)};
+  var IM=[['ativos','Produtos ativos'],['viol','Violações e penalidades'],['dev','Devoluções'],['faixa','Faixa de saúde (média)'],['fat','Faturamento no mês'],['taxas','Taxas e comissões']];
+  var medias='<div class="cx pn-w"><div class="cx-cab"><h3>Indicadores médios por plataforma</h3><span class="nt" style="margin-left:auto">Média das lojas, pela análise mais recente de cada uma</span></div><table class="tab-fe tab-ml"><thead><tr><th>Indicador</th>'+MKTS.map(function(m){return '<th>'+m+'</th>'}).join('')+'</tr></thead><tbody>'+IM.map(function(i){return '<tr><td data-rot="Indicador"><b>'+i[1]+'</b></td>'+MKTS.map(function(m){return '<td data-rot="'+m+'">'+med(m,i[0])+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table></div>';
+  return kpis+porPlat.replace('class="cx"','class="cx pn-w"')+conSit.replace('class="cx"','class="cx pn-w"')+lista+medias;
+}
+function abrirFicha(gs,o){fichaGs=gs;fichaAba='cad';fichaModo=(o&&o.modo)||'preencher';relSnap=(o&&o.snap)||'';pintar();window.scrollTo(0,0)}
+function focar(gs,o){aba='lojas';fichaGs=gs;fichaAba='cad';fichaModo=(o&&o.modo)||'preencher';relSnap=(o&&o.snap)||'';F.limpar()}
 function fichaView(){
   var gs=fichaGs,x=lojaPor(gs),o=lj(gs),m=x.l.plat,c=conDe(gs,m),s=c?sitEf(c):'Sem conexão',bs=blocos(m);
   var an=o.snaps.length?o.snaps.slice().sort(function(a,b){return a.data<b.data?1:-1})[0].data:null;
-  var corpo=fichaAba==='hist'?histHtml(gs,o):(function(){var b=bs.filter(function(y){return y.id===fichaAba})[0];return '<div class="mk-corpo">'+blocoHtml(b,o,gs)+'</div>'})();
-  return '<div class="mk-fv"><div class="mk-cab"><button class="btn sec mk-voltar" data-voltar style="width:auto;padding:0 12px">'+ic('arrow-left')+'Voltar para as lojas</button><div style="min-width:0"><h3>'+esc(x.l.n)+'</h3><div class="mk-sub">'+logo(m)+'<span class="mono">'+esc(gs)+'</span>'+chip(s,SITC[s])+'<span class="nt">Última análise: '+(an?fiso(an):'nunca')+'</span></div></div></div>'+
-   '<div class="mk-abas" role="tablist" aria-label="Seções da ficha da loja">'+ABAS_F.map(function(a){return '<button role="tab" class="mk-aba" data-faba="'+a+'" aria-selected="'+(fichaAba===a)+'">'+NOMES_F[a]+'</button>'}).join('')+'</div>'+corpo+'<div class="mk-pe">Campo manual guarda quem preencheu e quando. Quando o motor for ligado, o selo muda para API e o campo deixa de ser editável.</div></div>';
+  var corpo=fichaModo==='relatorio'?relHtml(gs):fichaModo==='comparar'?cmpHtml(gs,o):fichaAba==='hist'?'<div class="mk-corpo">'+histHtml(gs,o)+'</div>':(function(){var b=bs.filter(function(y){return y.id===fichaAba})[0];return '<div class="mk-corpo">'+blocoHtml(b,o,gs)+'</div>'})();
+  return '<div class="mk-fv"><div class="mk-cab"><button class="btn sec mk-voltar" data-voltar style="width:auto;padding:0 12px">'+ic('arrow-left')+'Voltar para as lojas</button><div style="min-width:0"><h3>'+esc(x.l.n)+'</h3><div class="mk-sub">'+logo(m)+'<span class="mono">'+esc(gs)+'</span>'+chip(s,SITC[s])+''+seloHtml(gs)+'<span class="nt">Última análise: '+(an?fiso(an):'nunca')+'</span></div></div></div>'+
+   '<div class="mk-modos" role="tablist" aria-label="Modo da ficha">'+[['preencher','Preencher','pencil'],['relatorio','Relatório','file-text'],['comparar','Comparar','git-compare']].map(function(a){return '<button role="tab" class="mk-modo" data-fmodo="'+a[0]+'" aria-selected="'+(fichaModo===a[0])+'">'+ic(a[2])+a[1]+'</button>'}).join('')+'</div>'+
+   (fichaModo==='preencher'?'<div class="mk-abas" role="tablist" aria-label="Seções da ficha da loja">'+ABAS_F.map(function(a){return '<button role="tab" class="mk-aba" data-faba="'+a+'" aria-selected="'+(fichaAba===a)+'">'+NOMES_F[a]+'</button>'}).join('')+'</div>':'')+corpo+(fichaModo==='preencher'?'<div class="mk-pe">Campo manual guarda quem preencheu e quando. Quando o motor for ligado, o selo muda para API e o campo deixa de ser editável.</div>':'')+'</div>';
 }
 function paintFicha(){pintar()}
 function fichaClique(e){
   var t=e.target,b;
   if((b=t.closest('[data-faba]'))){fichaAba=b.dataset.faba;pintar();return true}
+  if((b=t.closest('[data-fmodo]'))){fichaModo=b.dataset.fmodo;pintar();return true}
+  if((b=t.closest('[data-mk="pdfloja"]'))){var xx=lojaPor(fichaGs),ad=relDados(fichaGs).atual;pdfPrev(nomeArq('relatorio-'+xx.l.n,ad.data),'<h3 class="pdf-t">Relatório da loja</h3>'+relCorpo(fichaGs));return true}
   if(!(b=t.closest('[data-mk]')))return false;var a=b.dataset.mk,o=lj(fichaGs),m=mkt(fichaGs),f;
   if(a==='addlista'||a==='rmlista'){
     f=null;blocos(m).forEach(function(bl){bl.it.forEach(function(it){if(it.lista&&it.k===b.dataset.k)f=it})});
@@ -242,6 +461,7 @@ function fichaMudou(e){
     var meta=t.closest('.mf');if(meta){var sm=meta.querySelector('small.nt');if(sm)sm.textContent='Preenchido por '+EU+' em '+o.m[k].t}
     blocos(mkt(fichaGs)).forEach(function(b){if(b.id!==fichaAba)return;b.it.forEach(function(f){if(f.t!=='calc')return;if(b.p3){for(var i=0;i<3;i++){var e1=document.querySelector('[data-calc="p'+i+'.'+f.k+'"]');if(e1)e1.textContent=f.f(o.d,i)}}else{var e2=document.querySelector('[data-calc="'+f.k+'"]');if(e2)e2.textContent=f.f(o.d)}})});
     U.toast('Salvo. Preenchido por '+EU+'.');return true}
+  if(t.id==='rel-s'){relSnap=t.value;paintFicha();return true}
   if(t.id==='cmp-a'){cmpA=t.value;paintFicha();return true}if(t.id==='cmp-b'){cmpB=t.value;paintFicha();return true}if(t.id==='cmp-t'){cmpTodos=t.checked;paintFicha();return true}
   return false;
 }
@@ -252,20 +472,19 @@ function conLinhas(){
   var L=lojas(),out=[];
   L.forEach(function(x){var c=conDe(x.l.gs,x.l.plat);out.push({x:x,c:c,sit:c?sitEf(c):'Sem conexão',mkt:x.l.plat})});
   DB.con.forEach(function(c){if(c.mkt!==lojaPor(c.gs).l.plat)out.push({x:lojaPor(c.gs),c:c,sit:sitEf(c),mkt:c.mkt})});
-  var t=so(fq.trim()),n=nums(fq);
-  return out.filter(function(r){return (subC==='Todas'||r.mkt===subC)&&(!fSit||r.sit===fSit)&&(!fResp||String(r.x.p.id)===String(fResp))&&(!t||so(r.x.l.n).indexOf(t)>-1||so(r.x.p.nome).indexOf(t)>-1||(n&&r.x.l.gs.indexOf(n)>-1))});
+  return out.filter(function(r){return F.passa({p:r.x.p,l:r.x.l,plat:r.mkt,con:r.sit})});
 }
-function contC(m){var s=subC;subC=m;var n=conLinhas().length;subC=s;return n}
+function SP(){return F.get().plat||'Todas'}
+function contC(m){var s=F.get().plat;F.set({plat:m==='Todas'?'':m});var n=conLinhas().length;F.set({plat:s});return n}
 function abaConexoes(){
   var all=conLinhas(),cnt={};SITS.forEach(function(s){cnt[s]=all.filter(function(r){return r.sit===s}).length});
-  return subTabs([['Todas','Todas',contC('Todas')]].concat(MKTS.map(function(m){return [m,m,contC(m)]})),subC,'subc','Conexões por marketplace')+'<div class="fe-cont mk-cont">'+SITS.map(function(s){return '<div class="fe-k"><small>'+s+'</small><b class="'+(s==='Com erro'||s==='Vencida'?(cnt[s]?'pend':''):'')+'">'+cnt[s]+'</b></div>'}).join('')+'</div>'+
-   '<div class="fe-barra"><div class="rc-filtros"><label class="sel-p"><span>Situação</span><select class="sel" id="mk-f2"><option value="">Todas</option>'+SITS.map(function(s){return '<option'+(fSit===s?' selected':'')+'>'+s+'</option>'}).join('')+'</select></label><label class="sel-p"><span>Responsável</span><select class="sel" id="mk-f3"><option value="">Todos</option>'+respOp()+'</select></label><label class="busca-p mk-busca"><span class="sr">Buscar</span>'+ic('search')+'<input id="mk-q" type="search" placeholder="Buscar por loja, GS ou responsável" value="'+esc(fq)+'"></label></div>'+
-   '<div class="fe-filtros"><button class="btn sec" data-mk="convite" style="width:auto;padding:0 14px">Enviar convite ao cliente</button><button class="btn" data-mk="nova" style="width:auto;padding:0 14px">Nova conexão</button></div></div>'+
+  return subTabs([['Todas','Todas',contC('Todas')]].concat(MKTS.map(function(m){return [m,m,contC(m)]})),SP(),'subc','Conexões por marketplace')+'<div class="fe-cont mk-cont">'+SITS.map(function(s){return '<div class="fe-k"><small>'+s+'</small><b class="'+(s==='Com erro'||s==='Vencida'?(cnt[s]?'pend':''):'')+'">'+cnt[s]+'</b></div>'}).join('')+'</div>'+
+   F.html({semPlat:true,extra:'<div class="fe-filtros"><button class="btn sec" data-mk="convite" style="width:auto;padding:0 14px">Enviar convite ao cliente</button><button class="btn" data-mk="nova" style="width:auto;padding:0 14px">Nova conexão</button></div>'})+
    '<div class="tab-cartao"><table class="tab-fe tab-ml"><colgroup><col style="width:21%"><col style="width:15%"><col style="width:11%"><col style="width:12%"><col style="width:9%"><col style="width:11%"><col style="width:10%"><col style="width:11%"></colgroup><thead><tr><th>Loja (GS)</th><th>Responsável</th><th>Marketplace</th><th>Situação</th><th>Autorizada em</th><th>Validade</th><th>Última atualização</th><th></th></tr></thead><tbody>'+
    (all.length?all.map(function(r){var c=r.c;return '<tr><td data-rot="Loja (GS)"><div class="lj-n">'+esc(r.x.l.n)+'</div><div class="lj-gs">'+esc(r.x.l.gs)+'</div></td><td data-rot="Responsável" class="rp">'+esc(r.x.p.nome)+'</td><td data-rot="Marketplace">'+logo(r.mkt)+'</td><td data-rot="Situação">'+chip(r.sit,SITC[r.sit])+'</td><td data-rot="Autorizada em">'+(c&&c.autEm?fiso(c.autEm):'<span class="nt">—</span>')+'</td><td data-rot="Validade">'+(c?validTxt(c):'<span class="nt">—</span>')+'</td><td data-rot="Última atualização">'+(c&&c.at?'<div>'+esc(c.at.t)+'</div><div class="nt">'+esc(c.at.q)+'</div>':'<span class="nt">—</span>')+'</td><td class="rc-ac" data-rot="Ação"><button class="btn sec" data-mk="editar" data-gs="'+r.x.l.gs+'" data-m="'+esc(r.mkt)+'" style="width:auto;padding:0 10px;height:30px">'+(c?'Abrir':'Cadastrar')+'</button></td></tr>'}).join(''):'<tr><td colspan="8" class="vazio-t"><b>Nenhuma conexão neste filtro.</b></td></tr>')+'</tbody></table></div>';
 }
 function lojaOp(sel){return lojas().map(function(x){return '<option value="'+x.l.gs+'"'+(x.l.gs===sel?' selected':'')+'>'+esc(x.l.n)+' · '+esc(x.l.gs)+'</option>'}).join('')}
-var ROT_ID={'Shein':'ID da loja na Shein','Mercado Livre':'ID do usuário no Mercado Livre','Kwai':'ID do comerciante na Kwai'};
+var ROT_ID={'Shopee':'Identificador da loja na Shopee','Shein':'ID da loja na Shein','Mercado Livre':'ID do usuário no Mercado Livre','Kwai':'ID do comerciante na Kwai'};
 function cadastroCon(gs,m){
   var c=gs?conDe(gs,m):null,novo=!c;
   var ant=document.activeElement,v=document.createElement('div');v.className='veu';var g=document.createElement('aside');g.className='gaveta larga';g.setAttribute('role','dialog');g.setAttribute('aria-modal','true');g.setAttribute('aria-label','Cadastro da conexão');
@@ -273,7 +492,7 @@ function cadastroCon(gs,m){
   document.body.appendChild(v);document.body.appendChild(g);
   function paint(){
     var mk=st.mkt,ml=mk==='Mercado Livre',kw=mk==='Kwai',sh=mk==='Shein';
-    var tmp={mkt:mk,autEm:st.autEm},val=validade(tmp);
+    var tmp={mkt:mk,autEm:st.autEm,validDias:st.validDias},val=validade(tmp);
     var segs=[['chave','Chave secreta'],['token','Token de acesso']].map(function(s){var x=st.seg[s[0]];return '<div class="mk-seg"><div><b>'+s[1]+'</b><div class="nt">'+(x?'Cadastrado em '+esc(x.t)+' por '+esc(x.q):'Não cadastrado')+'</div></div>'+
       (st.abrir===s[0]||!x?'<div class="mk-seg-in"><input type="password" autocomplete="new-password" id="sg-'+s[0]+'" placeholder="Cole o valor. Ele nunca é exibido" aria-label="'+s[1]+'"><button class="btn sec" data-cx="gravarseg" data-s="'+s[0]+'" style="width:auto;padding:0 12px">Gravar</button></div>':'<button class="btn sec" data-cx="trocar" data-s="'+s[0]+'" style="width:auto;padding:0 12px">Trocar</button>')+'</div>'}).join('');
     g.innerHTML='<button class="fechar fechar-abs" aria-label="Fechar">'+ic('x')+'</button><div class="mk-cab"><div><h3>'+(novo?'Nova conexão':'Cadastro da conexão')+'</h3><div class="mk-sub">'+(st.gs?logo(mk):'')+'<span class="nt">Os campos são preenchidos à mão por enquanto.</span></div></div></div><div class="gaveta-corpo"><form id="cx-form" class="mk-corpo" novalidate>'+
@@ -282,10 +501,11 @@ function cadastroCon(gs,m){
      '<div class="campo"><label for="cx-login">Nome de login</label><input id="cx-login" value="'+esc(st.login)+'"></div><div class="campo"><label for="cx-pub">Nome público</label><input id="cx-pub" value="'+esc(st.publico)+'"></div>'+
      '<div class="campo"><label for="cx-id">'+ROT_ID[mk]+'</label><input id="cx-id" value="'+esc(st.idExt)+'"></div>'+
      (sh?'<div class="campo"><label for="cx-tipo">Tipo de loja</label><select class="sel" id="cx-tipo"><option value="">Selecione</option>'+['Auto-operada','Semi-gerenciada','Full-gerenciada'].map(function(x){return '<option'+(st.tipo===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select></div>':'')+
+     (mk==='Shopee'?'<div class="campo"><label for="cx-tv">Tipo de vendedor</label><select class="sel" id="cx-tv"><option value="">Selecione</option>'+['CPF','CNPJ'].map(function(x){return '<option'+(st.tipoVend===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select></div><div class="campo"><label for="cx-tl">Tipo de loja</label><select class="sel" id="cx-tl"><option value="">Selecione</option>'+['Local','Cross-border'].map(function(x){return '<option'+(st.tipoLojaSp===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select></div><div class="campo"><label for="cx-vd">Validade da autorização</label><select class="sel" id="cx-vd">'+['7','30','90','180','365'].map(function(x){return '<option value="'+x+'"'+(String(st.validDias)===x?' selected':'')+'>'+x+' dias</option>'}).join('')+'</select></div>':'')+
      (ml?'<div class="campo"><label for="cx-pais">País / site</label><select class="sel" id="cx-pais"><option>Brasil (MLB)</option></select></div>':'')+
      '<div class="campo"><label for="cx-sit">Situação</label><select class="sel" id="cx-sit">'+SITS.filter(function(s){return s!=='Vencida'}).map(function(s){return '<option'+(st.sit===s?' selected':'')+'>'+s+'</option>'}).join('')+'</select></div>'+
      '<div class="campo"><label for="cx-quem">Quem autorizou</label><input id="cx-quem" value="'+esc(st.quem)+'" placeholder="Texto livre"></div><div class="campo"><label for="cx-aut">Data da autorização</label><input id="cx-aut" type="date" value="'+esc(st.autEm)+'"></div>'+
-     '<div class="campo"><label>Validade da autorização</label><div class="ed-calc" id="cx-val">'+(sh?'Sem validade fixa':val?fd(val):'Informe a data da autorização')+'</div><small class="nt">'+(kw?'Kwai: 365 dias.':ml?'Mercado Livre: 6 meses.':'Shein: sem validade fixa.')+'</small></div></div>'+
+     '<div class="campo"><label>Validade da autorização</label><div class="ed-calc" id="cx-val">'+(sh?'Sem validade fixa':val?fd(val):'Informe a data da autorização')+'</div><small class="nt">'+(kw?'Kwai: 365 dias.':mk==='Shopee'?'Shopee: '+(st.validDias||365)+' dias.':ml?'Mercado Livre: 6 meses.':'Shein: sem validade fixa.')+'</small></div></div>'+
      '<div class="campo" style="margin-top:12px"><label>Permissões concedidas</label>'+(ml?'<div class="cf-multi">'+PERMS_ML.map(function(p){return '<label class="lembrar"><input type="checkbox" data-perm="'+p+'"'+(st.perms.indexOf(p)>-1?' checked':'')+'>'+p+'</label>'}).join('')+'</div>':kw?'<div class="cf-multi">'+PERMS_KW.map(function(p){return '<label class="lembrar"><input type="checkbox" data-perm="'+p+'"'+(st.perms.indexOf(p)>-1?' checked':'')+'><span class="mono">'+p+'</span></label>'}).join('')+'</div>':'<small class="nt">Na Shein, as permissões seguem o tipo do aplicativo. Não há escolha por conexão.</small>')+'</div>'+
      '<div class="campo" style="margin-top:12px"><label for="cx-obs">Observações</label><textarea id="cx-obs" class="cb-area" rows="3">'+esc(st.obs)+'</textarea></div>'+
      '<div class="f-sub" style="margin-top:14px">Chaves e tokens (só gravam, nunca mostram)</div>'+segs+
@@ -294,14 +514,14 @@ function cadastroCon(gs,m){
   }
   function ler(){
     var q=function(i){var e=g.querySelector('#'+i);return e?e.value:''};
-    st.gs=novo?q('cx-gs'):st.gs;st.mkt=novo?q('cx-mkt'):st.mkt;st.login=q('cx-login');st.publico=q('cx-pub');st.idExt=q('cx-id');if(g.querySelector('#cx-tipo'))st.tipo=q('cx-tipo');if(g.querySelector('#cx-pais'))st.pais=q('cx-pais');st.sit=q('cx-sit');st.quem=q('cx-quem');st.autEm=q('cx-aut');st.obs=q('cx-obs');
+    st.gs=novo?q('cx-gs'):st.gs;st.mkt=novo?q('cx-mkt'):st.mkt;st.login=q('cx-login');st.publico=q('cx-pub');st.idExt=q('cx-id');if(g.querySelector('#cx-tipo'))st.tipo=q('cx-tipo');if(g.querySelector('#cx-pais'))st.pais=q('cx-pais');if(g.querySelector('#cx-tv')){st.tipoVend=q('cx-tv');st.tipoLojaSp=q('cx-tl');st.validDias=q('cx-vd')||'365'}st.sit=q('cx-sit');st.quem=q('cx-quem');st.autEm=q('cx-aut');st.obs=q('cx-obs');
     st.perms=[].slice.call(g.querySelectorAll('[data-perm]')).filter(function(x){return x.checked}).map(function(x){return x.dataset.perm});
   }
   paint();requestAnimationFrame(function(){v.classList.add('aberto');g.classList.add('aberto')});
   function fechar(){v.classList.remove('aberto');g.classList.remove('aberto');document.removeEventListener('keydown',tecla);setTimeout(function(){v.remove();g.remove();if(ant&&ant.focus)ant.focus()},240)}
   function tecla(e){if(e.key==='Escape'&&!document.querySelector('.modal'))fechar()}
   document.addEventListener('keydown',tecla);v.addEventListener('click',fechar);
-  g.addEventListener('change',function(e){var t=e.target;if(t.id==='cx-mkt'||t.id==='cx-aut'){ler();if(t.id==='cx-mkt'){st.perms=t.value==='Kwai'?PERMS_KW.slice():[];st.tipo='';st.pais=t.value==='Mercado Livre'?'Brasil (MLB)':''}paint()}});
+  g.addEventListener('change',function(e){var t=e.target;if(t.id==='cx-mkt'||t.id==='cx-aut'||t.id==='cx-vd'){ler();if(t.id==='cx-mkt'){st.perms=t.value==='Kwai'?PERMS_KW.slice():[];st.tipo='';st.pais=t.value==='Mercado Livre'?'Brasil (MLB)':''}paint()}});
   g.addEventListener('click',function(e){
     var t=e.target;if(t.closest('.fechar')||t.closest('[data-cx="cancelar"]')){fechar();return}
     var b=t.closest('[data-cx]');if(!b)return;var a=b.dataset.cx;
@@ -329,12 +549,12 @@ function convite(){
 }
 /* ---------- aba Lojas ---------- */
 function abaLojas(){
-  var t=so(fq.trim()),n=nums(fq),L=lojas().filter(function(x){return (subL==='Todas'||x.l.plat===subL)&&(!fResp||String(x.p.id)===String(fResp))&&(!t||so(x.l.n).indexOf(t)>-1||so(x.p.nome).indexOf(t)>-1||(n&&x.l.gs.indexOf(n)>-1))});
-  var cl=function(m){return lojas().filter(function(x){return m==='Todas'||x.l.plat===m}).length};
-  return subTabs([['Todas','Todas',cl('Todas')]].concat(MKTS.map(function(m){return [m,m,cl(m)]})),subL,'subl','Lojas por marketplace')+'<div class="fe-barra"><div class="rc-filtros"><label class="sel-p"><span>Responsável</span><select class="sel" id="mk-f3"><option value="">Todos</option>'+respOp()+'</select></label><label class="busca-p mk-busca"><span class="sr">Buscar</span>'+ic('search')+'<input id="mk-q" type="search" placeholder="Buscar por loja, GS ou responsável" value="'+esc(fq)+'"></label></div><div class="fe-info"><b>'+L.length+'</b> lojas</div></div>'+
+  var L=lojas().filter(function(x){return F.passa(x)});
+  var cl=function(m){var s=F.get().plat;F.set({plat:m==='Todas'?'':m});var n=lojas().filter(function(x){return F.passa(x)}).length;F.set({plat:s});return n};
+  return subTabs([['Todas','Todas',cl('Todas')]].concat(MKTS.map(function(m){return [m,m,cl(m)]})),SP(),'subl','Lojas por marketplace')+F.html({semPlat:true,extra:'<div class="fe-info"><b>'+L.length+'</b> lojas</div>'})+
    '<div class="tab-cartao"><table class="tab-fe tab-ml tab-click"><colgroup><col style="width:26%"><col style="width:16%"><col style="width:14%"><col style="width:20%"><col style="width:14%"><col style="width:10%"></colgroup><thead><tr><th>Loja</th><th>GS</th><th>Marketplace</th><th>Responsável</th><th>Conexão</th><th>Última análise</th></tr></thead><tbody>'+
    (L.length?L.map(function(x){var o=lj(x.l.gs),an=o.snaps.length?o.snaps.slice().sort(function(a,b){return a.data<b.data?1:-1})[0].data:null,s=sitLoja(x);
-     return '<tr class="mk-lin" tabindex="0" data-gs="'+x.l.gs+'"><td data-rot="Loja"><div class="lj-n">'+esc(x.l.n)+'</div></td><td data-rot="GS" class="mono">'+esc(x.l.gs)+'</td><td data-rot="Marketplace">'+logo(x.l.plat)+'</td><td data-rot="Responsável" class="rp">'+esc(x.p.nome)+'</td><td data-rot="Conexão">'+chip(s,SITC[s])+'</td><td data-rot="Última análise">'+(an?fiso(an):'<span class="nt">Nunca</span>')+'</td></tr>'}).join(''):'<tr><td colspan="6" class="vazio-t"><b>Nenhuma loja neste filtro.</b></td></tr>')+'</tbody></table></div>';
+     return '<tr class="mk-lin" tabindex="0" data-gs="'+x.l.gs+'"><td data-rot="Loja"><div class="lj-n">'+esc(x.l.n)+'</div></td><td data-rot="GS" class="mono">'+esc(x.l.gs)+'</td><td data-rot="Marketplace">'+logo(x.l.plat)+'</td><td data-rot="Responsável" class="rp">'+esc(x.p.nome)+'</td><td data-rot="Conexão">'+chip(s,SITC[s])+'</td><td data-rot="Última análise">'+seloHtml(x.l.gs)+(an?'<div class="nt">'+fiso(an)+'</div>':'')+'</td></tr>'}).join(''):'<tr><td colspan="6" class="vazio-t"><b>Nenhuma loja neste filtro.</b></td></tr>')+'</tbody></table></div>';
 }
 /* ---------- aba Faturamento ---------- */
 function compsF(){return window.MKFechamento.comps()}
@@ -380,7 +600,9 @@ function abaApps(){
      '<div class="campo cf-c"><label for="ap-'+m+'-id">Identificador do app</label><input id="ap-'+m+'-id" data-ap="'+m+'" data-f="id" value="'+esc(v('id'))+'"></div>'+
      '<div class="mk-seg"><div><b>Segredo</b><div class="nt">'+(a.seg?'Cadastrado em '+esc(a.seg.t)+' por '+esc(a.seg.q):'Não cadastrado')+'</div></div>'+(ADR[m]&&ADR[m].trocar?'<div class="mk-seg-in"><input type="password" autocomplete="new-password" id="ap-'+m+'-seg" placeholder="Cole o novo segredo. Ele nunca é exibido" aria-label="Segredo do app '+m+'"><button class="btn sec" data-mk="gravarsegapp" data-m="'+esc(m)+'" style="width:auto;padding:0 12px">Gravar</button></div>':'<button class="btn sec" data-mk="trocarsegapp" data-m="'+esc(m)+'" style="width:auto;padding:0 12px">Trocar</button>')+'</div>'+
      (m==='Shein'?'<div class="campo cf-c"><label for="ap-'+m+'-tipo">Tipo de app</label><select class="sel" id="ap-'+m+'-tipo" data-ap="'+m+'" data-f="tipo">'+['Auto-operada','Semi-gerenciada','Full-gerenciada'].map(function(x){return '<option'+(v('tipo')===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select><small class="nt">Na Shein, o tipo do app não muda depois de criado.</small></div>':'')+
-     '<div class="campo cf-c"><label for="ap-'+m+'-url">Endereço de retorno da autorização</label><input id="ap-'+m+'-url" data-ap="'+m+'" data-f="url" value="'+esc(v('url'))+'"><small class="erro" id="ap-'+m+'-url-e" hidden></small></div>'+
+     (m==='Shopee'?'<div class="campo cf-c"><label>Tipo de app</label><div class="ed-calc">ERP</div><small class="nt">Na Shopee o tipo é sempre ERP.</small></div>':'')+
+     '<div class="campo cf-c"><label for="ap-'+m+'-url">'+(m==='Shopee'?'Endereço de retorno · teste':'Endereço de retorno da autorização')+'</label><input id="ap-'+m+'-url" data-ap="'+m+'" data-f="url" value="'+esc(v('url'))+'"><small class="erro" id="ap-'+m+'-url-e" hidden></small></div>'+
+     (m==='Shopee'?'<div class="campo cf-c"><label for="ap-'+m+'-urlp">Endereço de retorno · produção</label><input id="ap-'+m+'-urlp" data-ap="'+m+'" data-f="urlProd" value="'+esc(v('urlProd')||'')+'"></div>':'')+
      '<div class="campo cf-c"><label for="ap-'+m+'-ips">IPs liberados (um por linha)</label><textarea class="cb-area" rows="3" id="ap-'+m+'-ips" data-ap="'+m+'" data-f="ips">'+esc(v('ips'))+'</textarea>'+(m==='Shein'?'<small class="nt">Obrigatório em produção na Shein.</small>':'')+'</div>'+
      '<div class="campo cf-c"><label for="ap-'+m+'-sit">Situação da aprovação pelo marketplace</label><select class="sel" id="ap-'+m+'-sit" data-ap="'+m+'" data-f="sit">'+['Não solicitado','Em revisão','Aprovado','Reprovado'].map(function(x){return '<option'+(v('sit')===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select></div>'+
      '<div class="mk-kv3"><div class="f-kv"><span>Data de criação</span><b>'+esc(a.criado)+'</b></div><div class="f-kv"><span>Última troca do segredo</span><b>'+esc(a.troca)+'</b></div><div class="f-kv"><span>Lojas conectadas neste app</span><b>'+n+'</b></div></div></div>'+
@@ -388,14 +610,14 @@ function abaApps(){
 }
 /* ---------- tela ---------- */
 function render(alvo){
-  if(alvo)el=alvo;iniciar();
+  if(alvo)el=alvo;iniciar();F.ao(pintar);
   var nc=DB.con.filter(function(c){return sitEf(c)==='Conectada'}).length;
   el.innerHTML='<div class="dash fe-w rc-w"><div class="pag-topo"><div><h1>Marketplaces</h1><p class="sub">Conexões, lojas, faturamento e aplicativos. Tudo é preenchido à mão por enquanto.</p></div><div class="fe-info mk-legenda"><span class="mo manual">Manual</span><span class="mo api">API</span><span class="mo calc">Calculado</span><span class="nt">Selo de origem de cada campo. Quando o motor for ligado, Manual vira API.</span></div></div>'+
-   '<div class="rc-abas mk-abas-p" role="tablist">'+[['conexoes','Conexões',contC('Todas')],['lojas','Lojas',lojas().length],['fat','Faturamento',null],['apps','Aplicativos',null]].map(function(a){return '<button role="tab" class="rc-aba" data-aba="'+a[0]+'" aria-selected="'+(aba===a[0])+'">'+a[1]+(a[2]!==null?' <b>'+a[2]+'</b>':'')+'</button>'}).join('')+'</div>'+
+   '<div class="rc-abas mk-abas-p" role="tablist">'+[['painel','Painel',null],['conexoes','Conexões',contC('Todas')],['lojas','Lojas',lojas().length],['fat','Faturamento',null],['apps','Aplicativos',null]].map(function(a){return '<button role="tab" class="rc-aba" data-aba="'+a[0]+'" aria-selected="'+(aba===a[0])+'">'+a[1]+(a[2]!==null?' <b>'+a[2]+'</b>':'')+'</button>'}).join('')+'</div>'+
    '<section class="bloco"><div class="fe-painel" id="mk-corpo">'+corpo()+'</div></section><div class="aviso">Dados de exemplo. Servem só para desenhar a tela.</div></div>';
   U.icones();
 }
-function corpo(){return aba==='conexoes'?abaConexoes():aba==='lojas'?(fichaGs?fichaView():abaLojas()):aba==='fat'?abaFat():abaApps()}
+function corpo(){return aba==='painel'?painel():aba==='conexoes'?abaConexoes():aba==='lojas'?(fichaGs?fichaView():abaLojas()):aba==='fat'?abaFat():abaApps()}
 function pintar(){var c=document.getElementById('mk-corpo');if(c){c.innerHTML=corpo();U.icones()}}
 function refaz(){var y=window.scrollY;render();window.scrollTo(0,y)}
 /* ---------- eventos ---------- */
@@ -403,13 +625,14 @@ function noEl(e){return el&&el.isConnected&&el.contains(e.target)&&el.dataset.mo
 document.addEventListener('click',function(e){
   if(!noEl(e))return;var t=e.target,b;
   if((b=t.closest('[data-aba]'))){aba=b.dataset.aba;pg1=1;fq='';fichaGs=null;refaz();return}
-  if((b=t.closest('[data-subc]'))){subC=b.dataset.subc;pintar();return}
-  if((b=t.closest('[data-subl]'))){subL=b.dataset.subl;pintar();return}
+  if((b=t.closest('[data-subc]'))){F.set({plat:b.dataset.subc==='Todas'?'':b.dataset.subc});pintar();return}
+  if((b=t.closest('[data-subl]'))){F.set({plat:b.dataset.subl==='Todas'?'':b.dataset.subl});pintar();return}
   if((b=t.closest('[data-suba]'))){subA=b.dataset.suba;pintar();return}
   if((b=t.closest('[data-sub]'))){sub=b.dataset.sub;pg1=1;pintar();return}
   if(fichaGs&&aba==='lojas'){if(t.closest('[data-voltar]')){fichaGs=null;pintar();return}if(fichaClique(e))return}
   if((b=t.closest('tr.mk-lin'))){abrirFicha(b.dataset.gs);return}
   if(!(b=t.closest('[data-mk]')))return;var a=b.dataset.mk;
+  if(a==='focar'){focar(b.dataset.gs);refaz();return}
   if(a==='nova')cadastroCon(null,null);else if(a==='editar')cadastroCon(b.dataset.gs,b.dataset.m);else if(a==='convite')convite();
   else if(a==='pg'){pg1+=+b.dataset.v;pintar()}
   else if(a==='usar'){var gs=b.dataset.gs,val=+document.getElementById('us-'+gs).value,orig=document.getElementById('us-'+gs).selectedIndex===0?'pedidos':'notas',msg=window.MKFechamento.usarFaturado(fComp,gs,val,orig);if(msg)U.toast(msg);else U.toast('Valor de '+orig+' ('+R(val)+') levado para o Fechamento. A confirmação da linha volta a ser pedida.')}
@@ -438,5 +661,7 @@ document.addEventListener('change',function(e){
   if(t.id==='mk-f2'){fSit=t.value;pintar()}else if(t.id==='mk-f3'){fResp=t.value;pintar()}
   else if(t.id==='fa-c'){fComp=t.value;pg1=1;pintar()}else if(t.id==='fa-l'){fLoja=t.value;pg1=1;pintar()}else if(t.id==='fa-m'){fMk2=t.value;pg1=1;pintar()}else if(t.id==='fa-r'){fResp2=t.value;pg1=1;pintar()}
 });
-return {render:render};
+function logoI(m){var g=LOGO[m]||['?','#999','#fff'];return '<span class="mk-l mk-l-i" title="'+esc(m)+'"><i style="background:'+g[1]+';color:'+g[2]+'">'+g[0]+'</i></span>'}
+function api(){iniciar();return {visaoCliente:visaoCliente,historicoHtml:historicoHtml,nAnalises:nAnalises,conHtml:conHtml,pdfCliente:pdfCliente,selo:seloAn,seloHtml:seloHtml,sitLoja:function(l){return sitLoja({l:l})},logo:logo,logoI:logoI,indic:indic,faixaLoja:faixaLoja,ultima:ultimaAn,lojaPor:lojaPor,mkts:MKTS}}
+return {render:render,api:api,focar:focar};
 })();

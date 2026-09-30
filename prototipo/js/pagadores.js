@@ -1,31 +1,29 @@
 /* Tela Pagadores e Lojas. Dados de exemplo em window.MK_PAG. */
 window.MKPagadores=(function(){
-var DADOS=window.MK_PAG,el=null,q='',fLoja='',fFin='';
+var DADOS=window.MK_PAG,el=null,fLoja='',fFin='';
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function ic(n){return '<i data-lucide="'+n+'"></i>'}
 function so(s){return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')}
 function nums(s){return s.replace(/\D/g,'')}
 function filtrar(){
-  var t=so(q.trim()),n=nums(q);
-  return DADOS.filter(function(p){
-    if(fFin&&p.fin!==fFin)return false;
-    if(fLoja&&!p.lojas.some(function(l){return l.st===fLoja}))return false;
-    if(!t)return true;
-    if(so(p.nome).indexOf(t)>-1)return true;
-    if(n&&nums(p.fone).indexOf(n)>-1)return true;
-    return p.lojas.some(function(l){return so(l.n).indexOf(t)>-1||(n&&l.gs.indexOf(n)>-1)});
+  var F=MKFiltro,r=[];
+  DADOS.forEach(function(d){
+    if(fFin&&d.fin!==fFin)return;
+    var ls=d.lojas.filter(function(l){return (!fLoja||l.st===fLoja)&&F.passa({p:d,l:l})});
+    if(ls.length)r.push({p:d,ls:ls});
   });
+  return r;
 }
 function selo(st){return st==='ativa'?'':'<span class="selo '+st+'">'+(st==='bloqueada'?'Bloqueada':'Inativa')+'</span>'}
 function linhas(lista){
   if(!lista.length)return '<tr><td colspan="3" class="vazio-t"><b>Nenhum pagador encontrado.</b><br>Troque a busca ou limpe os filtros.<div><button class="btn sec" id="limpar" style="width:auto;margin-top:12px">Limpar filtros</button></div></td></tr>';
-  return lista.map(function(p){
+  return lista.map(function(it){var p=it.p;
     return '<tr class="pag-lin" tabindex="0" data-id="'+p.id+'"><td class="c-resp" data-rot="Responsável">'+esc(p.nome)+'</td>'+
      '<td class="c-fone" data-rot="WhatsApp"><span class="fone">'+esc(p.fone)+'</span><button class="btn-zap" data-zap="'+p.id+'" aria-label="Abrir conversa de '+esc(p.nome)+'" title="Abrir conversa">'+ic('message-circle')+'</button></td>'+
-     '<td class="c-lojas" data-rot="Lojas">'+p.lojas.map(function(l){return '<div class="loja"><div class="loja-n">'+esc(l.n)+selo(l.st)+'</div><div class="loja-gs">'+esc(l.gs)+'</div></div>'}).join('')+'</td></tr>';
+     '<td class="c-lojas" data-rot="Lojas">'+it.ls.map(function(l){var A=MKMarketplaces.api();return '<div class="loja"><div class="loja-n">'+A.logoI(l.plat)+'<span>'+esc(l.n)+'</span>'+selo(l.st)+'<span class="loja-an">'+A.seloHtml(l.gs)+'</span></div><div class="loja-gs">'+esc(l.gs)+' · '+esc(l.plat)+'</div></div>'}).join('')+'</td></tr>';
   }).join('');
 }
-function contagem(lista){var l=lista.reduce(function(a,p){return a+p.lojas.length},0);return lista.length+(lista.length===1?' pagador, ':' pagadores, ')+l+(l===1?' loja':' lojas')}
+function contagem(lista){var l=lista.reduce(function(a,it){return a+it.ls.length},0);return lista.length+(lista.length===1?' pagador, ':' pagadores, ')+l+(l===1?' loja':' lojas')}
 function pintar(){
   var lista=filtrar();
   document.getElementById('pag-corpo').innerHTML=linhas(lista);
@@ -34,19 +32,17 @@ function pintar(){
 }
 function render(alvo){
   if(alvo)el=alvo;
-  el.innerHTML='<div class="dash"><div class="pag-topo"><div><h1>Pagadores e Lojas</h1><p class="sub" id="pag-cont">'+contagem(DADOS)+'</p></div>'+
+  el.innerHTML='<div class="dash"><div class="pag-topo"><div><h1>Pagadores e Lojas</h1><p class="sub" id="pag-cont">'+contagem(filtrar())+'</p></div>'+
    '<button class="btn" id="novo" style="width:auto;height:36px;padding:0 16px">+ Novo pagador</button></div>'+
-   '<div class="pag-barra"><label class="busca-p"><span class="sr">Buscar</span>'+ic('search')+'<input id="pag-q" type="search" placeholder="Buscar por nome, telefone, nome da loja ou GS" value="'+esc(q)+'"></label>'+
-   '<label class="sel-p"><span>Situação da loja</span><select class="sel" id="pag-loja"><option value="">Todas</option><option value="ativa">Ativa</option><option value="bloqueada">Bloqueada</option><option value="inativa">Inativa</option></select></label>'+
-   '<label class="sel-p"><span>Situação financeira</span><select class="sel" id="pag-fin"><option value="">Todas</option><option value="dia">Em dia</option><option value="avencer">A vencer</option><option value="atraso">Em atraso</option><option value="acordo">Em acordo</option></select></label></div>'+
+   MKFiltro.html({dentro:'<label class="sel-p"><span>Situação da loja</span><select class="sel" id="pag-loja"><option value="">Todas</option><option value="ativa">Ativa</option><option value="bloqueada">Bloqueada</option><option value="inativa">Inativa</option></select></label><label class="sel-p"><span>Situação financeira</span><select class="sel" id="pag-fin"><option value="">Todas</option><option value="dia">Em dia</option><option value="avencer">A vencer</option><option value="atraso">Em atraso</option><option value="acordo">Em acordo</option></select></label>'})+
    '<div class="tab-cartao"><table class="tab-pag"><colgroup><col class="k1"><col class="k2"><col class="k3"></colgroup><thead><tr><th>Responsável</th><th>WhatsApp</th><th>Lojas</th></tr></thead><tbody id="pag-corpo"></tbody></table></div>'+
    '<div class="aviso">Dados de exemplo. Servem só para desenhar a tela.</div></div>';
   document.getElementById('pag-loja').value=fLoja;document.getElementById('pag-fin').value=fFin;
-  pintar();
+  MKFiltro.ao(pintar);pintar();
 }
 /* cadastro */
 function campo(id,rot,tipo,ph,extra){return '<div class="campo"><label for="'+id+'">'+rot+' <i class="obr">*</i></label>'+(tipo==='select'?extra:'<input id="'+id+'" type="'+tipo+'" placeholder="'+ph+'" autocomplete="off">')+'<small class="erro" id="'+id+'-e" hidden></small></div>'}
-var PLATS=['Shein','Mercado Livre','Shopee','Amazon','Magalu','Outra'];
+var PLATS=['Shein','Mercado Livre','Shopee','Kwai'];
 function blocoLoja(i){
   return '<div class="f-bloco" data-loja="'+i+'"><div class="f-bloco-cab"><b>Loja '+(i+1)+'</b>'+(i>0?'<button type="button" class="link-btn rem" data-rem="'+i+'">Remover</button>':'')+'</div>'+
    '<div class="f-grade">'+campo('ln'+i,'Nome da loja','text','Nome da loja')+campo('lg'+i,'GS','text','Somente números')+
@@ -86,16 +82,15 @@ function novo(){
     });
     if(ruim){var f=g.querySelector('#'+primeiro);if(f)f.focus();return}
     DADOS.unshift({id:Date.now(),nome:g.querySelector('#pn').value.trim().toUpperCase(),fone:g.querySelector('#pw').value.trim(),fin:'dia',lojas:lojas});
-    fechar();q='';fLoja='';fFin='';render();aviso('Pagador cadastrado.');
+    fechar();MKFiltro.limpar();fLoja='';fFin='';render();aviso('Pagador cadastrado.');
   });
 }
 function aviso(msg){var t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.className='toast';t.setAttribute('role','status');document.body.appendChild(t)}t.textContent=msg;t.classList.add('on');clearTimeout(aviso.h);aviso.h=setTimeout(function(){t.classList.remove('on')},2600)}
-document.addEventListener('input',function(e){if(e.target.id==='pag-q'){q=e.target.value;pintar()}});
 document.addEventListener('change',function(e){if(e.target.id==='pag-loja'){fLoja=e.target.value;pintar()}if(e.target.id==='pag-fin'){fFin=e.target.value;pintar()}});
 document.addEventListener('click',function(e){
   if(!el||!el.isConnected||!el.contains(e.target)&&el.dataset.modulo==='pagadores')return;
   if(e.target.closest('#novo')){novo();return}
-  if(e.target.closest('#limpar')){q='';fLoja='';fFin='';render();return}
+  if(e.target.closest('#limpar')){MKFiltro.limpar();fLoja='';fFin='';render();return}
   var z=e.target.closest('[data-zap]');
   if(z){var p=DADOS.filter(function(x){return String(x.id)===z.dataset.zap})[0];aviso('Abriria a conversa de '+p.nome+' na tela Conversas. Ainda sem função.');return}
   var l=e.target.closest('.pag-lin');if(l)MKFicha.abrir(DADOS.filter(function(x){return String(x.id)===l.dataset.id})[0]);

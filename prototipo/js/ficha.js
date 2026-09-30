@@ -2,7 +2,7 @@
 window.MKFicha=(function(){
 var U=window.MKUI,esc=U.esc,ic=U.ic;
 var ST={ativa:'Ativa',bloqueada:'Bloqueada',inativa:'Inativa'};
-var abertos={resumo:true,lojas:true,acomp:true,acordo:false,comp:false,tempo:false,pessoas:false,regras:false};
+var abertos={resumo:true,lojas:true,hist:false,acomp:true,acordo:false,comp:false,tempo:false,pessoas:false,regras:false};
 var ouvintes=[],hooks={};
 function R(v){return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function agora(){var d=new Date();return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' · '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
@@ -49,12 +49,15 @@ function pessoas(p){
 function bloco(id,titulo,cnt,corpo){
   return '<section class="fb"><button class="fb-cab" data-bloco="'+id+'" aria-expanded="'+!!abertos[id]+'"><span>'+titulo+(cnt!=null?' <em>'+cnt+'</em>':'')+'</span>'+ic('chevron-down')+'</button><div class="fb-corpo"'+(abertos[id]?'':' hidden')+'>'+corpo+'</div></section>';
 }
-function html(p){
+function html(p,aba){
+  aba=aba||'ficha';
   var f=financeiro(p),ac=acordoDe(p),cs=comprovantes(p),pes=pessoas(p),pend=cs.filter(function(c){return c.st==='conferir'}).length;
   var resumo='<div class="f-kv"><span>Total em aberto</span><b class="din">'+R(f.aberto)+'</b></div><div class="f-kv"><span>Próximo vencimento</span><b>'+esc(f.prox)+'</b></div>'+
     (f.comps.length?'<div class="f-sub">Competências em aberto</div>'+f.comps.map(function(c){return '<div class="f-kv"><span>'+esc(c[0])+'</span><b class="din">'+R(c[1])+'</b></div>'}).join(''):'<div class="f-vazio">Nenhuma competência em aberto.</div>');
-  var lojas=p.lojas.map(function(l){return '<div class="f-lin"><div style="min-width:0"><div class="pg">'+esc(l.n)+'</div><div class="nt mono">'+esc(l.gs)+' · '+esc(l.plat)+'</div></div><span class="selo '+l.st+'">'+ST[l.st]+'</span></div>'}).join('')+
+  var A=window.MKMarketplaces&&MKMarketplaces.api();
+  var lojas=p.lojas.map(function(l){return '<div class="f-lin f-lj"><div style="min-width:0"><div class="pg">'+(A?A.logoI(l.plat):'')+' '+esc(l.n)+'</div><div class="nt mono">'+esc(l.gs)+' · '+esc(l.plat)+'</div><div class="f-lj-s"><span class="selo '+l.st+'">'+ST[l.st]+'</span>'+(A?'<span class="nt">Conexão</span>'+A.conHtml(l)+'<span class="nt">Análise</span>'+A.seloHtml(l.gs):'')+'</div></div>'+(A?'<button class="btn sec" style="width:auto;padding:0 12px;height:30px" data-fa="loja" data-gs="'+esc(l.gs)+'">Ficha da loja</button>':'')+'</div>'}).join('')+
     '<div class="f-bts"><button class="btn esc" data-fa="bloquear">Bloquear todas e enviar</button><button class="btn sec" data-fa="liberar">Liberar todas e enviar</button></div>';
+  var hist=A?A.historicoHtml(p):'';
   var acomp=p.promessa?'<div class="f-kv"><span>Promessa ativa</span><b>Pagar em '+esc(p.promessa.data)+'</b></div><div class="f-kv"><span>Prazo de retorno</span><b>'+esc(p.retorno||'Sem retorno marcado')+'</b></div>':'<div class="f-vazio">Nenhuma promessa ativa.</div>';
   acomp+='<div class="f-bts"><button class="btn sec" data-fa="resultado">Registrar resultado</button></div>';
   var acordo=ac?ac.parcelas.map(function(x){var cl=x.st==='paga'?'vd':x.st==='atrasada'?'gr':'ok',tx=x.st==='paga'?'Paga':x.st==='atrasada'?'Atrasada':'A vencer';return '<div class="f-lin"><div><div class="pg">Parcela '+x.n+' de '+ac.parcelas.length+'</div><div class="nt">Vence '+esc(x.venc)+'</div></div><div class="f-dir"><b class="din">'+R(x.valor)+'</b><span class="atraso '+cl+'">'+tx+'</span></div></div>'}).join(''):'<div class="f-vazio">Este pagador não tem acordo.</div><div class="f-bts"><button class="btn" data-fa="acordo">Criar acordo</button></div>';
@@ -62,21 +65,30 @@ function html(p){
   var tl='<ol class="tempo">'+tempo(p).map(function(e){return '<li><span class="nt mono">'+esc(e[0])+'</span><span>'+esc(e[1])+'</span></li>'}).join('')+'</ol>';
   var pe=pes.map(function(x){return '<div class="f-lin"><div style="min-width:0"><div class="pg">'+esc(x[0])+'</div><div class="nt">'+esc(x[1])+'</div></div><div class="nt mono">'+esc(x[2])+'</div></div>'}).join('');
   var regras=[['Régua de cobrança','Etapas em 1, 5 e 10 dias após o vencimento'],['Permite parcelar',p.id%3===0?'Não':'Sim, em até 6 vezes'],['Dias até bloquear','15 dias de atraso']].map(function(r){return '<div class="f-kv"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>'}).join('');
-  return '<div class="f-topo"><h3>'+esc(p.nome)+'</h3><div class="f-topo-l"><span class="mono">'+esc(p.fone)+'</span>'+selo(p)+'</div></div>'+
-    bloco('resumo','Resumo financeiro',null,resumo)+bloco('lojas','Lojas',p.lojas.length,lojas)+bloco('acomp','Acompanhamento',null,acomp)+bloco('acordo','Acordo',null,acordo)+
+  var topo='<div class="f-topo"><h3>'+esc(p.nome)+'</h3><div class="f-topo-l"><span class="mono">'+esc(p.fone)+'</span>'+selo(p)+'</div></div>'+
+    (A?'<div class="f-abas" role="tablist" aria-label="Seções da ficha"><button role="tab" class="f-aba" data-fatab="ficha" aria-selected="'+(aba==='ficha')+'">Ficha</button><button role="tab" class="f-aba" data-fatab="analise" aria-selected="'+(aba==='analise')+'">Análise</button></div>':'');
+  if(aba==='analise'&&A)return topo+'<div class="f-analise">'+A.visaoCliente(p)+'</div>';
+  return topo+
+    bloco('resumo','Resumo financeiro',null,resumo)+bloco('lojas','Lojas de marketplace',p.lojas.length,lojas)+(A?bloco('hist','Histórico de análises',A.nAnalises(p),hist):'')+bloco('acomp','Acompanhamento',null,acomp)+bloco('acordo','Acordo',null,acordo)+
     bloco('comp','Comprovantes',pend?pend+' a conferir':cs.length,comp)+bloco('tempo','Linha do tempo',null,tl)+bloco('pessoas','Pessoas ligadas',pes.length,pe)+bloco('regras','Regras',null,regras);
 }
 function avisar(p){ouvintes.forEach(function(f){f(p)})}
 function evento(p,t){(p.ev=p.ev||[]).unshift([agora(),t])}
 function mount(el,p){
-  el._p=p;el.innerHTML=html(p);U.icones();
+  el._p=p;el.innerHTML=html(p,el._aba);U.icones();var gv=el.closest('.gaveta');if(gv)gv.classList.toggle('mk-g',el._aba==='analise');
   if(el._w)return;el._w=true;
   el.addEventListener('click',function(e){
     var p=el._p,b=e.target.closest('[data-bloco]');
     if(b){abertos[b.dataset.bloco]=!abertos[b.dataset.bloco];b.setAttribute('aria-expanded',abertos[b.dataset.bloco]);b.nextElementSibling.hidden=!abertos[b.dataset.bloco];return}
+    var tb=e.target.closest('[data-fatab]');
+    if(tb){el._aba=tb.dataset.fatab;mount(el,p);return}
+    var ar=e.target.closest('[data-rel]');
+    if(ar){var g0=el.closest('.gaveta');if(g0){var fx=g0.querySelector('.fechar');if(fx)fx.click()}MKMarketplaces.focar(ar.dataset.rel,{modo:'relatorio',snap:ar.dataset.snap});window.MKApp.ir('marketplaces');return}
     var a=e.target.closest('[data-fa]');if(!a)return;
     var acao=a.dataset.fa;
     function refaz(){mount(el,p);avisar(p)}
+    if(acao==='pdfcliente'){MKMarketplaces.api().pdfCliente(p);return}
+    if(acao==='loja'){var g1=el.closest('.gaveta');if(g1){var f1=g1.querySelector('.fechar');if(f1)f1.click()}MKMarketplaces.focar(a.dataset.gs);window.MKApp.ir('marketplaces');return}
     if(acao==='bloquear'||acao==='liberar'){
       var alvo=acao==='bloquear'?'ativa':'bloqueada',novo=acao==='bloquear'?'bloqueada':'ativa',n=p.lojas.filter(function(l){return l.st===alvo}).length;
       if(!n){U.toast(acao==='bloquear'?'Todas as lojas já estão bloqueadas ou inativas.':'Não há lojas bloqueadas para liberar.');return}
