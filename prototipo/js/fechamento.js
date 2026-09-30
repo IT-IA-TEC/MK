@@ -2,7 +2,7 @@
 window.MKFechamento=(function(){
 var U=window.MKUI,esc=U.esc,ic=U.ic,PAGS=window.MK_PAG,el=null,comps=null,atual=null,etapa=1,fConf='todas',selEnv={},prevPid=null,EU='Marina';
 var MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
-var PIX='00.000.000/0001-00';
+function pixCfg(){return (window.MK_CFG&&window.MK_CFG.dados&&window.MK_CFG.dados.cnpj)||'00.000.000/0001-00'}
 function R(v){return 'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function num(s){return +(''+s).replace(/\./g,'').replace(',','.')||0}
 function agora(){var d=new Date();return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
@@ -100,7 +100,7 @@ function contadores(c){
 function msg(c,g){
   var p=pagador(g.pid),pr=p.nome.split(' ')[0];pr=cap(pr.toLowerCase());
   var ls=g.lojas.filter(function(l){return l.conf}),tot=ls.reduce(function(a,l){return a+v40(l)},0);
-  return 'Olá, '+pr+'! Segue o fechamento da competência '+c.rotulo.toLowerCase()+':\n\n'+ls.map(function(l){return '• '+l.n+' (GS '+l.gs+')\n  Faturado '+R(l.fat)+' · Imposto '+R(l.imp)+' · 40%: '+R(v40(l))}).join('\n')+'\n\nTotal a pagar: '+R(tot)+'\nVencimento: '+c.venc+'\nPix (CNPJ da VHSS): '+PIX+'\n\nDepois de pagar, envie o comprovante por aqui.';
+  return 'Olá, '+pr+'! Segue o fechamento da competência '+c.rotulo.toLowerCase()+':\n\n'+ls.map(function(l){return '• '+l.n+' (GS '+l.gs+')\n  Faturado '+R(l.fat)+' · Imposto '+R(l.imp)+' · 40%: '+R(v40(l))}).join('\n')+'\n\nTotal a pagar: '+R(tot)+'\nVencimento: '+c.venc+'\nPix (CNPJ da VHSS): '+pixCfg()+'\n\nDepois de pagar, envie o comprovante por aqui.';
 }
 /* ---------- desenho ---------- */
 function chip(t,c){return '<span class="fs '+c+'">'+t+'</span>'}

@@ -211,7 +211,7 @@ function refaz(){var y=window.scrollY;render();window.scrollTo(0,y)}
 function regua(a){
   var p=a.p,d=a.dias,e=d<=5?1:d<=10?2:3,rot=a.rots.join(', ');
   var t=e===1?'Olá, '+pr(p)+'! Identificamos que a cobrança de '+rot+' venceu há '+d+(d===1?' dia':' dias')+', no valor de '+R(a.valor)+'. Se já pagou, é só enviar o comprovante por aqui. Se precisar de ajuda, responda esta mensagem.'
-   :e===2?'Olá, '+pr(p)+'. A cobrança de '+rot+' segue em aberto há '+d+' dias ('+R(a.valor)+'). Precisamos regularizar. Pix (CNPJ da VHSS): 00.000.000/0001-00. Envie o comprovante por aqui.'
+   :e===2?'Olá, '+pr(p)+'. A cobrança de '+rot+' segue em aberto há '+d+' dias ('+R(a.valor)+'). Precisamos regularizar. Pix (CNPJ da VHSS): '+((window.MK_CFG&&window.MK_CFG.dados&&window.MK_CFG.dados.cnpj)||'00.000.000/0001-00')+'. Envie o comprovante por aqui.'
    :'Aviso, '+pr(p)+': a cobrança de '+rot+' está em aberto há '+d+' dias ('+R(a.valor)+'). Sem o pagamento, suas lojas serão bloqueadas. Fale com a gente hoje para evitar o bloqueio.';
   return {e:e,t:t};
 }
