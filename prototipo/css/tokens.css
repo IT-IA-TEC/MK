@@ -40,3 +40,4 @@
   --t-rapido:160ms; --t-base:200ms; --t-lento:240ms; --curva:cubic-bezier(.22,.61,.36,1);
   --menu-largura:252px;
 }
+:root{--conv-robo-f:#EEF3FC;--conv-robo-b:#CBD8F3;--conv-robo-t:#2F418F;}

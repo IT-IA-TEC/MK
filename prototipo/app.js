@@ -15,7 +15,7 @@ function menu(){
   icones();
 }
 var ultMod=null;
-function mostrar(){var c=$('#conteudo');if(ultMod!==ativo){window.MKFiltro&&MKFiltro.limpar();ultMod=ativo}c.dataset.modulo=ativo;if(ativo==='dashboard')MKDashboard.render(c);else if(ativo==='pagadores')MKPagadores.render(c);else if(ativo==='conversas')MKConversas.render(c);else if(ativo==='fechamento')MKFechamento.render(c);else if(ativo==='recebimentos')MKRecebimentos.render(c);else if(ativo==='inadimplencia')MKInadimplencia.render(c);else if(ativo==='configuracoes')MKConfiguracoes.render(c);else if(ativo==='marketplaces')MKMarketplaces.render(c);else c.innerHTML='';window.scrollTo(0,0)}
+function mostrar(){var c=$('#conteudo');if(ultMod!==ativo){window.MKFiltro&&MKFiltro.limpar();ultMod=ativo}c.dataset.modulo=ativo;if(ativo==='dashboard')MKDashboard.render(c);else if(ativo==='pagadores')MKPagadores.render(c);else if(ativo==='conversas')MKConversas.render(c);else if(ativo==='fechamento')MKFechamento.render(c);else if(ativo==='recebimentos')MKRecebimentos.render(c);else if(ativo==='inadimplencia')MKInadimplencia.render(c);else if(ativo==='configuracoes')MKConfiguracoes.render(c);else if(ativo==='marketplaces')MKMarketplaces.render(c);else if(ativo==='robo')MKRobo.render(c);else c.innerHTML='';window.scrollTo(0,0)}
 function alternar(){
   var rec=app.classList.toggle('recolhido');guardar(rec);menu();
 }

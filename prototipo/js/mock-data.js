@@ -17,6 +17,7 @@ window.MK_DADOS={
     {id:"fechamento",nome:"Fechamento do mês",icone:"calendar-check"},
     {id:"recebimentos",nome:"Recebimentos",icone:"wallet"},
     {id:"inadimplencia",nome:"Inadimplência e Acordos",icone:"handshake"},
+    {id:"robo",nome:"Robô",icone:"bot"},
     {id:"configuracoes",nome:"Configurações",icone:"settings"}
   ]
 };

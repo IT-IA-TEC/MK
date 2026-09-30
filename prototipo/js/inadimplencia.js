@@ -3,7 +3,10 @@ window.MKInadimplencia=(function(){
 var U=window.MKUI,esc=U.esc,ic=U.ic,F=window.MKFicha,PAGS=window.MK_PAG,el=null,pronto=false,EU='Marina';
 var aba='atraso',q='',faixa='todas',ext={promessa:false,acordo:false,bloq:false,semcontato:false,n:15},fBl='todos',diaRel=0,nid=1;
 var HOJE0=new Date(new Date().getFullYear(),new Date().getMonth(),new Date().getDate());
-var BL={},SAIDAS=[],BAIXAS=[],BXH=[],LOG=[];
+var BL={},SAIDAS=[],BAIXAS=[],BXH=[],LOG=[],CONT=[],fCont='todas';
+var C_MOT=['Valor errado','Loja encerrada','Pagamento já feito','Não reconhece a loja','Faturamento diferente','Outro'];
+var C_SIT=[['Aberta','at'],['Em análise','ok'],['Aguardando cliente','cn'],['Procedente','vd'],['Improcedente','gr'],['Ajustada','ok']];
+var C_ATIVA=['Aberta','Em análise','Aguardando cliente'];
 function RC(){return window.MKRecebimentos.api()}
 function R(v){return 'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function num(s){return +(''+s).replace(/\./g,'').replace(',','.')||0}
@@ -22,7 +25,8 @@ function chip(t,c){return '<span class="fs '+c+'">'+t+'</span>'}
 function ev(p,t){F.evento(p,t)}
 /* ---------- regras ---------- */
 function acordoAtivo(p){return !!p.acordo&&p.acordo.estado!=='quebrado'&&p.acordo.parcelas.some(function(x){return x.st!=='paga'})}
-function reguaPausada(p){return !!p.promessa||acordoAtivo(p)}
+function contestAtiva(pid){return CONT.some(function(c){return c.pid===pid&&C_ATIVA.indexOf(c.sit)>-1})}
+function reguaPausada(p){return !!p.promessa||acordoAtivo(p)||contestAtiva(p.id)}
 function atrasos(){
   var api=RC(),out=[];
   PAGS.forEach(function(p){
@@ -37,6 +41,7 @@ function atrasos(){
   return out.sort(function(a,b){return b.dias-a.dias||b.valor-a.valor});
 }
 function sitDe(p){
+  if(contestAtiva(p.id))return ['Contestação em andamento','at'];
   if(p.promessa)return ['Promessa até '+p.promessa.data,'ok'];
   if(acordoAtivo(p))return ['Em acordo','at'];
   var m={'sem retorno':['Sem retorno','cn'],'recusou':['Recusou','gr'],'número errado':['Número errado','gr'],'promessa reagendada':['Promessa reagendada','ok']};
@@ -87,6 +92,17 @@ function iniciar(){
     {id:nid++,pid:3,lojas:['46.843.469 ADRIANO PEREIRA DA SILVA'],pedido:'02/08/2026',efetiva:'31/08/2026',sit:'concluída',hist:[{t:'02/08/2026 11:00',q:'Carlos',x:'Pedido de saída registrado'},{t:'01/09/2026 09:00',q:'Carlos',x:'Saída concluída, em aberto quitado'}]},
     {id:nid++,pid:10,lojas:['ARP BOUTIQUE LTDA'],pedido:'10/08/2026',efetiva:'30/09/2026',sit:'cancelada',hist:[{t:'10/08/2026 15:30',q:'Marina',x:'Pedido de saída registrado'},{t:'25/08/2026 10:10',q:'Marina',x:'Pedido cancelado: pagador desistiu'}]}
   ];
+  (function(){
+    var api=RC();function rots(pid,n){return api.DB.cobs.filter(function(c){return c.pid===pid}).slice(0,n).map(function(c){return {id:c.id,rot:c.rot}})}
+    function mk(pid,n,mot,desc,ab,pz,resp,sit,hist){var p=pagador(pid);if(!p)return;var h=[{t:fd(off(ab))+' 10:15',q:resp,x:'Contestação aberta'},{t:fd(off(ab))+' 10:15',q:'Sistema',x:'Memória de cálculo anexada'},{t:fd(off(ab))+' 10:15',q:'Sistema',x:'Régua de cobrança pausada para este pagador'}].concat(hist||[]);
+      CONT.push({id:nid++,pid:pid,cobs:rots(pid,n),motivo:mot,desc:desc,ab:off(ab),pz:off(pz),resp:resp,sit:sit,hist:h})}
+    mk(8,2,'Valor errado','Cliente diz que o faturamento de julho foi menor que o usado no cálculo.',-9,-2,'Marina','Em análise',[{t:fd(off(-7))+' 14:02',q:'Marina',x:'Situação: Em análise'}]);
+    mk(12,1,'Loja encerrada','Informa que encerrou a loja em junho e ainda recebe cobrança.',-3,7,'Rafael','Aberta');
+    mk(7,1,'Pagamento já feito','Diz que pagou por Pix fora do link. Enviou comprovante.',-5,2,'Carlos','Aguardando cliente',[{t:fd(off(-4))+' 09:40',q:'Carlos',x:'Situação: Aguardando cliente (pedido o comprovante completo)'}]);
+    mk(13,1,'Não reconhece a loja','Não reconhece uma das lojas da cobrança.',-20,-10,'Juliana','Procedente',[{t:fd(off(-12))+' 16:30',q:'Juliana',x:'Situação: Procedente. Loja retirada da cobrança'},{t:fd(off(-12))+' 16:30',q:'Sistema',x:'Régua de cobrança voltou'}]);
+    mk(5,1,'Faturamento diferente','Questiona a base de faturamento do mês.',-30,-20,'Marina','Improcedente',[{t:fd(off(-22))+' 11:05',q:'Marina',x:'Situação: Improcedente. Cálculo confere com a plataforma'},{t:fd(off(-22))+' 11:05',q:'Sistema',x:'Régua de cobrança voltou'}]);
+    mk(2,1,'Outro','Pediu revisão do desconto combinado na entrada.',-14,-6,'Rafael','Ajustada',[{t:fd(off(-8))+' 15:20',q:'Rafael',x:'Situação: Ajustada. Valor corrigido'},{t:fd(off(-8))+' 15:20',q:'Sistema',x:'Régua de cobrança voltou'}]);
+  })();
   var ids=[[8,'03/2025',28400],[12,'11/2024',9200],[7,'05/2025',15100],[1,'02/2025',6730],[13,'08/2024',12480],[5,'04/2025',3890],[9,'12/2024',21050],[2,'06/2025',7600],[11,'01/2025',5310],[14,'09/2024',18240],[6,'07/2025',4420],[3,'10/2024',11960]];
   BAIXAS=ids.map(function(x){var p=pagador(x[0]),m=x[1].split('/'),v=new Date(+m[1],+m[0],20);return {id:nid++,pid:x[0],rot:x[1],venc:fd(v),valor:x[2],dias:Math.round((HOJE0-v)/86400000)}}).filter(function(x){return x.dias>365});
 }
@@ -97,7 +113,7 @@ function topo(){
   return '<div class="pag-topo"><div><h1>Inadimplência e Acordos</h1><p class="sub">Quem deve, há quanto tempo, o que já foi combinado e o que precisa de decisão.</p></div></div>'+
    '<div class="ia-cont">'+C.map(function(c){return '<div class="fe-k"><small>'+c[0]+'</small><b class="'+c[2]+'">'+c[1]+'</b></div>'}).join('')+'</div>'+
    '<div class="rc-barra"><label class="busca-p"><span class="sr">Buscar</span>'+ic('search')+'<input id="ia-q" type="search" placeholder="Buscar por nome, telefone, loja ou GS" value="'+esc(q)+'"></label></div>'+
-   '<div class="rc-abas ia-abas" role="tablist">'+[['atraso','Em atraso',k.n],['acordos','Acordos',PAGS.filter(function(p){return p.acordo}).length],['bloqueios','Bloqueios',bloqRows().length],['saidas','Saídas',SAIDAS.length],['baixas','Baixas',BAIXAS.length],['relatorios','Relatórios',null]].map(function(a){return '<button role="tab" class="rc-aba" data-aba="'+a[0]+'" aria-selected="'+(aba===a[0])+'">'+a[1]+(a[2]!==null?' <b>'+a[2]+'</b>':'')+'</button>'}).join('')+'</div>';
+   '<div class="rc-abas ia-abas" role="tablist">'+[['atraso','Em atraso',k.n],['acordos','Acordos',PAGS.filter(function(p){return p.acordo}).length],['bloqueios','Bloqueios',bloqRows().length],['saidas','Saídas',SAIDAS.length],['baixas','Baixas',BAIXAS.length],['contestacoes','Contestações',CONT.filter(function(c){return C_ATIVA.indexOf(c.sit)>-1}).length],['relatorios','Relatórios',null]].map(function(a){return '<button role="tab" class="rc-aba" data-aba="'+a[0]+'" aria-selected="'+(aba===a[0])+'">'+a[1]+(a[2]!==null?' <b>'+a[2]+'</b>':'')+'</button>'}).join('')+'</div>';
 }
 function abaAtraso(){
   var todos=atrasos(),lista=todos.filter(function(a){return casa(q,a.p)});
@@ -118,7 +134,7 @@ function abaAtraso(){
       '<td data-rot="Lojas em atraso" class="rp">'+esc(a.lojas.slice(0,2).join(' · '))+(a.lojas.length>2?' <span class="nt">+'+(a.lojas.length-2)+'</span>':'')+'</td><td data-rot="Competências" class="rp">'+esc(a.rots.join(', '))+'</td>'+
       '<td data-rot="Dias de atraso" class="n"><b class="'+(a.dias>60?'pend':'')+'">'+a.dias+'</b></td><td data-rot="Valor em aberto" class="n v40">'+R(a.valor)+'</td>'+
       '<td data-rot="Situação">'+chip(s[0],s[1])+(reguaPausada(a.p)?'<div class="nt">Régua pausada</div>':'')+'<div class="nt">Último contato: '+(contato(a.p)===0?'hoje':'há '+contato(a.p)+' dias')+'</div></td>'+
-      '<td data-rot="Ação" class="rc-ac"><button class="btn" data-ia="cobrar" data-p="'+a.p.id+'" style="width:auto;padding:0 14px">Cobrar</button><button class="btn sec" data-ia="mais" data-p="'+a.p.id+'" style="width:auto;padding:0 12px" aria-haspopup="menu">Mais ações</button></td></tr>'}).join(''):'<tr><td colspan="8" class="vazio-t"><b>Nenhum pagador com este filtro.</b><br>Troque a faixa ou os filtros.</td></tr>')+'</tbody></table></div>';
+      '<td data-rot="Ação" class="rc-ac"><button class="btn" data-ia="cobrar" data-p="'+a.p.id+'" style="width:auto;padding:0 14px"'+(contestAtiva(a.p.id)?' disabled title="Contestação em andamento. A cobrança fica parada."':'')+'>Cobrar</button><button class="btn sec" data-ia="mais" data-p="'+a.p.id+'" style="width:auto;padding:0 12px" aria-haspopup="menu">Mais ações</button></td></tr>'}).join(''):'<tr><td colspan="8" class="vazio-t"><b>Nenhum pagador com este filtro.</b><br>Troque a faixa ou os filtros.</td></tr>')+'</tbody></table></div>';
 }
 function statusAc(p){
   var a=p.acordo;if(a.estado==='quebrado')return ['Quebrado','gr'];
@@ -195,7 +211,77 @@ function abaRel(){
     '<div class="rl-lista"><div class="f-sub">Maiores devedores</div>'+window.MK_DASH.rank.devedores.map(function(x,i){return '<div class="rank-l"><span class="pos">'+(i+1)+'</span><span class="pg">'+esc(x[0])+'</span><b class="din">'+R(x[1])+'</b></div>'}).join('')+'<div class="f-sub">Maiores pagadores</div>'+window.MK_DASH.rank.pagadores.map(function(x,i){return '<div class="rank-l"><span class="pos">'+(i+1)+'</span><span class="pg">'+esc(x[0])+'</span><b class="din">'+R(x[1])+'</b></div>'}).join('')+'</div></div>'+
    '<div class="cx rl-env"><div class="cx-cab">'+ic('layers')+'<h3>Envelhecimento da carteira</h3><span class="c">'+R(tot)+'</span></div>'+fx.map(function(x){return '<div class="rl-f"><div class="rl-f-t"><b>'+x[0]+'</b><span class="nt">'+x[1]+(x[1]===1?' cobrança':' cobranças')+'</span><b class="din">'+R(x[2])+'</b></div><div class="barra"><i class="dev" style="width:'+Math.round(x[2]/mx*100)+'%"></i></div></div>'}).join('')+'</div></div>';
 }
-function corpo(){return aba==='atraso'?abaAtraso():aba==='acordos'?abaAcordos():aba==='bloqueios'?abaBloqueios():aba==='saidas'?abaSaidas():aba==='baixas'?abaBaixas():abaRel()}
+/* contestações */
+function sitC(n){return C_SIT.filter(function(x){return x[0]===n})[0]||['','cn']}
+function prazoC(c){
+  if(C_ATIVA.indexOf(c.sit)<0)return '<span class="nt">Encerrada</span>';
+  var d=Math.round((c.pz-HOJE0)/86400000);
+  return '<div>'+fd(c.pz)+'</div><div class="nt'+(d<0?' c-venc':'')+'"><b>'+(d<0?'Vencido há '+(-d)+(d===-1?' dia':' dias'):d===0?'Vence hoje':d+(d===1?' dia restante':' dias restantes'))+'</b></div>';
+}
+function contFiltradas(){
+  return CONT.filter(function(c){return (fCont==='todas'||c.sit===fCont)&&casa(q,pagador(c.pid),c.motivo+' '+c.cobs.map(function(x){return x.rot}).join(' '))}).sort(function(a,b){var x=C_ATIVA.indexOf(a.sit)>-1?0:1,y=C_ATIVA.indexOf(b.sit)>-1?0:1;return x-y||a.pz-b.pz});
+}
+function abaCont(){
+  var todos=CONT.filter(function(c){return casa(q,pagador(c.pid),c.motivo+' '+c.cobs.map(function(x){return x.rot}).join(' '))}),l=contFiltradas();
+  var cnt={todas:todos.length};C_SIT.forEach(function(x){cnt[x[0]]=todos.filter(function(c){return c.sit===x[0]}).length});
+  return '<div class="fe-barra"><div class="fe-info"><b>O robô não decide contestação. Ela vai para uma pessoa.</b> Enquanto estiver aberta, em análise ou aguardando o cliente, a régua de cobrança daquele pagador fica parada.</div><button class="btn" data-ia="novacont" style="width:auto;padding:0 14px">Nova contestação</button></div>'+
+   '<div class="fe-barra"><div class="fe-filtros">'+[['todas','Todas']].concat(C_SIT.map(function(x){return [x[0],x[0]]})).map(function(x){return '<button class="chip-f" data-fcont="'+x[0]+'" aria-pressed="'+(fCont===x[0])+'">'+x[1]+' <b>'+cnt[x[0]]+'</b></button>'}).join('')+'</div></div>'+
+   '<div class="tab-cartao"><table class="tab-fe tab-ia"><colgroup><col style="width:16%"><col style="width:13%"><col style="width:13%"><col style="width:9%"><col style="width:14%"><col style="width:10%"><col style="width:13%"><col style="width:12%"></colgroup><thead><tr><th>Pagador</th><th>Cobranças contestadas</th><th>Motivo</th><th>Abertura</th><th>Prazo</th><th>Responsável</th><th>Situação</th><th>Ação</th></tr></thead><tbody>'+
+   (l.length?l.map(function(c){var s2=sitC(c.sit),at=C_ATIVA.indexOf(c.sit)>-1;
+     return '<tr><td data-rot="Pagador"><div class="lj-n">'+esc(pagador(c.pid).nome)+'</div>'+(at?'<div class="nt">Régua pausada</div>':'')+'</td><td data-rot="Cobranças contestadas" class="rp">'+esc(c.cobs.map(function(x){return x.rot}).join(', '))+'</td><td data-rot="Motivo" class="rp">'+esc(c.motivo)+'</td><td data-rot="Abertura">'+fd(c.ab)+'</td><td data-rot="Prazo">'+prazoC(c)+'</td><td data-rot="Responsável">'+esc(c.resp)+'</td><td data-rot="Situação">'+chip(s2[0]||c.sit,s2[1])+'</td><td data-rot="Ação" class="rc-ac"><button class="btn sec" data-ia="cdet" data-c="'+c.id+'" style="width:auto;padding:0 12px">Abrir</button></td></tr>'}).join(''):'<tr><td colspan="8" class="vazio-t"><b>Nenhuma contestação neste filtro.</b><br>Troque a situação ou a busca.</td></tr>')+'</tbody></table></div>';
+}
+function memoria(c){
+  if(window.MKMemoria&&MKMemoria.abrir){var p=pagador(c.pid);MKMemoria.abrir(c.pid,p&&p.lojas[0]&&p.lojas[0].gs)}
+  else U.toast('A memória de cálculo ainda não está disponível neste protótipo.');
+}
+function detHtml(c){
+  var s2=sitC(c.sit),at=C_ATIVA.indexOf(c.sit)>-1,p=pagador(c.pid);
+  return '<div class="c-cab">'+chip(s2[0],s2[1])+chip('Memória de cálculo anexada','vd')+(at?chip('Régua pausada','at'):chip('Régua voltou','cn'))+'</div>'+
+   '<div class="c-info"><div><small>Pagador</small><b>'+esc(p.nome)+'</b></div><div><small>Cobranças contestadas</small><b>'+esc(c.cobs.map(function(x){return x.rot}).join(', '))+'</b></div><div><small>Motivo</small><b>'+esc(c.motivo)+'</b></div><div><small>Abertura</small><b>'+fd(c.ab)+'</b></div><div><small>Prazo</small><b>'+(at?prazoC(c):fd(c.pz))+'</b></div><div><small>Responsável</small><b>'+esc(c.resp)+'</b></div></div>'+
+   (c.desc?'<div class="f-sub" style="margin-top:12px">Descrição</div><p style="overflow-wrap:anywhere">'+esc(c.desc)+'</p>':'')+
+   '<p class="dica-m" style="margin-top:8px">O robô não decide contestação. Ela vai para uma pessoa.</p>'+
+   '<div class="f-sub" style="margin-top:12px">Mudar situação</div><div class="fe-filtros c-sits">'+C_SIT.filter(function(x){return x[0]!==c.sit}).map(function(x){return '<button class="chip-f" data-cs="'+x[0]+'">'+x[0]+'</button>'}).join('')+'</div>'+
+   '<div class="c-mem"><button class="btn sec" data-cmem style="width:auto;padding:0 14px">Ver memória de cálculo</button></div>'+
+   '<div class="f-sub" style="margin-top:12px">Linha do tempo</div><div class="hist">'+c.hist.slice().reverse().map(function(h){return '<div class="h-lin"><b>'+esc(h.x)+'</b><div class="nt">'+esc(h.q)+' · '+esc(h.t)+'</div></div>'}).join('')+'</div>';
+}
+function detalhe(c){
+  var m=U.modal({titulo:'Contestação de '+pagador(c.pid).nome,ok:'Fechar',cancel:'Fechar',html:detHtml(c)});
+  function tela(){m.querySelector('.modal-corpo').innerHTML=detHtml(c);U.icones()}
+  m.addEventListener('click',function(e){
+    var b=e.target.closest('[data-cs]');
+    if(b){var ns=b.dataset.cs,p=pagador(c.pid),era=C_ATIVA.indexOf(c.sit)>-1,vai=C_ATIVA.indexOf(ns)>-1;
+      c.sit=ns;c.hist.push({t:agora(),q:EU,x:'Situação: '+ns});
+      if(era&&!vai)c.hist.push({t:agora(),q:'Sistema',x:'Régua de cobrança voltou'});
+      if(!era&&vai)c.hist.push({t:agora(),q:'Sistema',x:'Régua de cobrança pausada para este pagador'});
+      ev(p,'Contestação: '+ns+(era&&!vai?'. Régua voltou':''));tela();refaz();U.toast(era&&!vai?'Contestação encerrada. A régua voltou.':'Situação registrada.');return}
+    if(e.target.closest('[data-cmem]'))memoria(c);
+  });
+}
+function contestar(pid,cobId){
+  iniciar();var api=RC(),pre=pid?pagador(pid):null;
+  var m=U.modal({titulo:'Nova contestação',ok:'Abrir contestação',html:'<div class="campo"><label for="nc-p">Pagador <i class="obr">*</i></label><select class="sel" id="nc-p"><option value="">Selecione</option>'+PAGS.map(function(p){return '<option value="'+p.id+'"'+(pre&&p.id===pre.id?' selected':'')+'>'+esc(p.nome)+'</option>'}).join('')+'</select></div>'+
+    '<div class="campo" style="margin-top:10px"><label>Cobranças contestadas <i class="obr">*</i></label><div class="ac-cobs" id="nc-c"></div></div>'+
+    '<div class="f-grade" style="margin-top:10px"><div class="campo"><label for="nc-m">Motivo <i class="obr">*</i></label><select class="sel" id="nc-m">'+C_MOT.map(function(x){return '<option>'+x+'</option>'}).join('')+'</select></div><div class="campo"><label for="nc-d">Prazo para responder <i class="obr">*</i></label><input id="nc-d" type="date" value="'+iso2(off(10))+'"></div></div>'+
+    '<div class="campo" style="margin-top:10px"><label for="nc-t">Descrição</label><textarea id="nc-t" class="cb-area" rows="3"></textarea></div><small class="erro" id="nc-e" hidden></small>'+
+    '<p class="dica-m" style="margin-top:8px">Ao abrir, a memória de cálculo é anexada e a régua de cobrança deste pagador fica parada até a contestação ser resolvida.</p>',
+    onOk:function(mm){
+      var id=+mm.querySelector('#nc-p').value,cs=[].slice.call(mm.querySelectorAll('[data-nc]')).filter(function(x){return x.checked}),d=mm.querySelector('#nc-d').value,e=mm.querySelector('#nc-e');
+      if(!id||!cs.length||!d){e.textContent='Escolha o pagador, ao menos uma cobrança e o prazo.';e.hidden=false;return false}
+      var p=pagador(id),cobs=cs.map(function(x){var cb=api.DB.cobs.filter(function(z){return z.id===x.dataset.nc})[0];return {id:cb.id,rot:cb.rot}});
+      var mot=mm.querySelector('#nc-m').value,t=agora();
+      CONT.unshift({id:nid++,pid:id,cobs:cobs,motivo:mot,desc:mm.querySelector('#nc-t').value.trim(),ab:new Date(HOJE0),pz:iso(d),resp:EU,sit:'Aberta',hist:[{t:t,q:EU,x:'Contestação aberta'},{t:t,q:'Sistema',x:'Memória de cálculo anexada'},{t:t,q:'Sistema',x:'Régua de cobrança pausada para este pagador'}]});
+      ev(p,'Contestação aberta ('+mot+'). Régua pausada');
+      if(el&&el.isConnected&&el.dataset.modulo==='inadimplencia'){aba='contestacoes';fCont='todas';refaz()}
+      U.toast('Contestação aberta. A régua ficou pausada e a memória de cálculo foi anexada.')}});
+  function cobs(){
+    var id=+m.querySelector('#nc-p').value,box=m.querySelector('#nc-c');
+    if(!id){box.innerHTML='<span class="nt">Escolha o pagador.</span>';return}
+    var l=api.DB.cobs.filter(function(c){return c.pid===id});
+    box.innerHTML=l.length?l.map(function(c){return '<label class="lc-cob"><input type="checkbox" data-nc="'+c.id+'"'+(cobId?(c.id===cobId?' checked':''):(c===l[l.length-1]||c===l.filter(function(z){return api.saldo(z)>.02})[0]?' checked':''))+'><span><b>'+esc(c.rot)+'</b><small>'+c.lojas.map(function(x){return esc(x.n)}).join(' · ')+'</small></span><b class="n">'+R(api.total(c))+'</b></label>'}).join(''):'<span class="nt">Este pagador não tem cobranças.</span>';
+  }
+  m.addEventListener('change',function(e){if(e.target.id==='nc-p'){cobId=null;cobs()}});cobs();
+}
+function corpo(){return aba==='atraso'?abaAtraso():aba==='acordos'?abaAcordos():aba==='bloqueios'?abaBloqueios():aba==='saidas'?abaSaidas():aba==='baixas'?abaBaixas():aba==='contestacoes'?abaCont():abaRel()}
 function sincDash(){
   var pf=window.MK_DASH.fila.parcelas;
   PAGS.forEach(function(p){if(!p.acordo||p.acordo.estado==='quebrado')return;p.acordo.parcelas.forEach(function(x){if(x.st!=='paga'&&dias(x.venc)>0){var n='Parcela '+x.n+' de '+p.acordo.parcelas.length+' do acordo';if(!pf.some(function(y){return y.p===p.nome&&y.n===n}))pf.push({p:p.nome,l:p.lojas.slice(0,3).map(function(l){return l.n}),v:x.valor,d:dias(x.venc),n:n})}})});
@@ -217,7 +303,7 @@ function regua(a){
 }
 function cobrar(a){
   var g=regua(a),p=a.p;
-  U.modal({titulo:'Cobrar '+p.nome,ok:'Enviar mensagem',html:'<p class="dica-m">Mensagem da régua, etapa '+g.e+'. Revise antes de enviar.</p>'+(reguaPausada(p)?'<div class="fe-aviso" style="margin-bottom:10px"><span>A régua está pausada para este pagador ('+(p.promessa?'promessa ativa':'acordo ativo')+'). Você está enviando uma cobrança manual.</span></div>':'')+'<textarea id="cb-txt" class="cb-area" rows="8">'+esc(g.t)+'</textarea>',
+  U.modal({titulo:'Cobrar '+p.nome,ok:'Enviar mensagem',html:'<p class="dica-m">Mensagem da régua, etapa '+g.e+'. Revise antes de enviar.</p>'+(reguaPausada(p)?'<div class="fe-aviso" style="margin-bottom:10px"><span>A régua está pausada para este pagador ('+(p.promessa?'promessa ativa':contestAtiva(p.id)?'contestação em andamento':'acordo ativo')+'). Você está enviando uma cobrança manual.</span></div>':'')+'<textarea id="cb-txt" class="cb-area" rows="8">'+esc(g.t)+'</textarea>',
     onOk:function(m){var x=m.querySelector('#cb-txt').value.trim();if(!x)return false;p.contato=0;ev(p,'Cobrança da régua enviada (etapa '+g.e+')');refaz();U.toast('Mensagem enviada.')}});
 }
 function promessa(p){
@@ -349,6 +435,7 @@ document.addEventListener('click',function(e){
   if((b=t.closest('[data-faixa]'))){faixa=b.dataset.faixa;pintar();return}
   if((b=t.closest('[data-ext]'))){ext[b.dataset.ext]=!ext[b.dataset.ext];pintar();return}
   if((b=t.closest('[data-fbl]'))){fBl=b.dataset.fbl;pintar();return}
+  if((b=t.closest('[data-fcont]'))){fCont=b.dataset.fcont;pintar();return}
   if((b=t.closest('[data-ia]'))){
     var a=b.dataset.ia,it=null;
     if(b.dataset.p)it=atrasos().filter(function(x){return String(x.p.id)===b.dataset.p})[0];
@@ -360,6 +447,7 @@ document.addEventListener('click',function(e){
     else if(a==='concluir')concluir(SAIDAS.filter(function(s){return s.id===+b.dataset.s})[0]);else if(a==='cancelarsaida')cancelarSaida(SAIDAS.filter(function(s){return s.id===+b.dataset.s})[0]);
     else if(a==='histsaida')histSaida(SAIDAS.filter(function(s){return s.id===+b.dataset.s})[0]);else if(a==='novasaida')novaSaida();
     else if(a==='bx')baixar(BAIXAS.filter(function(x){return x.id===+b.dataset.b})[0],b.dataset.t);
+    else if(a==='novacont')contestar();else if(a==='cdet')detalhe(CONT.filter(function(x){return x.id===+b.dataset.c})[0]);
     else if(a==='dia'){var v=+b.dataset.v;diaRel=v===0?0:Math.min(0,diaRel+v);pintar()}
     else if(a==='expplan')csv();else if(a==='exppdf')U.toast('O PDF é gerado no sistema final. Aqui, use a exportação para planilha.');
   }
@@ -369,5 +457,5 @@ document.addEventListener('input',function(e){
   if(e.target.id==='ia-q'){q=e.target.value;pintar()}
   if(e.target.id==='ia-n'){ext.n=Math.max(1,+e.target.value||1);var pos=e.target.selectionStart;pintar();var n=document.getElementById('ia-n');if(n){n.focus()}}
 });
-return {render:render};
+return {render:render,contestar:contestar,api:function(){iniciar();return {contestacoes:function(){return CONT.slice()},contestacoesDe:function(pid){return CONT.filter(function(c){return c.pid===pid})},contestacaoAtiva:contestAtiva,reguaPausada:function(pid){var p=pagador(pid);return !!p&&reguaPausada(p)}}}};
 })();

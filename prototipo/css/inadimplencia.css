@@ -1,5 +1,5 @@
 .ia-cont{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
-.ia-abas{grid-template-columns:repeat(6,minmax(0,1fr))}
+.ia-abas{grid-template-columns:repeat(7,minmax(0,1fr))}
 .ia-filtros{display:flex;flex-direction:column;gap:8px}
 .ia-ext{align-items:center}
 .ia-n input{width:74px;height:32px;padding:0 8px;text-align:center}
@@ -23,7 +23,7 @@
 .rl-f{padding:10px 16px;border-top:1px solid var(--borda);display:flex;flex-direction:column;gap:6px}
 .rl-f-t{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:16px;align-items:baseline;font-size:13.5px}
 .rl-f .barra{height:8px}.rl-f .barra i.dev{background:var(--travado-t)}
-@container (max-width:1000px){.ia-cont{grid-template-columns:repeat(3,minmax(0,1fr))}.ia-abas{grid-template-columns:repeat(3,minmax(0,1fr))}.rl-grade{grid-template-columns:1fr}}
+@container (max-width:1000px){.ia-cont{grid-template-columns:repeat(3,minmax(0,1fr))}.ia-abas{grid-template-columns:repeat(4,minmax(0,1fr))}.rl-grade{grid-template-columns:1fr}}
 @container (max-width:640px){.ia-cont{grid-template-columns:repeat(2,minmax(0,1fr))}.ia-abas{grid-template-columns:repeat(2,minmax(0,1fr))}.rl-f-t{grid-template-columns:1fr 1fr}}
 .tab-ia .fs{white-space:normal}
 .tab-ia td.nw{white-space:nowrap;font-size:12px}
@@ -31,3 +31,11 @@
 .rl-dia .rl-k>div{grid-column:span 2}.rl-dia .rl-k>div:nth-child(n+4){grid-column:span 3}
 .rl-k2{grid-template-columns:repeat(3,minmax(0,1fr))}
 @container (max-width:640px){.rl-dia .rl-k>div,.rl-dia .rl-k>div:nth-child(n+4){grid-column:span 3}.rl-dia .rl-k>div:last-child{grid-column:1 / -1}.rl-k2{grid-template-columns:1fr}}
+
+.c-venc{color:var(--travado-t)}
+.c-cab{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.c-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.c-info>div{background:var(--pagina);border:1px solid var(--borda);border-radius:var(--raio-bloco);padding:8px 12px;min-width:0}
+.c-info small{display:block;font-size:12px;color:var(--apoio)}.c-info b{font-size:13.5px;overflow-wrap:anywhere}
+.c-sits{margin-top:6px}.c-mem{margin-top:12px}
+.tab-ia .fs{white-space:normal}

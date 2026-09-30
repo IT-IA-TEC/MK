@@ -2,7 +2,7 @@
 window.MKFicha=(function(){
 var U=window.MKUI,esc=U.esc,ic=U.ic;
 var ST={ativa:'Ativa',bloqueada:'Bloqueada',inativa:'Inativa'};
-var abertos={resumo:true,lojas:true,hist:false,acomp:true,acordo:false,comp:false,tempo:false,pessoas:false,regras:false};
+var abertos={resumo:true,lojas:true,robo:true,hist:false,acomp:true,acordo:false,comp:false,tempo:false,pessoas:false,regras:false};
 var ouvintes=[],hooks={};
 function R(v){return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function agora(){var d=new Date();return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' · '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
@@ -53,11 +53,15 @@ function html(p,aba){
   aba=aba||'ficha';
   var f=financeiro(p),ac=acordoDe(p),cs=comprovantes(p),pes=pessoas(p),pend=cs.filter(function(c){return c.st==='conferir'}).length;
   var resumo='<div class="f-kv"><span>Total em aberto</span><b class="din">'+R(f.aberto)+'</b></div><div class="f-kv"><span>Próximo vencimento</span><b>'+esc(f.prox)+'</b></div>'+
+    '<div class="f-bts"><button class="btn sec" data-fa="memoria">Memória de cálculo</button></div>'+
     (f.comps.length?'<div class="f-sub">Competências em aberto</div>'+f.comps.map(function(c){return '<div class="f-kv"><span>'+esc(c[0])+'</span><b class="din">'+R(c[1])+'</b></div>'}).join(''):'<div class="f-vazio">Nenhuma competência em aberto.</div>');
   var A=window.MKMarketplaces&&MKMarketplaces.api();
   var lojas=p.lojas.map(function(l){return '<div class="f-lin f-lj"><div style="min-width:0"><div class="pg">'+(A?A.logoI(l.plat):'')+' '+esc(l.n)+'</div><div class="nt mono">'+esc(l.gs)+' · '+esc(l.plat)+'</div><div class="f-lj-s"><span class="selo '+l.st+'">'+ST[l.st]+'</span>'+(A?'<span class="nt">Conexão</span>'+A.conHtml(l)+'<span class="nt">Análise</span>'+A.seloHtml(l.gs):'')+'</div></div>'+(A?'<button class="btn sec" style="width:auto;padding:0 12px;height:30px" data-fa="loja" data-gs="'+esc(l.gs)+'">Ficha da loja</button>':'')+'</div>'}).join('')+
     '<div class="f-bts"><button class="btn esc" data-fa="bloquear">Bloquear todas e enviar</button><button class="btn sec" data-fa="liberar">Liberar todas e enviar</button></div>';
   var hist=A?A.historicoHtml(p):'';
+  var RB=window.MKRobo&&MKRobo.api(),rs=RB?RB.situacao(p.id):null;
+  var robo=rs?'<div class="f-robo"><div class="f-kv"><span>Situação do robô</span><b><span class="fs '+(rs.st==='Atende'?'vd':rs.st==='Em teste'?'ok':'gr')+'">'+rs.st+'</span></b></div>'+(rs.motivo?'<div class="f-kv"><span>Motivo</span><b>'+esc(rs.motivo)+'</b></div>':'')+'<div class="f-kv"><span>Desde</span><b>'+esc(rs.desde)+'</b></div><div class="f-kv"><span>Alterado por</span><b>'+esc(rs.quem)+'</b></div><div class="f-bts">'+['Atende','Não atende','Em teste'].map(function(s){return '<button class="btn '+(rs.st===s?'esc':'sec')+'" data-fa="robo" data-st="'+s+'"'+(rs.st===s?' disabled':'')+'>'+s+'</button>'}).join('')+'</div>'+
+    '<div class="f-sub">Modo de cobrança</div><div class="f-bts">'+[['','Padrão do sistema'],['pagador','Um Pix por pagador'],['loja','Um Pix por loja']].map(function(m){return '<button class="btn '+((p.modoCob||'')===m[0]?'esc':'sec')+'" data-fa="modocob" data-m="'+m[0]+'">'+m[1]+'</button>'}).join('')+'</div><div class="nt">'+(p.modoCob==='loja'?'Uma cobrança e um Pix para cada loja.':'Uma cobrança e um Pix para todas as lojas do pagador.')+' Padrão definido em Configurações.</div></div>':'';
   var acomp=p.promessa?'<div class="f-kv"><span>Promessa ativa</span><b>Pagar em '+esc(p.promessa.data)+'</b></div><div class="f-kv"><span>Prazo de retorno</span><b>'+esc(p.retorno||'Sem retorno marcado')+'</b></div>':'<div class="f-vazio">Nenhuma promessa ativa.</div>';
   acomp+='<div class="f-bts"><button class="btn sec" data-fa="resultado">Registrar resultado</button></div>';
   var acordo=ac?ac.parcelas.map(function(x){var cl=x.st==='paga'?'vd':x.st==='atrasada'?'gr':'ok',tx=x.st==='paga'?'Paga':x.st==='atrasada'?'Atrasada':'A vencer';return '<div class="f-lin"><div><div class="pg">Parcela '+x.n+' de '+ac.parcelas.length+'</div><div class="nt">Vence '+esc(x.venc)+'</div></div><div class="f-dir"><b class="din">'+R(x.valor)+'</b><span class="atraso '+cl+'">'+tx+'</span></div></div>'}).join(''):'<div class="f-vazio">Este pagador não tem acordo.</div><div class="f-bts"><button class="btn" data-fa="acordo">Criar acordo</button></div>';
@@ -69,7 +73,7 @@ function html(p,aba){
     (A?'<div class="f-abas" role="tablist" aria-label="Seções da ficha"><button role="tab" class="f-aba" data-fatab="ficha" aria-selected="'+(aba==='ficha')+'">Ficha</button><button role="tab" class="f-aba" data-fatab="analise" aria-selected="'+(aba==='analise')+'">Análise</button></div>':'');
   if(aba==='analise'&&A)return topo+'<div class="f-analise">'+A.visaoCliente(p)+'</div>';
   return topo+
-    bloco('resumo','Resumo financeiro',null,resumo)+bloco('lojas','Lojas de marketplace',p.lojas.length,lojas)+(A?bloco('hist','Histórico de análises',A.nAnalises(p),hist):'')+bloco('acomp','Acompanhamento',null,acomp)+bloco('acordo','Acordo',null,acordo)+
+    bloco('resumo','Resumo financeiro',null,resumo)+bloco('robo','Robô',rs?rs.st:null,robo)+bloco('lojas','Lojas de marketplace',p.lojas.length,lojas)+(A?bloco('hist','Histórico de análises',A.nAnalises(p),hist):'')+bloco('acomp','Acompanhamento',null,acomp)+bloco('acordo','Acordo',null,acordo)+
     bloco('comp','Comprovantes',pend?pend+' a conferir':cs.length,comp)+bloco('tempo','Linha do tempo',null,tl)+bloco('pessoas','Pessoas ligadas',pes.length,pe)+bloco('regras','Regras',null,regras);
 }
 function avisar(p){ouvintes.forEach(function(f){f(p)})}
@@ -87,6 +91,11 @@ function mount(el,p){
     var a=e.target.closest('[data-fa]');if(!a)return;
     var acao=a.dataset.fa;
     function refaz(){mount(el,p);avisar(p)}
+    if(acao==='memoria'){window.MKMemoria&&MKMemoria.abrir(p.id);return}
+    if(acao==='modocob'){p.modoCob=a.dataset.m;evento(p,'Modo de cobrança: '+(a.dataset.m==='loja'?'um Pix por loja':a.dataset.m==='pagador'?'um Pix por pagador':'padrão do sistema'));refaz();U.toast('Modo de cobrança salvo.');return}
+    if(acao==='robo'){var st=a.dataset.st,RBa=MKRobo.api(),fim=function(mot){RBa.definir(p.id,st,mot);evento(p,'Robô: '+st+(mot?' ('+mot+')':''));refaz();U.toast('Situação do robô salva.')};
+      if(st==='Não atende')U.modal({titulo:'Robô não atende este pagador',ok:'Confirmar',html:'<p class="dica-m">O robô deixa de falar com '+esc(p.nome)+'. Escreva o motivo.</p><div class="campo"><label for="rb-m">Motivo <i class="obr">*</i></label><textarea class="cb-area" id="rb-m" rows="3"></textarea><small class="erro" id="rb-me" hidden>Escreva o motivo.</small></div>',onOk:function(m){var v=m.querySelector('#rb-m').value.trim();if(!v){m.querySelector('#rb-me').hidden=false;return false}fim(v)}});
+      else fim('');return}
     if(acao==='pdfcliente'){MKMarketplaces.api().pdfCliente(p);return}
     if(acao==='loja'){var g1=el.closest('.gaveta');if(g1){var f1=g1.querySelector('.fechar');if(f1)f1.click()}MKMarketplaces.focar(a.dataset.gs);window.MKApp.ir('marketplaces');return}
     if(acao==='bloquear'||acao==='liberar'){

@@ -1,8 +1,9 @@
 /* Tela Recebimentos: conferir o dinheiro que entrou e ligar a uma cobrança. Dados de exemplo. */
 window.MKRecebimentos=(function(){
 var U=window.MKUI,esc=U.esc,ic=U.ic,PAGS=window.MK_PAG,el=null,pronto=false;
-var EU='Marina',aba='conferir',q='',pag1=1,PG=25,fSem={per:'todos',min:'',max:''},fConf='todos',lanc=null,nid=1000;
-var DB={cobs:[],pags:[],hist:[],fila:[],cred:{}};
+var EU='Marina',aba='pix',pxOrd='rec',pxPG=10,aba0='pix',q='',pag1=1,PG=25,fSem={per:'todos',min:'',max:''},fConf='todos',lanc=null,nid=1000;
+var DB={cobs:[],pags:[],hist:[],fila:[],cred:{},pix:[],div:[]};
+var MOTIVOS={valor:['Valor diferente','at'],terceiro:['Quem pagou é diferente do pagador','gr'],prazo:['Pix fora do prazo ou expirado','cn'],dup:['Pagamento duplicado','gr']};
 var HOJE=new Date();
 function R(v){return 'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function num(s){return +(''+s).replace(/\./g,'').replace(',','.')||0}
@@ -79,6 +80,23 @@ function iniciar(){
     var sug=null;if(pid&&r()<.6){var rot=['06/2026','05/2026','04/2026','03/2026','02/2026'][Math.floor(r()*5)];sug={rot:rot,valor:v}}
     DB.pags.push({id:nid++,pid:pid,nome:pid?null:'PIX RECEBIDO '+nomes[Math.floor(r()*nomes.length)],valor:v,ts:ts(dias,8+Math.floor(r()*10),Math.floor(r()*60)),forma:r()<.8?'Pix':'Transferência',banco:'Itaú',tid:'E'+(100000+i),aloc:[],estado:'pendente',sug:sug});
   }
+  /* Pix automático (baixa feita pelo banco) e divergentes (vão para uma pessoa) */
+  (function(){
+    var r2=lcg(31),prov=['Banco','Banco','Asaas/Inter'],ok=PAGS.slice(0,14);
+    function tidPix(k){var a='E18236120'+('00000'+(k*7919+13)).slice(-5),c='0123456789abcdefghijklmnopqrstuvwxyz';for(var j=0;j<18;j++)a+=c.charAt(Math.floor(r2()*c.length));return a}
+    ok.forEach(function(p,i){
+      var cs=DB.cobs.filter(function(c){return c.pid===p.id});if(!cs.length)return;
+      var c=cs[i%cs.length],dia=i<6?0:i<10?1:2+(i%4);
+      DB.pix.push({id:nid++,pid:p.id,cob:c.id,ts:ts(dia,8+(i*2)%10,(i*11)%60),valor:total(c),quem:i%5===3?p.nome.split(' ')[0]+' (CONTA DA EMPRESA)':p.nome,tid:tidPix(i),prov:prov[i%3]});
+    });
+    DB.pix.sort(function(a,b){return b.ts-a.ts});
+    var dv=[[2,'valor',0,-1,0.0],[6,'terceiro',0,0,0.0],[13,'prazo',1,0,0.0],[11,'dup',0,0,0.0],[4,'valor',0,1,0.0],[9,'terceiro',0,0,0.0]];
+    dv.forEach(function(x,i){
+      var p=pagador(x[0]);if(!p)return;var ab=abertas(x[0])[0]||DB.cobs.filter(function(c){return c.pid===x[0]})[0];if(!ab)return;
+      var esp=saldo(ab)>.02?saldo(ab):total(ab),rec=x[1]==='valor'?Math.round((x[3]<0?esp-180.4:esp+95.5)*100)/100:esp;
+      DB.div.push({id:nid++,pid:x[0],cob:ab.id,motivo:x[1],esp:esp,rec:rec,quem:x[1]==='terceiro'?['ALEXANDRE T. GOMES','MARCOS P. LIMA'][i%2]+' (conta pessoal)':p.nome,ts:ts(x[2],9+i,5+i*7),tid:tidPix(40+i)});
+    });
+  })();
   DB.pags.sort(function(a,b){return b.ts-a.ts});DB.hist.sort(function(a,b){return b.ts-a.ts});
 }
 /* ---------- efeitos ---------- */
@@ -125,13 +143,53 @@ function topo(){
   return '<div class="pag-topo"><div><h1>Recebimentos</h1><p class="sub">Tudo que chega passa por aqui até estar ligado a uma cobrança.</p></div></div>'+
    '<div class="fe-cont"><div class="fe-k"><small>Comprovantes a conferir</small><b class="'+(fila?'pend':'')+'">'+fila+'</b></div><div class="fe-k"><small>Pagamentos sem cobrança ligada</small><b class="'+(sem?'pend':'')+'">'+sem.toLocaleString('pt-BR')+'</b></div><div class="fe-k"><small>Recebido hoje</small><b>'+R(pgTotalHoje())+'</b></div><div class="fe-k"><small>Recebido no mês</small><b>'+R(pgTotalMes())+'</b></div></div>'+
    '<div class="rc-barra"><label class="busca-p"><span class="sr">Buscar</span>'+ic('search')+'<input id="rc-q" type="search" placeholder="Buscar por nome, telefone, GS ou valor" value="'+esc(q)+'"></label></div>'+
-   '<div class="rc-abas" role="tablist">'+[['conferir','A conferir',fila],['sem','Sem cobrança ligada',sem],['conf','Conferidos',DB.hist.length],['lancar','Lançar pagamento',null]].map(function(a){return '<button role="tab" class="rc-aba" data-aba="'+a[0]+'" aria-selected="'+(aba===a[0])+'">'+a[1]+(a[2]!==null?' <b>'+a[2].toLocaleString('pt-BR')+'</b>':'')+'</button>'}).join('')+'</div>';
+   '<div class="rc-abas rc-6" role="tablist">'+[['pix','Pix automático',DB.pix.length],['div','Divergentes',DB.div.length],['conferir','A conferir',fila],['sem','Sem cobrança ligada',sem],['conf','Conferidos',DB.hist.length],['lancar','Lançar pagamento',null]].map(function(a){return '<button role="tab" class="rc-aba" data-aba="'+a[0]+'" aria-selected="'+(aba===a[0])+'">'+a[1]+(a[2]!==null?' <b>'+a[2].toLocaleString('pt-BR')+'</b>':'')+'</button>'}).join('')+'</div>';
 }
 function sugestao(f){
   var pl=plano(f.pid,f.valor,f.alvo,'');
   if(!pl.alvo)return '<div class="rc-sug"><b>Sem cobrança em aberto</b><small>O valor vira crédito do pagador</small></div>';
   var s=saldo(pl.alvo),t=pl.tipo==='igual'?chipF('Igual ao em aberto','vd'):pl.tipo==='menor'?chipF('Parcial · resta '+R(s-f.valor),'at'):chipF('Sobra de '+R(pl.sobra),'ok');
   return '<div class="rc-sug"><b>'+esc(pl.alvo.rot)+'</b><small>Em aberto '+R(s)+'</small>'+t+'</div>';
+}
+function nomeCob(c){if(!c)return '—';var ls=c.lojas.map(function(l){return l.n});return '<div class="lj-n">'+esc(c.rot)+'</div><div class="nt">'+esc(ls.slice(0,2).join(' · '))+(ls.length>2?' +'+(ls.length-2):'')+'</div>'}
+function cobDe(id){return DB.cobs.filter(function(c){return c.id===id})[0]}
+function pixFiltrado(){
+  var l=DB.pix.filter(function(x){var c=cobDe(x.cob);return casa(q,x.pid,x.valor,gsDe(x.pid),'',x.quem+' '+x.tid+' '+(c?c.rot:''))});
+  l.sort(function(a,b){return pxOrd==='val'?b.valor-a.valor:pxOrd==='pag'?so(nomeDe(a.pid)).localeCompare(so(nomeDe(b.pid))):b.ts-a.ts});return l;
+}
+function hm(ts){var d=new Date(ts);return d2(d.getHours())+':'+d2(d.getMinutes())}
+function abaPix(){
+  var hj=fdata(HOJE.getTime()),h=DB.pix.filter(function(x){return fdata(x.ts)===hj}),vh=h.reduce(function(a,x){return a+x.valor},0),pct=DB.pix.length?100:0;
+  var l=pixFiltrado(),tot=l.length,pgs=Math.max(1,Math.ceil(tot/pxPG));if(pag1>pgs)pag1=pgs;var vis=l.slice((pag1-1)*pxPG,pag1*pxPG);
+  return '<div class="fe-cont"><div class="fe-k"><small>Pix recebidos hoje</small><b>'+h.length+'</b></div><div class="fe-k"><small>Valor recebido hoje por Pix</small><b>'+R(vh)+'</b></div><div class="fe-k"><small>Baixa automática</small><b>'+pct+'%</b></div></div>'+
+   '<div class="fe-barra"><div class="fe-info">O banco avisa o Pix e o sistema dá a baixa sozinho. Nada para conferir aqui. O que não bate vai para Divergentes.</div><label class="sel-p"><span>Ordenar por</span><select class="sel" id="px-ord">'+[['rec','Mais recentes'],['val','Maior valor'],['pag','Pagador (A a Z)']].map(function(o){return '<option value="'+o[0]+'"'+(pxOrd===o[0]?' selected':'')+'>'+o[1]+'</option>'}).join('')+'</select></label></div>'+
+   '<div class="tab-cartao"><table class="tab-fe tab-rc"><colgroup><col style="width:9%"><col style="width:17%"><col style="width:15%"><col style="width:11%"><col style="width:17%"><col style="width:19%"><col style="width:12%"></colgroup><thead><tr><th>Data e hora</th><th>Pagador</th><th>Cobrança</th><th class="n">Valor</th><th>Quem pagou (vem do banco)</th><th>Identificador da transação</th><th>Situação</th></tr></thead><tbody>'+
+   (vis.length?vis.map(function(x){return '<tr><td data-rot="Data e hora"><div>'+fdata(x.ts)+'</div><small class="nt">'+hm(x.ts)+'</small></td><td data-rot="Pagador"><div class="lj-n">'+esc(nomeDe(x.pid))+'</div><div class="nt">Provedor: '+esc(x.prov)+'</div></td><td data-rot="Cobrança">'+nomeCob(cobDe(x.cob))+'</td><td data-rot="Valor" class="n v40">'+R(x.valor)+'</td><td data-rot="Quem pagou" class="rp">'+esc(x.quem)+'</td><td data-rot="Identificador" class="rp"><span class="mono rc-tid">'+esc(x.tid)+'</span></td><td data-rot="Situação">'+chipF('Baixa automática','vd')+'</td></tr>'}).join(''):'<tr><td colspan="7" class="vazio-t"><b>Nenhum Pix nesta busca.</b><br>Limpe a busca para ver todos.</td></tr>')+'</tbody></table></div>'+
+   '<div class="rc-pag"><button class="btn sec" data-pg="-1" style="width:auto;padding:0 14px"'+(pag1<=1?' disabled':'')+'>Anterior</button><span>Página '+pag1+' de '+pgs+' · '+tot+' Pix</span><button class="btn sec" data-pg="1" style="width:auto;padding:0 14px"'+(pag1>=pgs?' disabled':'')+'>Próxima</button></div>';
+}
+function divFiltrada(){return DB.div.filter(function(x){var c=cobDe(x.cob);return casa(q,x.pid,x.rec,gsDe(x.pid),'',x.quem+' '+(c?c.rot:'')+' '+MOTIVOS[x.motivo][0])})}
+function abaDiv(){
+  var l=divFiltrada();
+  return '<div class="fe-barra"><div class="fe-info"><b>'+DB.div.length+'</b> Pix esperando uma pessoa. O robô não resolve divergência. Ela vai para uma pessoa decidir.</div></div>'+
+   '<div class="tab-cartao"><table class="tab-fe tab-rc"><colgroup><col style="width:17%"><col style="width:16%"><col style="width:14%"><col style="width:12%"><col style="width:12%"><col style="width:16%"><col style="width:13%"></colgroup><thead><tr><th>Motivo</th><th>Pagador</th><th>Cobrança</th><th class="n">Esperado</th><th class="n">Recebido</th><th>Quem pagou e quando</th><th>Ação</th></tr></thead><tbody>'+
+   (l.length?l.map(function(x){var m=MOTIVOS[x.motivo],dif=Math.abs(x.rec-x.esp)>.005;
+     return '<tr class="rc-alerta"><td data-rot="Motivo">'+chipF(m[0],m[1])+'</td><td data-rot="Pagador"><div class="lj-n">'+esc(nomeDe(x.pid))+'</div></td><td data-rot="Cobrança">'+nomeCob(cobDe(x.cob))+'</td><td data-rot="Esperado" class="n">'+R(x.esp)+'</td><td data-rot="Recebido" class="n v40"><b class="'+(dif?'pend':'')+'">'+R(x.rec)+'</b></td><td data-rot="Quem pagou" class="rp"><div>'+esc(x.quem)+'</div><div class="nt">'+fhora(x.ts)+'</div><div class="nt mono rc-tid">'+esc(x.tid)+'</div></td><td data-rot="Ação" class="rc-ac"><button class="btn" data-rc="resolver" data-d="'+x.id+'" style="width:auto;padding:0 14px">Resolver</button></td></tr>'}).join(''):'<tr><td colspan="7" class="vazio-t"><b>'+(DB.div.length?'Nenhuma divergência nesta busca.':'Nenhuma divergência.')+'</b><br>'+(DB.div.length?'Limpe a busca para ver todas.':'Todo Pix bateu com a cobrança.')+'</td></tr>')+'</tbody></table></div>';
+}
+function resolverDiv(x){
+  var p=pagador(x.pid),ab=abertas(x.pid),c0=cobDe(x.cob);
+  var outras=ab.filter(function(c){return c.id!==x.cob});
+  var m=U.modal({titulo:'Resolver divergência',ok:'Confirmar',html:'<p class="dica-m">'+chipF(MOTIVOS[x.motivo][0],MOTIVOS[x.motivo][1])+'</p><p style="margin-top:8px"><b>'+esc(nomeDe(x.pid))+'</b> · '+esc(c0?c0.rot:'')+'<br>Esperado '+R(x.esp)+' · Recebido <b>'+R(x.rec)+'</b><br>Pago por '+esc(x.quem)+'</p>'+
+    '<div class="lc-rad"><label><input type="radio" name="rs" value="aceitar" checked><span>Aceitar e dar baixa</span></label><label><input type="radio" name="rs" value="devolver"><span>Devolver (estornar ao banco)</span></label><label><input type="radio" name="rs" value="ligar"'+(outras.length?'':' disabled')+'><span>Ligar a outra cobrança'+(outras.length?'':' (não há outra em aberto)')+'</span></label><label><input type="radio" name="rs" value="credito"><span>Marcar como crédito do pagador</span></label></div>'+
+    (outras.length?'<div class="campo" style="margin-top:10px"><label for="rs-c">Outra cobrança</label><select class="sel" id="rs-c">'+outras.map(function(c){return '<option value="'+c.id+'">'+esc(c.rot)+' · em aberto '+R(saldo(c))+'</option>'}).join('')+'</select></div>':'')+
+    '<div class="campo" style="margin-top:10px"><label for="rs-m">Observação</label><textarea id="rs-m" class="cb-area" rows="2"></textarea></div>',
+    onOk:function(mm){
+      var op=mm.querySelector('input[name=rs]:checked').value,ob=mm.querySelector('#rs-m').value.trim(),mot=MOTIVOS[x.motivo][0]+(ob?'. '+ob:''),txt,msg;
+      if(op==='aceitar'){var pl=plano(x.pid,x.rec,x.cob,'');aplicar(x.pid,x.rec,pl.aloc,pl.cred,{ts:x.ts,tid:x.tid,forma:'Pix'});msg='Baixa feita.'}
+      else if(op==='ligar'){var id=mm.querySelector('#rs-c').value,pl2=plano(x.pid,x.rec,id,'');aplicar(x.pid,x.rec,pl2.aloc,pl2.cred,{ts:x.ts,tid:x.tid,forma:'Pix'});msg='Ligado a outra cobrança.'}
+      else if(op==='credito'){aplicar(x.pid,x.rec,[],x.rec,{ts:x.ts,tid:x.tid,forma:'Pix'});msg='Guardado como crédito.'}
+      else{DB.hist.unshift({id:nid++,pgId:null,pid:x.pid,valor:x.rec,ts:Date.now(),quem:EU,comp:'Pix '+x.tid,tipo:'devolvido',motivo:mot});msg='Devolução registrada.'}
+      if(op!=='devolver'&&DB.hist[0])DB.hist[0].motivo='Divergência resolvida: '+mot;
+      DB.div=DB.div.filter(function(d){return d!==x});refaz();U.toast(msg+' Fica registrado em Conferidos.')}});
 }
 function abaConferir(){
   var l=filaFiltrada();
@@ -186,7 +244,7 @@ function render(alvo){
   el.innerHTML='<div class="dash fe-w rc-w">'+topo()+'<section class="bloco"><div class="fe-painel" id="rc-corpo">'+corpo()+'</div></section><div class="aviso">Dados de exemplo. Servem só para desenhar a tela.</div></div>';
   U.icones();
 }
-function corpo(){return aba==='conferir'?abaConferir():aba==='sem'?abaSem():aba==='conf'?abaConf():abaLancar()}
+function corpo(){return aba==='pix'?abaPix():aba==='div'?abaDiv():aba==='conferir'?abaConferir():aba==='sem'?abaSem():aba==='conf'?abaConf():abaLancar()}
 function pintar(){var c=document.getElementById('rc-corpo');if(c){c.innerHTML=corpo();U.icones()}}
 function refaz(){var y=window.scrollY;render();window.scrollTo(0,y)}
 /* ---------- ações ---------- */
@@ -302,7 +360,7 @@ document.addEventListener('click',function(e){
   if((b=t.closest('[data-rc]'))){
     var a=b.dataset.rc,f=b.dataset.f?fila1(+b.dataset.f):null,p=b.dataset.p?pg1(+b.dataset.p):null;
     if(a==='confirmar')confirmar(f);else if(a==='decidir')decidir(f);else if(a==='mais')menuFila(b,f);
-    else if(a==='ligar')ligar(p);
+    else if(a==='ligar')ligar(p);else if(a==='resolver')resolverDiv(DB.div.filter(function(d){return d.id===+b.dataset.d})[0]);
     else if(a==='mais2')U.menu(b,[{id:'credito',t:'Marcar como crédito',icone:'piggy-bank'},{id:'devolvido',t:'Marcar como devolvido ou estornado',icone:'undo-2'},{id:'descartado',t:'Descartar',icone:'trash-2',perigo:true}],function(id){marcar(p,id)});
     else if(a==='desfazer')desfazer(DB.hist.filter(function(h){return h.id===+b.dataset.h})[0]);
     else if(a==='exportar')exportar();else if(a==='limpar'){lanc=null;refaz()}
@@ -318,6 +376,7 @@ document.addEventListener('input',function(e){
 });
 document.addEventListener('change',function(e){
   if(!noEl(e))return;
+  if(e.target.id==='px-ord'){pxOrd=e.target.value;pag1=1;pintar()}
   if(e.target.id==='sm-per'){fSem.per=e.target.value;pag1=1;pintar()}
   if(e.target.id==='lc-pid'){lerForm();lanc.sel={};pintar();var f=document.getElementById('lc-valor');if(f)f.focus()}
 });

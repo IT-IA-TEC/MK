@@ -39,3 +39,10 @@
 .dv-lin .sel{height:34px;width:100%;text-align:right}
 @container (max-width:1000px){.lc-grade{grid-template-columns:1fr}}
 @container (max-width:640px){.rc-abas{grid-template-columns:repeat(2,minmax(0,1fr))}.rc-aba{border:1px solid var(--borda);border-radius:var(--raio-controle);margin:0 4px 4px 0}.rc-abas{border:0;gap:6px}}
+
+.rc-abas.rc-6{grid-template-columns:repeat(6,minmax(0,1fr))}
+.rc-aba{min-width:0;flex-wrap:wrap;text-align:center;line-height:1.2}
+.rc-tid{overflow-wrap:anywhere;word-break:break-all;font-size:11.5px}
+.tab-rc .fs{white-space:normal}
+@container (max-width:1000px){.rc-abas.rc-6{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@container (max-width:640px){.rc-abas.rc-6{grid-template-columns:repeat(2,minmax(0,1fr))}}

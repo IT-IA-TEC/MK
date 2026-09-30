@@ -1,0 +1,60 @@
+/* Robô e Memória de cálculo */
+.rb-estado{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.rb-alerta{justify-content:space-between;flex-wrap:wrap;background:var(--travado-f);color:var(--travado-t);border-color:var(--travado-t)}
+.rb-alerta span{flex:1 1 280px}
+.rb-k{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.rb-k3{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.rb-k .nt,.rb-k3 .nt{display:block;margin-top:2px}
+.rb-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:stretch}
+.rb-g2{grid-template-columns:repeat(auto-fit,minmax(380px,1fr))}
+.rb-g>.cx{margin:0;display:flex;flex-direction:column}
+.rb-g .cf-corpo{flex:1}
+.rb-g .cx-cab .fs{margin-left:auto}
+.rb-ac{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed var(--borda)}
+.rb-ac:last-of-type{border-bottom:0}
+.rb-ac b{font-size:13.5px}
+.rb-dias{display:flex;gap:6px;flex-wrap:wrap}.rb-dias .chip-f{flex:1 1 52px;padding:0 6px}
+.rb-chips{padding:0 0 4px;border-bottom:0}
+.rb-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+.rb-cards .cx{margin:0;display:flex;flex-direction:column}
+.rb-cards .cf-corpo{flex:1}
+.rb-bl{background:var(--hover);border:1px solid var(--borda);border-radius:var(--raio-controle);padding:8px 12px}
+.rb-bl small{display:block;font:600 11px var(--f-maquina);text-transform:uppercase;letter-spacing:.04em;color:var(--apoio)}
+.rb-bl p{margin-top:2px;font-size:13.5px}
+.rb-bl-r{background:var(--ok-suave);border-color:var(--verde-medio)}
+.rb-lote{background:var(--grad-cabeca);border:1px solid var(--borda);border-radius:var(--raio-bloco);padding:8px 12px}
+.rb-sim{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.rb-res{font:700 13px var(--f-display);text-transform:uppercase;letter-spacing:.04em;padding:8px 12px;border-radius:var(--raio-controle)}
+.rb-res.ok{background:var(--verde-claro);color:var(--tinta)}.rb-res.no{background:var(--travado-f);color:var(--travado-t)}
+.rb-bolha{background:var(--ok-suave);border:1px solid var(--verde-medio);border-radius:var(--raio-bloco);border-top-left-radius:3px;padding:10px 14px;font-size:13.5px;box-shadow:var(--sombra-1)}
+.rb-chk{list-style:none;padding:0;display:flex;flex-direction:column;gap:4px;font-size:13px}
+.rb-chk li{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.rb-chk b{font:600 11px var(--f-maquina);text-transform:uppercase;padding:1px 7px;border-radius:99px}
+.rb-chk .ok b{background:var(--verde-claro);color:var(--tinta)}.rb-chk .no b{background:var(--travado-f);color:var(--travado-t)}
+.fe-aviso.rb-fixo{background:var(--curso-f);color:var(--curso-t);border-color:var(--curso-f)}
+/* modo de cobrança e bloco Robô na ficha */
+.f-robo{display:flex;flex-direction:column;gap:8px}
+.f-robo .f-bts .btn{flex:1 1 100px}
+/* memória de cálculo */
+.mm-topo{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;padding:14px 20px;background:var(--grad-cabeca);border-bottom:1px solid var(--borda)}
+.mm-corpo{padding:16px 20px;display:flex;flex-direction:column;gap:14px}
+.mm-kv{display:flex;flex-direction:column;gap:2px;padding:8px 12px;border:1px solid var(--borda);border-radius:var(--raio-controle);background:var(--cartao);min-width:0}
+.mm-kv span{font:500 11px var(--f-maquina);text-transform:uppercase;letter-spacing:.04em;color:var(--apoio)}
+.mm-kv b{font-size:14px;overflow-wrap:anywhere}
+.mm-destaque{background:var(--verde-claro);border-color:var(--verde-medio)}.mm-destaque b{font-size:16px;color:var(--tinta)}
+.mm-loja{border:1px solid var(--borda-forte);border-radius:var(--raio-cartao);padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--cartao)}
+.mm-cab{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.mm-cab h4{font:600 15px var(--f-corpo);overflow-wrap:anywhere}
+.mm-grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.mm-conta{display:flex;flex-direction:column;gap:4px;background:var(--hover);border:1px dashed var(--verde-medio);border-radius:var(--raio-controle);padding:8px 12px}
+.mm-conta code{font:600 13px var(--f-maquina);overflow-wrap:anywhere;color:var(--tinta)}
+.mm-vs summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--verde-marca)}
+.mm-ext{border:1px solid var(--borda-forte);border-radius:var(--raio-cartao);overflow:hidden;background:var(--cartao)}
+.mm-txt{margin:0;padding:14px 16px;font:13px/1.6 var(--f-maquina);white-space:pre-wrap;overflow-wrap:anywhere;background:var(--ok-suave)}
+.mm-ext .f-bts{padding:0 14px 14px}
+.rb-selo{margin:4px 0 0!important}
+
+.rb-g>.cx,.rb-cards>.cx{margin-top:0!important}
+.rb-k,.rb-k3{display:flex;flex-wrap:wrap}.rb-k>.fe-k{flex:1 1 150px}.rb-k3>.fe-k{flex:1 1 130px}
+.mk-abas-p .rc-aba{height:auto;min-height:44px;padding:6px 8px;gap:6px;flex-wrap:nowrap}
+.mk-abas-p .rc-aba span{min-width:0}

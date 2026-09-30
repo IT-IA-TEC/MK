@@ -1,6 +1,6 @@
 /* Tela Pagadores e Lojas. Dados de exemplo em window.MK_PAG. */
 window.MKPagadores=(function(){
-var DADOS=window.MK_PAG,el=null,fLoja='',fFin='';
+var DADOS=window.MK_PAG,el=null,fLoja='',fFin='',fRobo='';
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function ic(n){return '<i data-lucide="'+n+'"></i>'}
 function so(s){return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')}
@@ -9,6 +9,7 @@ function filtrar(){
   var F=MKFiltro,r=[];
   DADOS.forEach(function(d){
     if(fFin&&d.fin!==fFin)return;
+    if(fRobo&&(window.MKRobo?MKRobo.api().situacao(d.id).st:'Atende')!==fRobo)return;
     var ls=d.lojas.filter(function(l){return (!fLoja||l.st===fLoja)&&F.passa({p:d,l:l})});
     if(ls.length)r.push({p:d,ls:ls});
   });
@@ -18,7 +19,7 @@ function selo(st){return st==='ativa'?'':'<span class="selo '+st+'">'+(st==='blo
 function linhas(lista){
   if(!lista.length)return '<tr><td colspan="3" class="vazio-t"><b>Nenhum pagador encontrado.</b><br>Troque a busca ou limpe os filtros.<div><button class="btn sec" id="limpar" style="width:auto;margin-top:12px">Limpar filtros</button></div></td></tr>';
   return lista.map(function(it){var p=it.p;
-    return '<tr class="pag-lin" tabindex="0" data-id="'+p.id+'"><td class="c-resp" data-rot="Responsável">'+esc(p.nome)+'</td>'+
+    return '<tr class="pag-lin" tabindex="0" data-id="'+p.id+'"><td class="c-resp" data-rot="Responsável">'+esc(p.nome)+(window.MKRobo&&MKRobo.api().situacao(p.id).st==='Não atende'?'<div><span class="selo inativa rb-selo" title="'+esc(MKRobo.api().situacao(p.id).motivo)+'">Robô não atende</span></div>':'')+'</td>'+
      '<td class="c-fone" data-rot="WhatsApp"><span class="fone">'+esc(p.fone)+'</span><button class="btn-zap" data-zap="'+p.id+'" aria-label="Abrir conversa de '+esc(p.nome)+'" title="Abrir conversa">'+ic('message-circle')+'</button></td>'+
      '<td class="c-lojas" data-rot="Lojas">'+it.ls.map(function(l){var A=MKMarketplaces.api();return '<div class="loja"><div class="loja-n">'+A.logoI(l.plat)+'<span>'+esc(l.n)+'</span>'+selo(l.st)+'<span class="loja-an">'+A.seloHtml(l.gs)+'</span></div><div class="loja-gs">'+esc(l.gs)+' · '+esc(l.plat)+'</div></div>'}).join('')+'</td></tr>';
   }).join('');
@@ -34,10 +35,10 @@ function render(alvo){
   if(alvo)el=alvo;
   el.innerHTML='<div class="dash"><div class="pag-topo"><div><h1>Pagadores e Lojas</h1><p class="sub" id="pag-cont">'+contagem(filtrar())+'</p></div>'+
    '<button class="btn" id="novo" style="width:auto;height:36px;padding:0 16px">+ Novo pagador</button></div>'+
-   MKFiltro.html({dentro:'<label class="sel-p"><span>Situação da loja</span><select class="sel" id="pag-loja"><option value="">Todas</option><option value="ativa">Ativa</option><option value="bloqueada">Bloqueada</option><option value="inativa">Inativa</option></select></label><label class="sel-p"><span>Situação financeira</span><select class="sel" id="pag-fin"><option value="">Todas</option><option value="dia">Em dia</option><option value="avencer">A vencer</option><option value="atraso">Em atraso</option><option value="acordo">Em acordo</option></select></label>'})+
+   MKFiltro.html({dentro:'<label class="sel-p"><span>Situação da loja</span><select class="sel" id="pag-loja"><option value="">Todas</option><option value="ativa">Ativa</option><option value="bloqueada">Bloqueada</option><option value="inativa">Inativa</option></select></label><label class="sel-p"><span>Situação financeira</span><select class="sel" id="pag-fin"><option value="">Todas</option><option value="dia">Em dia</option><option value="avencer">A vencer</option><option value="atraso">Em atraso</option><option value="acordo">Em acordo</option></select></label><label class="sel-p"><span>Situação do robô</span><select class="sel" id="pag-robo"><option value="">Todas</option><option>Atende</option><option>Não atende</option><option>Em teste</option></select></label>'})+
    '<div class="tab-cartao"><table class="tab-pag"><colgroup><col class="k1"><col class="k2"><col class="k3"></colgroup><thead><tr><th>Responsável</th><th>WhatsApp</th><th>Lojas</th></tr></thead><tbody id="pag-corpo"></tbody></table></div>'+
    '<div class="aviso">Dados de exemplo. Servem só para desenhar a tela.</div></div>';
-  document.getElementById('pag-loja').value=fLoja;document.getElementById('pag-fin').value=fFin;
+  document.getElementById('pag-loja').value=fLoja;document.getElementById('pag-fin').value=fFin;document.getElementById('pag-robo').value=fRobo;
   MKFiltro.ao(pintar);pintar();
 }
 /* cadastro */
@@ -82,15 +83,15 @@ function novo(){
     });
     if(ruim){var f=g.querySelector('#'+primeiro);if(f)f.focus();return}
     DADOS.unshift({id:Date.now(),nome:g.querySelector('#pn').value.trim().toUpperCase(),fone:g.querySelector('#pw').value.trim(),fin:'dia',lojas:lojas});
-    fechar();MKFiltro.limpar();fLoja='';fFin='';render();aviso('Pagador cadastrado.');
+    fechar();MKFiltro.limpar();fLoja='';fFin='';fRobo='';render();aviso('Pagador cadastrado.');
   });
 }
 function aviso(msg){var t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.className='toast';t.setAttribute('role','status');document.body.appendChild(t)}t.textContent=msg;t.classList.add('on');clearTimeout(aviso.h);aviso.h=setTimeout(function(){t.classList.remove('on')},2600)}
-document.addEventListener('change',function(e){if(e.target.id==='pag-loja'){fLoja=e.target.value;pintar()}if(e.target.id==='pag-fin'){fFin=e.target.value;pintar()}});
+document.addEventListener('change',function(e){if(e.target.id==='pag-loja'){fLoja=e.target.value;pintar()}if(e.target.id==='pag-fin'){fFin=e.target.value;pintar()}if(e.target.id==='pag-robo'){fRobo=e.target.value;pintar()}});
 document.addEventListener('click',function(e){
   if(!el||!el.isConnected||!el.contains(e.target)&&el.dataset.modulo==='pagadores')return;
   if(e.target.closest('#novo')){novo();return}
-  if(e.target.closest('#limpar')){MKFiltro.limpar();fLoja='';fFin='';render();return}
+  if(e.target.closest('#limpar')){MKFiltro.limpar();fLoja='';fFin='';fRobo='';render();return}
   var z=e.target.closest('[data-zap]');
   if(z){var p=DADOS.filter(function(x){return String(x.id)===z.dataset.zap})[0];aviso('Abriria a conversa de '+p.nome+' na tela Conversas. Ainda sem função.');return}
   var l=e.target.closest('.pag-lin');if(l)MKFicha.abrir(DADOS.filter(function(x){return String(x.id)===l.dataset.id})[0]);

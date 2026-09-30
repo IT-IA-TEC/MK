@@ -19,11 +19,24 @@ function ativas(){return CONV.filter(function(c){return !c.arq})}
 function preview(m){
   if(m.apagada)return 'Mensagem apagada';
   var t=m.t==='txt'?m.x:m.t==='aud'?'Áudio '+m.x:m.t==='img'?'Imagem':'PDF · '+m.x;
-  return (m.de==='e'?'Você: ':m.de==='n'?'Nota: ':'')+t;
+  return (m.robo?'Robô: ':m.de==='e'?'Você: ':m.de==='n'?'Nota: ':'')+t;
 }
 function iniciais(s){var w=s.replace(/[^A-Za-zÀ-ú ]/g,'').trim().split(/\s+/);return (w[0][0]+(w[1]?w[1][0]:'')).toUpperCase()}
+function roboApi(){return window.MKRobo&&MKRobo.api?MKRobo.api():null}
+function roboGeralPausado(){var a=roboApi();return !!(a&&a.pausado&&a.pausado())}
+function semear(){
+  function c(id){return CONV.filter(function(x){return x.id===id})[0]}
+  function R(id,i){var x=c(id);if(x&&x.msgs[i])x.msgs[i].robo=true}
+  [[2,0],[3,0],[4,0],[6,0],[8,0],[9,0],[10,0]].forEach(function(a){R(a[0],a[1])});
+  var c1=c(1);if(c1){c1.msgs.unshift({de:'e',robo:true,t:'txt',x:'Olá, Adriano! Segue a cobrança de setembro: total de R$ 6.730,00, vencimento dia 20. Pague por Pix automático no link: pix.itmk.exemplo/c/7731. A baixa é feita sozinha.',h:'08:00',d:'Ontem',feita:true})}
+  var c7=c(7);if(c7){c7.msgs.unshift({de:'e',robo:true,t:'txt',x:'Olá! Passando para lembrar que a cobrança vence dia 20. Você pode pagar pelo Pix do link que enviamos.',h:'07:50',d:'Hoje'});c7.msgs.push({de:'e',robo:true,t:'txt',x:'Esse assunto é com a equipe. Já passei a conversa para uma pessoa e ela responde em breve.',h:'07:56',d:'Hoje'});c7.escal='Pediu nota fiscal (fora da cobrança)'}
+  var c5=c(5);if(c5){c5.msgs.splice(1,0,{de:'e',robo:true,t:'txt',x:'Pagamento confirmado: Pix de R$ 4.810,00 recebido e baixado automaticamente. Obrigado!',h:'14:05',d:'Ontem'})}
+  var c6=c(6);if(c6){c6.msgs.push({de:'e',robo:true,t:'txt',x:'Entendi. Parcelamento é decidido pela equipe. Vou passar sua conversa para uma pessoa agora.',h:'10:16',d:'Hoje'});c6.escal='Cliente pediu parcelamento'}
+  if(c1){c1.msgs.push({de:'e',robo:true,t:'txt',x:'Vou passar sua dúvida sobre o valor para a equipe conferir a memória de cálculo.',h:'09:12',d:'Hoje'});c1.escal='Contestou o valor'}
+  CONV.forEach(function(x){x.assumida=false})
+}
 function iniciar(){
-  if(iniciado)return;iniciado=true;
+  if(iniciado)return;iniciado=true;semear();
   CONV.forEach(function(c,i){c.ord=CONV.length-i;c.robo=true;
     var p=pag(c);if(!p)return;var lista=F.comprovantes(p);
     c.msgs.forEach(function(m){if(m.de==='p'&&(m.t==='img'||m.t==='pdf')){if(m.comp)lista.push({arq:m.x,data:'Ontem',st:'conferido',comp:m.comp});else lista.push({arq:m.x,data:'Hoje, '+m.h,st:'conferir',ref:m})}});
@@ -66,12 +79,12 @@ function pintarLista(){
 function topoHtml(c){
   var p=pag(c);
   return '<button class="btn-voltar" data-voltar aria-label="Voltar para a lista">'+ic('arrow-left')+'</button><span class="cv-av'+(c.grupo?' g':'')+'">'+(c.grupo?ic('users'):esc(iniciais(nome(c))))+'</span>'+
-   '<div class="ch-nome"><b>'+esc(nome(c))+'</b><div class="ch-sub">'+(p?'<span class="mono">'+esc(p.fone)+'</span>'+F.selo(p):'<span>Grupo · '+(c.id===101?'4':'6')+' participantes</span>')+(c.dono?'<span class="ch-dono">Atendente: '+esc(c.dono)+'</span>':'<span class="cv-tag sd">Sem dono</span>')+'</div></div>'+
-   '<div class="ch-acoes">'+(p?'<button class="btn sec btn-ficha" data-ficha style="width:auto;padding:0 12px">Ficha</button><button class="btn sec" data-robo aria-pressed="'+c.robo+'" title="Só quem tem permissão liga ou desliga o robô" style="width:auto;padding:0 12px"><span class="robo-p '+(c.robo?'on':'')+'"></span>Robô '+(c.robo?'ON':'OFF')+'</button><button class="btn" data-cobrar style="width:auto;padding:0 14px">Enviar cobrança</button>':'')+'</div>';
+   '<div class="ch-nome"><b>'+esc(nome(c))+'</b><div class="ch-sub">'+(p?'<span class="mono">'+esc(p.fone)+'</span>'+F.selo(p):'<span>Grupo · '+(c.id===101?'4':'6')+' participantes</span>')+(c.dono?'<span class="ch-dono">Atendente: '+esc(c.dono)+'</span>':'<span class="cv-tag sd">Sem dono</span>')+(p&&c.assumida?'<span class="cv-tag sd">Robô pausado nesta conversa</span>':'')+(p&&!c.assumida&&roboGeralPausado()?'<span class="cv-tag sd">Robô pausado (geral)</span>':'')+'</div></div>'+
+   '<div class="ch-acoes">'+(p?'<button class="btn sec btn-ficha" data-ficha style="width:auto;padding:0 12px">Ficha</button><button class="btn sec" data-assumir aria-pressed="'+!!c.assumida+'" style="width:auto;padding:0 12px">'+(c.assumida?'Devolver ao robô':'Assumir conversa')+'</button><button class="btn sec" data-contestar style="width:auto;padding:0 12px">Contestar</button><button class="btn sec" data-memoria style="width:auto;padding:0 12px">Memória de cálculo</button><button class="btn sec" data-robo aria-pressed="'+c.robo+'" title="Só quem tem permissão liga ou desliga o robô" style="width:auto;padding:0 12px"><span class="robo-p '+(c.robo?'on':'')+'"></span>Robô '+(c.robo?'ON':'OFF')+'</button><button class="btn" data-cobrar style="width:auto;padding:0 14px">Enviar cobrança</button>':'')+'</div>'+(c.escal?'<div class="ch-esc" role="note"><b>Motivo da escalação</b><span>'+esc(c.escal)+'</span><small>O robô passou esta conversa para uma pessoa.</small></div>':'');
 }
 function pintarTopo(){var c=sel,t=document.getElementById('ch-topo');if(c&&t){t.innerHTML=topoHtml(c);U.icones()}}
 function msgHtml(c,m,i){
-  var cls=m.de==='p'?'m-p':m.de==='e'?'m-e':'m-n',corpo;
+  var cls=m.de==='p'?'m-p':m.de==='e'?'m-e'+(m.robo?' m-r':''):'m-n',corpo;
   if(m.apagada)corpo='<i class="m-ap">Mensagem apagada</i>';
   else if(m.t==='txt')corpo='<span>'+esc(m.x).replace(/\n/g,'<br>')+'</span>';
   else if(m.t==='aud')corpo='<div class="aud"><span class="aud-p">'+ic('play')+'</span><span class="aud-b"><i></i></span><span class="mono">'+esc(m.x)+'</span></div>';
@@ -81,7 +94,7 @@ function msgHtml(c,m,i){
   if(m.de==='p'&&(m.t==='img'||m.t==='pdf')&&p){var e=F.comprovantes(p).filter(function(x){return x.ref===m||x.arq===m.x})[0];tags=e&&e.st==='conferido'?'<span class="m-tag ok">Comprovante conferido</span>':(m.att?'<span class="m-tag">Comprovante · '+esc(m.att)+' · a conferir</span>':'<span class="m-tag at">A conferir</span>')}
   if(m.feita)tags+='<span class="m-tag">Cobrança feita</span>';
   return '<div class="m '+cls+'" data-i="'+i+'">'+(m.de==='n'?'<div class="m-nota">Nota interna · só a equipe vê</div>':'')+(m.q?'<div class="m-q">'+esc(m.q)+'</div>':'')+corpo+(tags?'<div class="m-tags">'+tags+'</div>':'')+
-    '<div class="m-meta"><span>'+m.h+(m.ed?' · editada':'')+'</span>'+(m.apagada?'':'<button class="m-mn" data-mm="'+i+'" aria-label="Ações da mensagem">'+ic('chevron-down')+'</button>')+'</div></div>';
+    '<div class="m-meta">'+(m.robo?'<span class="m-robo">Robô</span>':'')+'<span>'+m.h+(m.ed?' · editada':'')+'</span>'+(m.apagada?'':'<button class="m-mn" data-mm="'+i+'" aria-label="Ações da mensagem">'+ic('chevron-down')+'</button>')+'</div></div>';
 }
 function pintarMsgs(){
   var c=sel,box=document.getElementById('ch-msgs');if(!c||!box)return;
@@ -193,6 +206,14 @@ function render(alvo){
   if(sel&&!sel.arq){var s=sel;abrirConversa(s,false)}else{sel=null;document.getElementById('cv-chat').innerHTML=vazioChat();
     var lf=filtradas(),primeiro=lf.filter(function(c){return !c.grupo&&c.un>0})[0]||lf[0];if(primeiro&&window.matchMedia('(min-width:641px)').matches)abrirConversa(primeiro,false)}
 }
+function assumir(c){
+  var p=pag(c),a=roboApi(),eu=c.dono||'Marina';
+  c.assumida=!c.assumida;
+  if(c.assumida){if(!c.dono)c.dono=eu;if(a&&a.escalar)try{a.escalar(p.id,'Conversa assumida por '+eu)}catch(x){}}
+  c.msgs.push({de:'n',t:'txt',x:c.assumida?eu+' assumiu a conversa. O robô fica parado aqui.':eu+' devolveu a conversa ao robô.',h:agora(),d:'Hoje'});
+  pintarTopo();pintarMsgs();pintarLista();
+  U.toast(c.assumida?'Você assumiu a conversa. O robô parou nela.':'Conversa devolvida ao robô.');
+}
 /* eventos */
 function noEl(e){return el&&el.isConnected&&el.contains(e.target)&&el.dataset.modulo==='conversas'}
 document.addEventListener('click',function(e){
@@ -203,6 +224,9 @@ document.addEventListener('click',function(e){
   if(t.closest('[data-voltar]')){document.getElementById('conv').classList.remove('chat');return}
   if(t.closest('[data-ficha]')){var p=pag(sel);if(p)F.abrir(p);return}
   if((b=t.closest('[data-robo]'))){sel.robo=!sel.robo;pintarTopo();U.toast('Robô '+(sel.robo?'ligado':'desligado')+' nesta conversa.');return}
+  if(t.closest('[data-assumir]')){assumir(sel);return}
+  if(t.closest('[data-contestar]')){var pc=pag(sel);if(window.MKInadimplencia&&MKInadimplencia.contestar)MKInadimplencia.contestar(pc.id);else U.toast('A tela de contestação ainda não está disponível.');return}
+  if(t.closest('[data-memoria]')){var pm=pag(sel);if(window.MKMemoria&&MKMemoria.abrir)MKMemoria.abrir(pm.id);else U.toast('A memória de cálculo ainda não está disponível.');return}
   if(t.closest('[data-cobrar]')){cobrancaDialog(sel);return}
   if((b=t.closest('[data-mm]'))){menuMsg(b,+b.dataset.mm);return}
   if((b=t.closest('[data-modo]'))){modo=b.dataset.modo;edit=null;resp=null;var cx=document.getElementById('cv-chat'),v=document.getElementById('ch-txt').value;cx.querySelector('.ch-compor').outerHTML=compHtml(sel);document.getElementById('ch-txt').value=v;U.icones();return}
