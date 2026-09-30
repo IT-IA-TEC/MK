@@ -91,7 +91,7 @@ button{font:inherit;cursor:pointer}
 .btn-recolher:hover{background:var(--pagina)}.btn-recolher svg{width:16px;height:16px;transition:transform var(--t-lento) var(--curva)}
 .recolhido .btn-recolher svg{transform:rotate(180deg)}
 .menu-lista{display:flex;flex-direction:column;gap:2px;overflow-y:auto;overflow-x:hidden;flex:1}
-.item{display:flex;align-items:center;gap:12px;height:42px;padding:0 12px;border:0;background:none;border-radius:var(--raio-controle);color:var(--texto-2);font-weight:500;text-align:left;position:relative;white-space:nowrap;flex:none;transition:background var(--t-rapido) var(--curva)}
+.item{display:flex;align-items:center;gap:12px;padding:0 12px;border:0;background:none;border-radius:var(--raio-controle);color:var(--texto-2);font-weight:500;text-align:left;position:relative;flex:none;line-height:1.25;min-height:42px;padding-block:6px;transition:background var(--t-rapido) var(--curva)}
 .item:hover{background:var(--pagina)}
 .item svg{width:18px;height:18px;flex:none}
 .item.ativo{background:var(--verde-claro);color:var(--tinta);font-weight:600}
@@ -101,7 +101,7 @@ button{font:inherit;cursor:pointer}
 .recolhido .menu .marca{flex:none}
 .recolhido .item{justify-content:center;padding:0}
 .recolhido .btn-recolher{order:2}
-.conteudo{min-width:0;min-height:100vh;background:var(--cartao)}
+.conteudo{min-width:0;min-height:100vh;overflow-x:clip}
 @media(max-width:720px){
   .app,.app.recolhido{grid-template-columns:1fr}
   .btn-recolher,.menu .marca,.marca-nome,.item span{display:none}

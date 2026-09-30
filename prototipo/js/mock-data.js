@@ -84,8 +84,8 @@ window.MK_DASH={
       {p:"Ótica Central",l:"Ótica Kids",d:12,v:3400}
     ],
     desbloquear:[
-      {p:"Norte Sports Ltda",l:"Norte Outlet",q:"Quitou em 19/09"},
-      {p:"Vértice Comércio ME",l:"Vértice Sul",q:"Quitou em 22/09"}
+      {p:"Norte Sports Ltda",l:"Norte Outlet",q:"Quitou em 19/09",v:6420},
+      {p:"Vértice Comércio ME",l:"Vértice Sul",q:"Quitou em 22/09",v:9870}
     ],
     saidas:[
       {p:"Loja Recanto Verde",falta:14800,parc:"3 cobranças em aberto",st:"Aguardando quitação"},
