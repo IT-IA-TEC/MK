@@ -156,3 +156,18 @@ p,.sub,.dica-m,.fe-aviso span,.fe-info,.fe-vazio,.mk-pe,.aviso-txt,.nt.just,.mod
 
 /* login: painel verde à esquerda, formulário à direita */
 .login-lado{order:-1}
+
+/* ---------- grupos da fila e das pendências: cada categoria com faixa e cor própria ---------- */
+.grupo-f-cab{position:relative;gap:10px;padding:12px 16px 12px 20px;margin-top:10px;background:linear-gradient(90deg,var(--gc-f,var(--ok-suave)) 0%,var(--branco) 100%);border-top:1px solid var(--borda-forte);border-bottom:1px solid var(--borda-forte);box-shadow:var(--sombra-1);z-index:1}
+.grupo-f-cab:first-child,.cab-col+.grupo-f-cab{margin-top:0}
+.grupo-f-cab::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--gc,var(--verde-marca))}
+.grupo-f-cab svg{width:26px;height:26px;padding:6px;border-radius:50%;background:var(--gc,var(--verde-marca));color:var(--branco);box-shadow:var(--sombra-1),var(--relevo-escuro);flex:none}
+.grupo-f-cab h3{font:700 13.5px var(--f-display);letter-spacing:.01em;color:var(--gc,var(--tinta));text-transform:uppercase}
+.grupo-f-cab .c{margin-left:auto;min-width:24px;text-align:center;padding:1px 8px;border-radius:99px;background:var(--gc,var(--verde-marca));color:var(--branco);font:600 11.5px var(--f-maquina);box-shadow:var(--sombra-1)}
+.gc-0,.gl-0{--gc:var(--cat0);--gc-f:var(--cat0-f)}.gc-1,.gl-1{--gc:var(--cat1);--gc-f:var(--cat1-f)}.gc-2,.gl-2{--gc:var(--cat2);--gc-f:var(--cat2-f)}.gc-3,.gl-3{--gc:var(--cat3);--gc-f:var(--cat3-f)}.gc-4,.gl-4{--gc:var(--cat4);--gc-f:var(--cat4-f)}
+.linha[class*="gl-"]{box-shadow:inset 5px 0 0 var(--gc-f);padding-left:21px}
+.linha[class*="gl-"]:hover{box-shadow:inset 5px 0 0 var(--gc);background:var(--hover)}
+/* títulos das categorias centralizados */
+.grupo-f-cab{justify-content:center;text-align:center;padding-left:16px}
+.grupo-f-cab h3{text-align:center}
+.grupo-f-cab .c{margin-left:0}

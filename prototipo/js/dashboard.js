@@ -54,8 +54,8 @@ function fila(){
   var chips='<button class="chip-f" id="f-todos" data-filtro="todos" aria-pressed="'+(filtro==='todos')+'">Tudo <b>'+tot+'</b></button>'+
     META.filter(function(m){return cont[m.k]>0}).map(function(m){return '<button class="chip-f" id="f-'+m.k+'" data-filtro="'+m.k+'" aria-pressed="'+(filtro===m.k)+'">'+m.c+' <b>'+cont[m.k]+'</b></button>'}).join('');
   var corpo=META.filter(function(m){return cont[m.k]>0&&(filtro==='todos'||filtro===m.k)}).map(function(m){
-    return '<div class="grupo-f-cab">'+ic(m.i)+'<h3>'+m.t+'</h3><span class="c">'+cont[m.k]+'</span></div>'+
-    D.fila[m.k].map(function(x){return '<div class="linha"><div style="min-width:0"><div class="pg">'+esc(x.p)+'</div><div class="nt">'+esc(x.n)+'</div></div>'+lojas(x.l)+dias(x.d)+din(x.v)+botao(m.b,x.p)+'</div>'}).join('');
+    var gi=META.indexOf(m);return '<div class="grupo-f-cab gc-'+gi+'">'+ic(m.i)+'<h3>'+m.t+'</h3><span class="c">'+cont[m.k]+'</span></div>'+
+    D.fila[m.k].map(function(x){return '<div class="linha gl-'+gi+'"><div style="min-width:0"><div class="pg">'+esc(x.p)+'</div><div class="nt">'+esc(x.n)+'</div></div>'+lojas(x.l)+dias(x.d)+din(x.v)+botao(m.b,x.p)+'</div>'}).join('');
   }).join('');
   return '<section class="bloco"><div class="bloco-cab"><h2>Fila do dia</h2><span class="leg">Sempre de hoje</span></div><div class="fila">'+
     (tot?'<div class="filtros">'+chips+'</div><div class="cab-col"><span>Pagador</span><span>Lojas</span><span>Situação</span><span class="d">Valor</span><span></span></div>'+corpo:'<div class="nada">Nada para hoje.</div>')+'</div></section>';
@@ -63,8 +63,8 @@ function fila(){
 function pendencias(){
   var P=D.pend,g=[];
   function grupo(t,i,arr,linha){
-    if(!arr.length)return;
-    g.push('<div class="grupo-f-cab">'+ic(i)+'<h3>'+t+'</h3><span class="c">'+arr.length+'</span></div>'+arr.map(linha).join(''));
+    if(!arr.length)return;var gi=g.length;
+    g.push('<div class="grupo-f-cab gc-'+gi+'">'+ic(i)+'<h3>'+t+'</h3><span class="c">'+arr.length+'</span></div>'+arr.map(linha).join(''));
   }
   function lin(p,c2,c3,v,b){return '<div class="comp-lin"><div class="pg">'+esc(p)+'</div><div class="nt">'+c2+'</div><div class="nt">'+c3+'</div>'+din(v)+b+'</div>'}
   grupo('Comprovantes para conferir','receipt-text',P.comprovantes,function(x){return lin(x.p,esc(x.dest),'Competência sugerida: <b>'+esc(x.comp)+'</b>',x.v,botao('Conferir',x.p,'sec'))});

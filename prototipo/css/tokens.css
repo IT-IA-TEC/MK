@@ -10,6 +10,8 @@
   --menu-topo:#04502F; --menu-base:#00260F; --menu-texto:#CFE8DC; --menu-apoio:#8FB5A2; --menu-linha:rgba(152,255,224,.14);
   --vidro:rgba(255,255,255,.14); --brilho:rgba(255,255,255,.55); --sombra-cor:0,56,23; --veu-cor:rgba(0,38,15,.42);
   --verde-claro-2:#7CF0CB; --verde-sombra:rgba(0,157,113,.6); --verde-halo:rgba(0,157,113,.35); --texto-sombra:rgba(0,0,0,.18);
+  /* categorias da fila e pendências: cada grupo com a sua cor */
+  --cat0:#026842; --cat0-f:#E3F6EE; --cat1:#2F418F; --cat1-f:#E7EBFA; --cat2:#8A6400; --cat2-f:#FDF3D7; --cat3:#5B41A8; --cat3-f:#EDE6FA; --cat4:#B3341A; --cat4-f:#FBE7E2;
   /* degradês */
   --grad-marca:linear-gradient(180deg,#0A8A5C 0%,#026842 100%); --grad-marca-hover:linear-gradient(180deg,#0B9A66 0%,#037A4D 100%);
   --grad-tinta:linear-gradient(180deg,#0A4D2B 0%,#003817 100%);
