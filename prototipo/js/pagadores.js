@@ -38,7 +38,7 @@ function render(alvo){
    '<button class="btn" id="novo" style="width:auto;height:36px;padding:0 16px">+ Novo pagador</button></div>'+
    '<div class="pag-barra"><label class="busca-p"><span class="sr">Buscar</span>'+ic('search')+'<input id="pag-q" type="search" placeholder="Buscar por nome, telefone, nome da loja ou GS" value="'+esc(q)+'"></label>'+
    '<label class="sel-p"><span>Situação da loja</span><select class="sel" id="pag-loja"><option value="">Todas</option><option value="ativa">Ativa</option><option value="bloqueada">Bloqueada</option><option value="inativa">Inativa</option></select></label>'+
-   '<label class="sel-p"><span>Situação financeira</span><select class="sel" id="pag-fin"><option value="">Todas</option><option value="dia">Em dia</option><option value="atraso">Em atraso</option><option value="acordo">Em acordo</option></select></label></div>'+
+   '<label class="sel-p"><span>Situação financeira</span><select class="sel" id="pag-fin"><option value="">Todas</option><option value="dia">Em dia</option><option value="avencer">A vencer</option><option value="atraso">Em atraso</option><option value="acordo">Em acordo</option></select></label></div>'+
    '<div class="tab-cartao"><table class="tab-pag"><colgroup><col class="k1"><col class="k2"><col class="k3"></colgroup><thead><tr><th>Responsável</th><th>WhatsApp</th><th>Lojas</th></tr></thead><tbody id="pag-corpo"></tbody></table></div>'+
    '<div class="aviso">Dados de exemplo. Servem só para desenhar a tela.</div></div>';
   document.getElementById('pag-loja').value=fLoja;document.getElementById('pag-fin').value=fFin;
