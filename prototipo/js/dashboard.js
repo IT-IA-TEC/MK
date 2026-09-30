@@ -28,7 +28,7 @@ function numeros(){
    Object.keys(D.periodos).map(function(k){return '<option value="'+k+'"'+(k===periodo?' selected':'')+'>'+D.periodos[k].rotulo+'</option>'}).join('')+'</select></label></div>'+
    '<div class="numeros">'+
    card('cobrado','Cobrado no mês',R0(d.cobrado[0]),d.cobrado[1]+' cobranças geradas')+
-   card('recebido','Recebido no mês',R0(d.recebido[0]),d.recebido[1]+' pagamentos confirmados','heroi-c')+
+   card('recebido','Recebido no mês',R0(d.recebido[0]),d.recebido[1]+' pagamentos confirmados')+
    card('avencer','A vencer',R0(d.avencer[0]),d.avencer[1]+' cobranças enviadas')+
    card('vencido','Vencido',R0(d.vencido[0]),d.vencido[1]+' em atraso · sem passivo baixado','perigo')+
    card('pont','Pontualidade',d.pont[0]+'%',d.pont[1]+' de '+d.pont[2]+' pagos em dia')+
@@ -58,7 +58,7 @@ function fila(){
     D.fila[m.k].map(function(x){return '<div class="linha"><div style="min-width:0"><div class="pg">'+esc(x.p)+'</div><div class="nt">'+esc(x.n)+'</div></div>'+lojas(x.l)+dias(x.d)+din(x.v)+botao(m.b,x.p)+'</div>'}).join('');
   }).join('');
   return '<section class="bloco"><div class="bloco-cab"><h2>Fila do dia</h2><span class="leg">Sempre de hoje</span></div><div class="fila">'+
-    (tot?'<div class="filtros">'+chips+'</div>'+corpo:'<div class="nada">Nada para hoje.</div>')+'</div></section>';
+    (tot?'<div class="filtros">'+chips+'</div><div class="cab-col"><span>Pagador</span><span>Lojas</span><span>Situação</span><span class="d">Valor</span><span></span></div>'+corpo:'<div class="nada">Nada para hoje.</div>')+'</div></section>';
 }
 function pendencias(){
   var P=D.pend,g=[];
@@ -72,31 +72,33 @@ function pendencias(){
   grupo('Desbloqueios a pedir','lock-open',P.desbloquear,function(x){return lin(x.p,esc(x.l),esc(x.q)+', loja ainda bloqueada',x.v,botao('Pedir desbloqueio',x.p))});
   grupo('Pedidos de saída em andamento','log-out',P.saidas,function(x){return lin(x.p,esc(x.parc),'<span class="est">'+esc(x.st)+'</span>',x.falta,botao('Abrir pedido',x.p,'sec'))});
   if(!g.length)return '';
-  return '<section class="bloco"><div class="bloco-cab"><h2>Pendências de decisão</h2></div><div class="fila">'+g.join('')+'</div></section>';
+  return '<section class="bloco"><div class="bloco-cab"><h2>Pendências de decisão</h2></div><div class="fila"><div class="cab-col"><span>Pagador</span><span>Detalhe</span><span>Situação</span><span class="d">Valor</span><span></span></div>'+g.join('')+'</div></section>';
 }
 function alertas(){
   if(!D.alertas.length)return '';
   return '<section class="bloco"><div class="bloco-cab"><h2>Alertas de dado</h2></div><div class="alertas">'+D.alertas.map(function(a){
     return '<div class="alerta"><span class="ico">'+ic(a.i)+'</span><div style="min-width:0"><h4>'+esc(a.t)+'</h4><p>'+esc(a.d)+'</p></div><div class="fim"><span class="cnt">'+a.n+'</span>'+botao('Ver',a.t,'sec')+'</div></div>'}).join('')+'</div></section>';
 }
-function grafico(){
-  var ev=D.rank.evolucao,W=600,H=250,L=58,T=12,B=30,Rr=8,pw=W-L-Rr,ph=H-T-B,mx=500000,g=pw/ev.length,bw=24;
-  var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Cobrado e recebido nos últimos 6 meses">';
-  for(var v=0;v<=mx;v+=100000){var y=T+ph*(1-v/mx);s+='<line x1="'+L+'" x2="'+(W-Rr)+'" y1="'+y+'" y2="'+y+'" style="stroke:var(--borda)" stroke-width="1"/><text x="'+(L-8)+'" y="'+(y+4)+'" text-anchor="end">'+(v===0?'0':(v/1000)+' mil')+'</text>'}
+function desenhar(){
+  var box=document.getElementById('graf');if(!box)return;
+  var ev=D.rank.evolucao,W=Math.max(280,box.clientWidth-32),H=240,L=48,T=10,B=26,Rr=4,pw=W-L-Rr,ph=H-T-B,mx=500000,g=pw/ev.length,bw=Math.min(30,g*.26);
+  var s='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Cobrado e recebido nos últimos 6 meses">';
+  for(var v=0;v<=mx;v+=100000){var y=Math.round(T+ph*(1-v/mx))+.5;s+='<line x1="'+L+'" x2="'+(W-Rr)+'" y1="'+y+'" y2="'+y+'" style="stroke:var(--borda)" stroke-width="1"/><text x="'+(L-8)+'" y="'+(y+4)+'" text-anchor="end">'+(v===0?'0':(v/1000)+' mil')+'</text>'}
   ev.forEach(function(m,i){
     var cx=L+g*i+g/2,h1=ph*m[1]/mx,h2=ph*m[2]/mx;
-    s+='<rect x="'+(cx-bw-2)+'" y="'+(T+ph-h1)+'" width="'+bw+'" height="'+h1+'" rx="4" style="fill:var(--apoio-claro)"><title>Cobrado '+m[0]+': '+R0(m[1])+'</title></rect>'+
-       '<rect x="'+(cx+2)+'" y="'+(T+ph-h2)+'" width="'+bw+'" height="'+h2+'" rx="4" style="fill:var(--verde-vivo)"><title>Recebido '+m[0]+': '+R0(m[2])+'</title></rect>'+
-       '<text x="'+cx+'" y="'+(H-10)+'" text-anchor="middle">'+m[0]+'</text>';
+    s+='<rect x="'+(cx-bw-1.5)+'" y="'+(T+ph-h1)+'" width="'+bw+'" height="'+h1+'" rx="2" style="fill:var(--apoio-claro)"><title>Cobrado '+m[0]+': '+R0(m[1])+'</title></rect>'+
+       '<rect x="'+(cx+1.5)+'" y="'+(T+ph-h2)+'" width="'+bw+'" height="'+h2+'" rx="2" style="fill:var(--verde-vivo)"><title>Recebido '+m[0]+': '+R0(m[2])+'</title></rect>'+
+       '<text x="'+cx+'" y="'+(H-8)+'" text-anchor="middle">'+m[0]+'</text>';
   });
-  return s+'</svg>';
+  box.innerHTML=s+'</svg>';
 }
+window.addEventListener('resize',function(){clearTimeout(desenhar.h);desenhar.h=setTimeout(desenhar,120)});
 function rankings(){
   function lista(tit,ico,arr,dev){var mx=arr[0][1];return '<div class="cx"><div class="cx-cab">'+ic(ico)+'<h3>'+tit+'</h3></div>'+arr.map(function(x,i){
     return '<div class="rank-l"><span class="pos">'+(i+1)+'</span><span class="pg">'+esc(x[0])+'</span><b class="din" style="font-variant-numeric:tabular-nums">'+R(x[1])+'</b><div class="barra"><i class="'+(dev?'dev':'')+'" style="width:'+Math.round(x[1]/mx*100)+'%"></i></div></div>'}).join('')+'</div>'}
   return '<section class="bloco"><div class="bloco-cab"><h2>Rankings</h2></div><div class="rank-grade">'+
     lista('Maiores devedores','trending-down',D.rank.devedores,true)+lista('Maiores pagadores','trending-up',D.rank.pagadores,false)+
-    '<div class="cx gtotal"><div class="cx-cab">'+ic('bar-chart-3')+'<h3>Cobrado x recebido, últimos 6 meses</h3></div><div class="legenda"><span><i style="background:var(--apoio-claro)"></i>Cobrado</span><span><i style="background:var(--verde-vivo)"></i>Recebido</span></div><div class="grafico">'+grafico()+'</div></div>'+
+    '<div class="cx gtotal"><div class="cx-cab">'+ic('bar-chart-3')+'<h3>Cobrado x recebido, últimos 6 meses</h3></div><div class="legenda"><span><i style="background:var(--apoio-claro)"></i>Cobrado</span><span><i style="background:var(--verde-vivo)"></i>Recebido</span></div><div class="grafico" id="graf"></div></div>'+
   '</div></section>';
 }
 function render(alvo){
@@ -107,6 +109,7 @@ function render(alvo){
    '</div>'+
    numeros()+andamento()+fila()+pendencias()+alertas()+rankings()+
    '<div class="aviso">Dados de exemplo. Servem só para desenhar a tela.</div></div>';
+  desenhar();
   if(window.lucide)lucide.createIcons();
   if(foco){var f=document.getElementById(foco);if(f)f.focus()}
 }
