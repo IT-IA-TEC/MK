@@ -1,0 +1,54 @@
+# As conexões, os aplicativos e as chaves do Pix passam a ser feitos no Java do BL. As telas do IT.MK só mostram e pedem. Aba: qualquer uma (Editar em lote).
+
+editar: Cadastro da conexão
+  no épico: Conexões e aplicativos dos marketplaces
+  titulo: Ver a conexão da loja e pedir reconexão
+  trocar aceites: sim
+  historia: Como analista de marketplaces, quero ver a conexão de uma loja como o BL a guarda e pedir a reconexão, para saber se a loja está ligada sem cadastrar nada à mão.
+  aceite: A janela é só de leitura e mostra loja, código da loja, responsável, situação, data da autorização, validade, quem autorizou, nomes, identificador no marketplace e última atualização
+  aceite: A validade vem calculada pelo BL pela regra da plataforma (Shein sem validade fixa, Mercado Livre 6 meses, Kwai a confirmar, Shopee conforme o prazo escolhido)
+  aceite: O botão Pedir reconexão ao BL (ou Pedir conexão, se não houver conexão) registra o pedido e avisa que o resultado aparece quando o BL responder
+  aceite: Chaves e tokens nunca aparecem no IT.MK
+  situação: Pronto para testar
+
+editar: Segredos só de gravação
+  no épico: Conexões e aplicativos dos marketplaces
+  titulo: Segredos ficam no BL
+  trocar aceites: sim
+  historia: Como analista de marketplaces, quero que nenhum segredo apareça nem seja digitado no IT.MK, para que ninguém veja uma chave.
+  aceite: Nenhuma tela do IT.MK tem campo para digitar chave, token ou certificado de marketplace ou de provedor de Pix
+  aceite: As janelas explicam que chaves e tokens ficam no BL
+  aceite: Trocar ou renovar um segredo é pedido ao BL
+
+editar: Convite ao cliente
+  no épico: Conexões e aplicativos dos marketplaces
+  cancelar: o convite para o cliente autorizar a conexão passa a ser feito no Java do BL
+
+editar: Aba Aplicativos
+  no épico: Conexões e aplicativos dos marketplaces
+  titulo: Aba Aplicativos só de leitura
+  trocar aceites: sim
+  historia: Como analista de marketplaces, quero ver o aplicativo de cada plataforma como o BL o guarda, para saber se a conexão pode funcionar.
+  aceite: Um cartão por plataforma mostra identificador do app, situação da aprovação, endereço de retorno, IPs, datas e quantas lojas usam o app
+  aceite: O segredo do app aparece como guardado no BL e nunca é mostrado
+  aceite: Na Shopee o tipo é ERP, e no Mercado Livre a conta dona do aplicativo é a da empresa IT.MK
+  aceite: Não há campo para editar nem botão Salvar
+  situação: Pronto para testar
+
+editar: Dados de recebimento com Asaas ou Banco Inter
+  no épico: Configurações
+  titulo: Dados de recebimento vindos do BL
+  trocar aceites: sim
+  historia: Como responsável pelo financeiro, quero ver qual provedor de Pix está ativo e em que ambiente, para saber como as cobranças são geradas.
+  aceite: Mostra o provedor ativo (Asaas ou Banco Inter), o ambiente (teste ou produção) e a chave Pix recebedora, só para leitura
+  aceite: Avisa que chaves, certificados e tokens ficam no BL e nunca aparecem aqui
+  aceite: Nenhum campo de chave, certificado ou token existe nesta tela
+
+editar: Testar conexão do Pix
+  no épico: Configurações
+  titulo: Pedir teste da conexão do Pix ao BL
+  trocar aceites: sim
+  historia: Como responsável pelo financeiro, quero pedir ao BL um teste da conexão com o provedor, para saber se o aviso de pagamento está chegando.
+  aceite: O botão Pedir teste ao BL mostra o resultado devolvido
+  aceite: Mostra a situação do aviso automático: Recebendo ou Não está recebendo
+  aceite: Mostra o último Pix recebido
