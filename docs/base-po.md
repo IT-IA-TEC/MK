@@ -64,7 +64,7 @@ Fontes: (1) Product Owner's Handbook (Atacan Demiralp, guia de Scrum), (2) Produ
 - PO pode cancelar o ciclo se a meta ficar obsoleta (desperdiça recursos). Itens prontos são revisados, os incompletos voltam ao backlog.
 - **Demonstração e entrega**: não entregar na sexta-feira. Não começar ciclos de 10 dias na segunda (terminariam na sexta). Demonstrar só o que ficou pronto horas antes. PO e Scrum Master marcam com antecedência.
 - **Ambiente de teste (staging)**: cópia interna do sistema real onde se testa antes de entregar.
-- **Testes de tela**: usar tamanhos padrão de aparelhos (celular, tablet, computador) e citar o aparelho ao relatar erro.
+- **Testes de tela**: usar tamanhos padrão de larguras de tela de computador e citar o aparelho ao relatar erro.
 
 ## 8. Dívida técnica e tamanho do time
 - Dívida técnica: custo de refazer porque foi feito às pressas (causas: falta de capacidade ou experiência, pressão de prazo, desânimo). Cresce com juros. Reduzir de forma sistemática.
@@ -85,7 +85,7 @@ Quando o dono pedir um plano ou uma estrutura, entregar sempre nesta ordem, em p
 3. **Valor**: o que ganha o cliente, o que ganha a empresa, o que ganha o processo. Como medir.
 4. **Roadmap** em versões com data.
 5. **Épicos e histórias**: "Como [analista de cobrança, consultor, dono, pagador], quero..., para...".
-6. **Critérios de aceite** em caixas e, quando for tela, desenho de computador e celular. Seguir as regras do `CLAUDE.md` (visão única, sem espaço vazio, sem barra horizontal, cores só em `tokens.css`).
+6. **Critérios de aceite** em caixas e, quando for tela, desenho de computador (celular fora do escopo por enquanto). Seguir as regras do `CLAUDE.md` (visão única, sem espaço vazio, sem barra horizontal, cores só em `tokens.css`).
 7. **Prioridade** (MoSCoW e níveis 1 a 5) e **ordem** por valor, dependência, risco e custo.
 8. **Plano de versões** e **Definição de Pronto** (sem bugs conhecidos, testado nas larguras de tela, prévia publicada).
 9. **Riscos, dívida técnica e o que NÃO foi verificado**. Melhoria pedida depois vira item novo.
