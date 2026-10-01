@@ -114,7 +114,7 @@ function blocos(m){
   var NA={na:1,l:'Não se aplica neste marketplace'};
   var out=[];
   out.push({id:'cad',t:'Cadastro',it:[
-    {k:'cad.login',l:'Nome de login',t:'txt'},{k:'cad.publico',l:'Nome público',t:'txt'},{fx:'Marketplace',v:function(x){return m}},{fx:'GS / ID da loja',v:function(x){var c=conDe(x.gs,m);return x.gs+(c&&c.idExt?' · ID '+c.idExt:'')}},
+    {k:'cad.login',l:'Nome de login',t:'txt'},{k:'cad.publico',l:'Nome público',t:'txt'},{fx:'Marketplace',v:function(x){return m}},{fx:'CNPJ da loja (informativo)',v:function(x){var d=String(x.cnpj||'');return d.length===14?d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,'$1.$2.$3/$4-$5'):'—'}},{fx:'GS / ID da loja',v:function(x){var c=conDe(x.gs,m);return x.gs+(c&&c.idExt?' · ID '+c.idExt:'')}},
     {k:'cad.link',l:'Link da loja',t:'txt'},{fx:'Data de início',v:function(x){return x.ini||'—'}},{k:'cad.pct',l:'Percentual da 40%',t:'num',suf:'%',padrao:'40'},{fx:'Responsável',v:function(x){return x.resp}},
     {k:'cad.antiga',l:'Data da publicação mais antiga (referência de antiguidade)',t:'data',info:'Será calculada quando houver lista de produtos. Manual até lá.'}]});
   if(K)out[0].it.unshift({info:'Kwai: sem documentação oficial acessível. Todos os campos da ficha ficam Manual (a confirmar com a Kwai).'});
@@ -253,7 +253,7 @@ function blocoHtml(b,o,gs){
     if(f.info&&!f.k&&!f.lista)h+='<div class="fe-aviso"><span>'+esc(f.info)+'</span></div>';
     else if(f.sec)h+='<div class="f-sub" style="margin-top:6px">'+esc(f.sec)+'</div>';
     else if(f.na)h+='<div class="mf na"><span class="mf-l">'+esc(f.l)+'</span><b>'+(f.txt||'Não se aplica')+'</b></div>';
-    else if(f.fx)h+='<div class="mf"><span class="mf-l">'+esc(f.fx)+'</span><div class="mf-v"><b>'+esc(f.v({gs:gs,ini:lojaPor(gs).l.ini,resp:lojaPor(gs).p.nome}))+'</b></div><span class="mo cad">Cadastro</span><small class="nt">Vem do cadastro da loja</small></div>';
+    else if(f.fx)h+='<div class="mf"><span class="mf-l">'+esc(f.fx)+'</span><div class="mf-v"><b>'+esc(f.v({gs:gs,ini:lojaPor(gs).l.ini,cnpj:lojaPor(gs).l.cnpj,resp:lojaPor(gs).p.nome}))+'</b></div><span class="mo cad">Cadastro</span><small class="nt">Vem do cadastro da loja</small></div>';
     else if(f.lista)h+=listaHtml(f,o,ro);
     else h+=campoHtml(f,o,f.k);
   });

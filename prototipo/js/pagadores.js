@@ -46,15 +46,15 @@ function campo(id,rot,tipo,ph,extra){return '<div class="campo"><label for="'+id
 var PLATS=['Shein','Mercado Livre','Shopee','Kwai'];
 function blocoLoja(i){
   return '<div class="f-bloco" data-loja="'+i+'"><div class="f-bloco-cab"><b>Loja '+(i+1)+'</b>'+(i>0?'<button type="button" class="link-btn rem" data-rem="'+i+'">Remover</button>':'')+'</div>'+
-   '<div class="f-grade">'+campo('ln'+i,'Nome da loja','text','Nome da loja')+campo('lg'+i,'GS','text','Somente números')+
-   campo('lp'+i,'Plataforma','select','','<select class="sel" id="lp'+i+'"><option value="">Selecione</option>'+PLATS.map(function(p){return '<option>'+p+'</option>'}).join('')+'</select>')+campo('ld'+i,'Data de início','date','')+'</div></div>';
+   '<div class="f-grade">'+campo('ln'+i,'Nome da loja','text','Nome da loja')+campo('lg'+i,'Código da loja na plataforma (GS na Shein)','text','Ex.: GS2405891')+
+   campo('lp'+i,'Plataforma','select','','<select class="sel" id="lp'+i+'"><option value="">Selecione</option>'+PLATS.map(function(p){return '<option>'+p+'</option>'}).join('')+'</select>')+campo('ld'+i,'Data de início','date','')+'<div class="campo"><label for="lc'+i+'">CNPJ da loja (só informativo)</label><input id="lc'+i+'" type="text" placeholder="Opcional" autocomplete="off"><small class="erro" id="lc'+i+'-e" hidden></small></div></div></div>';
 }
 function novo(){
   var ant=document.activeElement,n=1;
   var v=document.createElement('div');v.className='veu';
   var g=document.createElement('aside');g.className='gaveta larga';g.setAttribute('role','dialog');g.setAttribute('aria-modal','true');g.setAttribute('aria-label','Novo pagador');
   g.innerHTML='<form id="f-novo" novalidate style="display:flex;flex-direction:column;min-height:0;flex:1"><div class="gaveta-cab"><div><h3>Novo pagador</h3><p>Todos os campos são obrigatórios.</p></div><button type="button" class="fechar" aria-label="Fechar">'+ic('x')+'</button></div>'+
-   '<div class="gaveta-corpo" style="padding:16px 20px"><div class="f-grade">'+campo('pn','Nome do responsável','text','Nome completo')+campo('pw','WhatsApp','tel','(00) 00000-0000')+'</div>'+
+   '<div class="gaveta-corpo" style="padding:16px 20px"><div class="f-grade">'+campo('pn','Nome do pagador','text','Nome completo')+campo('pc','CPF do pagador','text','000.000.000-00')+campo('pw','WhatsApp','tel','(00) 00000-0000')+'</div>'+
    '<h4 class="f-tit">Lojas</h4><div id="f-lojas">'+blocoLoja(0)+'</div><button type="button" class="btn sec" id="mais-loja" style="width:auto;padding:0 14px;margin-top:8px">+ Adicionar outra loja</button></div>'+
    '<div class="gaveta-pe f-pe"><button type="button" class="btn sec cancelar" style="width:auto;padding:0 16px">Cancelar</button><button type="submit" class="btn" style="width:auto;padding:0 18px">Salvar pagador</button></div></form>';
   document.body.appendChild(v);document.body.appendChild(g);
@@ -73,16 +73,17 @@ function novo(){
   g.querySelector('#f-novo').addEventListener('submit',function(e){
     e.preventDefault();var ruim=false,primeiro=null;
     function ck(id,msg,ok){var m=erro(id,ok?'':msg);if(m&&!primeiro)primeiro=id;ruim=ruim||m}
-    ck('pn','Informe o nome do responsável.',g.querySelector('#pn').value.trim().length>2);
+    ck('pn','Informe o nome do pagador.',g.querySelector('#pn').value.trim().length>2);
+    ck('pc','O CPF precisa ter 11 números.',nums(g.querySelector('#pc').value).length===11);
     ck('pw','Informe o WhatsApp com DDD.',nums(g.querySelector('#pw').value).length>=10);
     var lojas=[];
     g.querySelectorAll('[data-loja]').forEach(function(b){var i=b.dataset.loja;
-      var nome=g.querySelector('#ln'+i).value.trim(),gs=nums(g.querySelector('#lg'+i).value),pl=g.querySelector('#lp'+i).value,dt=g.querySelector('#ld'+i).value;
-      ck('ln'+i,'Informe o nome da loja.',nome.length>1);ck('lg'+i,'Informe o GS, somente números.',gs.length>=8);ck('lp'+i,'Escolha a plataforma.',!!pl);ck('ld'+i,'Informe a data de início.',!!dt);
-      var d=dt.split('-');lojas.push({n:nome.toUpperCase(),gs:gs,st:'ativa',plat:pl,ini:d.length===3?d[2]+'/'+d[1]+'/'+d[0]:''});
+      var nome=g.querySelector('#ln'+i).value.trim(),gs=g.querySelector('#lg'+i).value.trim().toUpperCase().replace(/\s+/g,''),cn=nums(g.querySelector('#lc'+i).value),pl=g.querySelector('#lp'+i).value,dt=g.querySelector('#ld'+i).value;
+      ck('ln'+i,'Informe o nome da loja.',nome.length>1);ck('lg'+i,'Informe o código da loja na plataforma.',gs.length>=4);ck('lc'+i,'O CNPJ precisa ter 14 números.',cn.length===0||cn.length===14);ck('lp'+i,'Escolha a plataforma.',!!pl);ck('ld'+i,'Informe a data de início.',!!dt);
+      var d=dt.split('-');lojas.push({n:nome.toUpperCase(),gs:gs,cnpj:cn,st:'ativa',plat:pl,ini:d.length===3?d[2]+'/'+d[1]+'/'+d[0]:''});
     });
     if(ruim){var f=g.querySelector('#'+primeiro);if(f)f.focus();return}
-    DADOS.unshift({id:Date.now(),nome:g.querySelector('#pn').value.trim().toUpperCase(),fone:g.querySelector('#pw').value.trim(),fin:'dia',lojas:lojas});
+    DADOS.unshift({id:Date.now(),nome:g.querySelector('#pn').value.trim().toUpperCase(),cpf:g.querySelector('#pc').value.trim(),fone:g.querySelector('#pw').value.trim(),fin:'dia',lojas:lojas});
     fechar();MKFiltro.limpar();fLoja='';fFin='';fRobo='';render();aviso('Pagador cadastrado.');
   });
 }

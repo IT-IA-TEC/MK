@@ -58,7 +58,7 @@ function html(p,aba){
     '<div class="f-bts"><button class="btn sec" data-fa="memoria">Memória de cálculo</button></div>'+
     (f.comps.length?'<div class="f-sub">Competências em aberto</div>'+f.comps.map(function(c){return '<div class="f-kv"><span>'+esc(c[0])+'</span><b class="din">'+R(c[1])+'</b></div>'}).join(''):'<div class="f-vazio">Nenhuma competência em aberto.</div>');
   var A=window.MKMarketplaces&&MKMarketplaces.api();
-  var lojas=p.lojas.map(function(l){return '<div class="f-lin f-lj"><div style="min-width:0"><div class="pg">'+(A?A.logoI(l.plat):'')+' '+esc(l.n)+'</div><div class="nt mono">'+esc(l.gs)+' · '+esc(l.plat)+'</div><div class="f-lj-s"><span class="selo '+l.st+'">'+ST[l.st]+'</span>'+(A?'<span class="nt">Conexão</span>'+A.conHtml(l)+'<span class="nt">Análise</span>'+A.seloHtml(l.gs):'')+'</div></div>'+(A?'<button class="btn sec" style="width:auto;padding:0 12px;height:30px" data-fa="loja" data-gs="'+esc(l.gs)+'">Ficha da loja</button>':'')+'</div>'}).join('')+
+  var lojas=p.lojas.map(function(l){return '<div class="f-lin f-lj"><div style="min-width:0"><div class="pg">'+(A?A.logoI(l.plat):'')+' '+esc(l.n)+'</div><div class="nt mono">'+esc(l.plat)+' · código '+esc(l.gs)+(l.cnpj?' · CNPJ (informativo) '+esc(l.cnpj):'')+'</div><div class="f-lj-s"><span class="selo '+l.st+'">'+ST[l.st]+'</span>'+(A?'<span class="nt">Conexão</span>'+A.conHtml(l)+'<span class="nt">Análise</span>'+A.seloHtml(l.gs):'')+'</div></div>'+(A?'<button class="btn sec" style="width:auto;padding:0 12px;height:30px" data-fa="loja" data-gs="'+esc(l.gs)+'">Ficha da loja</button>':'')+'</div>'}).join('')+
     '<div class="f-bts"><button class="btn esc" data-fa="bloquear">Bloquear todas e enviar</button><button class="btn sec" data-fa="liberar">Liberar todas e enviar</button></div>';
   var hist=A?A.historicoHtml(p):'';
   var RB=window.MKRobo&&MKRobo.api(),rs=RB?RB.situacao(p.id):null;
@@ -71,7 +71,7 @@ function html(p,aba){
   var tl='<ol class="tempo">'+tempo(p).map(function(e){return '<li><span class="nt mono">'+esc(e[0])+'</span><span>'+esc(e[1])+'</span></li>'}).join('')+'</ol>';
   var pe=pes.map(function(x){return '<div class="f-lin"><div style="min-width:0"><div class="pg">'+esc(x[0])+'</div><div class="nt">'+esc(x[1])+'</div></div><div class="nt mono">'+esc(x[2])+'</div></div>'}).join('');
   var regras=[['Régua de cobrança','Etapas em 1, 5 e 10 dias após o vencimento'],['Permite parcelar',p.id%3===0?'Não':'Sim, em até 6 vezes'],['Dias até bloquear','15 dias de atraso']].map(function(r){return '<div class="f-kv"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>'}).join('');
-  var topo='<div class="f-topo"><h3>'+esc(p.nome)+'</h3><div class="f-topo-l"><span class="mono">'+esc(p.fone)+'</span>'+selo(p)+'</div></div>'+
+  var topo='<div class="f-topo"><h3>'+esc(p.nome)+'</h3><div class="f-topo-l"><span class="mono">'+esc(p.fone)+'</span>'+(p.cpf?'<span class="nt">CPF '+esc(p.cpf)+'</span>':'')+selo(p)+'</div></div>'+
     (A?'<div class="f-abas" role="tablist" aria-label="Seções da ficha"><button role="tab" class="f-aba" data-fatab="ficha" aria-selected="'+(aba==='ficha')+'">Ficha</button><button role="tab" class="f-aba" data-fatab="analise" aria-selected="'+(aba==='analise')+'">Análise</button></div>':'');
   if(aba==='analise'&&A)return topo+'<div class="f-analise">'+A.visaoCliente(p)+'</div>';
   return topo+
