@@ -1,0 +1,91 @@
+# Detalha o que o BL precisa construir e devolver (contrato completo em docs/contrato-bl-itmk.md). Troca os critérios genéricos pelos detalhados. Aba: qualquer uma (Editar em lote).
+
+editar: Criar na ficha do BL os campos que o IT.MK precisa
+  no épico: Pendências fora do sistema
+  trocar aceites: sim
+  aceite: Cliente (pessoa) tem CPF único com 11 números, nome, WhatsApp só com números e DDD, e-mail e ativo
+  aceite: Vínculo com a 40% guarda companhia, ativo, data de início, data de fim, motivo de saída (Inadimplência, Pedido do cliente, Encerramento da loja ou da empresa, Outros), detalhe do motivo em texto e quem registrou
+  aceite: Pessoas ligadas guardam nome, papel (responsável, financeiro ou sócio) e telefone, com um só responsável por cliente
+  aceite: Empresas do cliente guardam CNPJ (só informação, aceita letras e números), razão social e regime tributário
+  aceite: Lojas guardam plataforma, código da loja na plataforma (na Shein é o GS), nome, CPF do cliente dono, CNPJ informativo opcional, data de início e percentual da 40% (padrão 40), com chave única por plataforma e código
+  aceite: Situação de bloqueio, robô, modo de cobrança e tudo de cobrança e conversa não ficam no BL
+  aceite: Os nomes reais das tabelas ficam registrados no item, e o detalhe completo está em docs/contrato-bl-itmk.md (seção 1)
+
+editar: Liberar o aviso em tempo real nas tabelas da ficha do BL
+  no épico: Pendências fora do sistema
+  trocar aceites: sim
+  aceite: O BL publica um evento a cada mudança de cliente, vínculo e loja, com evento_id único, tipo (vinculo_entrou, vinculo_saiu, cliente_alterado, loja_alterada), CPF, plataforma e código da loja, hora e, na saída, o motivo e o detalhe
+  aceite: A entrega é pelo menos uma vez; o mesmo evento repetido traz o mesmo evento_id
+  aceite: O IT.MK consegue reler os eventos por intervalo de datas depois de uma queda
+  aceite: O IT.MK escuta só com a credencial de leitura e não escreve nada no BL
+
+editar: Criar a credencial de leitura da base do BL
+  no épico: Pendências fora do sistema
+  trocar aceites: sim
+  aceite: Existe um usuário só de leitura (SELECT) com acesso apenas às visões combinadas (carteira da 40%, loja, pessoa ligada, conexão, análise, faturado e erro de integração)
+  aceite: Um teste prova que escrever, alterar ou apagar com esse usuário é recusado e que outras tabelas não são visíveis
+  aceite: A credencial é entregue ao time técnico por canal seguro, nunca no repositório, no log ou nos lotes, e tem data de troca combinada
+  aceite: Há limite de pedidos por segundo para esse usuário
+
+editar: Marcar o vínculo da 40% nos clientes no sistema do BL
+  no épico: Pendências fora do sistema
+  trocar aceites: sim
+  aceite: Está registrada a lista de clientes que fazem parte da carteira do IT.MK (CPF e nome)
+  aceite: Cada cliente da lista tem vínculo ativo com a companhia 40%, com data de início
+  aceite: A conferência compara a lista com a contagem de vínculos da 40% no BL (hoje 0) e as duas batem
+  aceite: Nenhum vínculo da YOU Contabilidade é alterado ou removido
+
+editar: Entregar o acesso da VPS ao time técnico
+  no épico: Pendências da entrega
+  trocar aceites: sim
+  aceite: O time técnico entra na VPS por chave (SSH) com um usuário comum que pode administrar, sem usar o root
+  aceite: Estão registrados o sistema operacional e a versão, o IP fixo e o endereço HTTPS com certificado
+  aceite: A porta 443 está aberta e a do banco está fechada para a internet
+  aceite: Existe cópia de segurança da VPS
+  aceite: O tamanho mínimo (CPU, memória e disco) é definido pelo time técnico e registrado no item
+
+editar: BL: Porta do Java do BL para o IT.MK pedir um Pix
+  no épico: Portas e leituras entre o BL e o IT.MK
+  trocar aceites: sim
+  aceite: Parte do BL: porta HTTPS com credencial própria do IT.MK e tempo limite de 10 segundos
+  aceite: Entrada: pedido_id, cpf, plataforma, codigo_loja, valor_centavos (inteiro), vencimento, parcela, total_parcelas e modo (pagador, loja ou parcela)
+  aceite: Saída: pix_id, identificador_provedor, copia_e_cola, link, validade e estado
+  aceite: Erros do negócio: valor inválido, provedor indisponível e pedido repetido com dados diferentes
+  aceite: Repetir o mesmo pedido_id devolve o mesmo Pix e nunca gera um segundo (efeito único)
+  aceite: Nenhum segredo de provedor sai do BL
+
+editar: BL: Porta para cancelar ou remover um Pix
+  no épico: Portas e leituras entre o BL e o IT.MK
+  trocar aceites: sim
+  aceite: Parte do BL: entrada pix_id; saída estado (Cancelado ou Expirado)
+  aceite: Pix já pago não é cancelado e a resposta diz o motivo
+  aceite: Repetir o pedido devolve o mesmo resultado
+
+editar: BL: Porta para pedir a reconexão de uma loja
+  no épico: Portas e leituras entre o BL e o IT.MK
+  trocar aceites: sim
+  aceite: Parte do BL: entrada plataforma e codigo_loja; saída situacao e, quando houver, o link de autorização para o vendedor
+  aceite: Quem reconecta é o BL; o IT.MK só pede e depois lê a situação na visão de conexão
+
+editar: BL: Visões de leitura para o IT.MK
+  no épico: Portas e leituras entre o BL e o IT.MK
+  trocar aceites: sim
+  aceite: Parte do BL: sete visões só de leitura: carteira da 40%, loja, pessoa ligada, conexão da loja, análise da loja, faturado da loja e erro de integração
+  aceite: As colunas de cada visão seguem docs/contrato-bl-itmk.md (seção 2)
+  aceite: Dinheiro com duas casas exatas, datas no fuso de São Paulo e paginação por chave
+  aceite: Só o usuário de leitura do IT.MK consulta
+
+editar: BL: Evento de pagamento do Pix para o IT.MK escutar
+  no épico: Portas e leituras entre o BL e o IT.MK
+  trocar aceites: sim
+  aceite: Parte do BL: o evento traz evento_id único, pix_id, pedido_id, valor_centavos, pago_em, provedor, pagador_nome e documento do pagador mascarado
+  aceite: O mesmo aviso do provedor repetido não gera dois eventos
+  aceite: O IT.MK consegue reler eventos por intervalo de datas depois de uma queda
+
+editar: BL: Base das integrações do BL
+  no épico: Portas e leituras entre o BL e o IT.MK
+  trocar aceites: sim
+  aceite: Parte do BL: tempo limite de 10 segundos e até 3 tentativas com espera crescente
+  aceite: Fila de erros com reprocesso manual e alerta, e logs sem segredo e sem dado pessoal
+  aceite: Chave geral para desligar cada integração sem nova versão
+  aceite: Os erros ficam na visão de erros de integração para o IT.MK mostrar
