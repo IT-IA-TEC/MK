@@ -1,0 +1,10 @@
+lote: Porta de teste do Pix
+depois de: Destino da cobrança e quem trata
+
+Portas e leituras entre o BL e o IT.MK [Integrações] {v1.1}
+- BL: Porta para testar a conexão do Pix
+  tipo: Tarefa
+  responsavel: William
+  prazo: 02/10/2026
+  aceite: Parte do BL: porta HTTPS com credencial própria do IT.MK que testa a conexão com o provedor de Pix e devolve o resultado em texto simples (certificado vencido, chave errada ou escopo faltando), a situação do aviso e o último Pix recebido
+  aceite: O teste não gera Pix, não tem custo e tem efeito único

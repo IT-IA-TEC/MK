@@ -1,0 +1,36 @@
+# Faturado, pedidos, notas, juros, multa e validade do link vêm do BL; o IT.MK só mostra. Aba: qualquer uma (Editar em lote).
+
+editar: Botão Usar no Fechamento
+  no épico: Faturamento por base
+  cancelar: o faturado que vale para a cobrança vem calculado do BL e o IT.MK não envia valor ao Fechamento
+editar: Lista de pedidos e notas
+  no épico: Faturamento por base
+  trocar aceites: sim
+  historia: Como analista de cobrança, quero ver os pedidos e as notas um a um, para conferir o total.
+  aceite: Pedidos e notas em abas, com paginação, lidos do BL
+  aceite: Filtra por competência, loja, plataforma e responsável
+  aceite: Só leitura: não há botão para adicionar pedido ou nota; isso é feito no Java do BL
+editar: Validade do link, juros e multa
+  no épico: Configurações
+  titulo: Validade do link, juros e multa vindos do BL
+  trocar aceites: sim
+  historia: Como responsável pelo financeiro, quero ver a validade do link, os juros e a multa que valem para o Pix, para explicar a cobrança.
+  aceite: Mostra a validade do link depois do vencimento, se juros e multa estão ligados ou desligados e, quando ligados, a multa e os juros
+  aceite: Só leitura: um aviso explica que são configurados no Java do BL, junto com o Pix
+editar: Guardar juros e multa desligados por padrão
+  no épico: Configurações no banco
+  titulo: BL: Guardar juros e multa desligados por padrão
+  tipo: Tarefa
+  responsavel: William
+  prazo: 02/10/2026
+  aceite: Parte do BL: validade do link, juros e multa são configurados no Java do BL, desligados por padrão, e cada mudança guarda quem, quando, valor antigo e novo
+  aceite: O IT.MK lê pela visão v_config_pix e não envia esses valores no pedido de Pix
+editar: BL: Juros e multa desligados
+  no épico: Cobrança e Pix no servidor
+  aceite: O BL aplica a configuração de juros, multa e validade do link que o usuário definiu no Java do BL; a porta de pedir Pix não recebe esses valores
+editar: Gerar um Pix por pagador ou por loja e por parcela
+  no épico: Cobrança e Pix no banco
+  aceite: O IT.MK registra o pedido de cada Pix e guarda o que o BL devolveu (identificador, copia e cola, link, validade e estado); quem cria o Pix no provedor é o BL
+editar: BL: Visões de leitura para o IT.MK
+  no épico: Portas e leituras entre o BL e o IT.MK
+  aceite: Também existem as visões v_config_pix, v_aplicativo_marketplace, v_pedido_loja e v_nota_loja, e as colunas novas de v_conexao_loja, v_faturado_loja e v_regra_calculo descritas no adendo 1 (docs/para-o-bl-adendo-1.md)
