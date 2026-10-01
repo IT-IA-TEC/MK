@@ -101,7 +101,7 @@ function abaUsuarios(){
 }
 function abaRegras(){
   function cx(tit,ico,ks,ex){return '<div class="cx"><div class="cx-cab">'+ic(ico)+'<h3>'+tit+'</h3></div><div class="cf-corpo">'+campos('regras',ks)+(ex||'')+'</div></div>'}
-  return '<div class="fe-info">Mudança de regra vale daqui para frente. As cobranças já fechadas não são recalculadas.</div><div class="cf-grade2">'+
+  return '<div class="fe-info">Mudança de regra vale daqui para frente. As cobranças já fechadas não são recalculadas.</div><div class="cf-grade2">'+(window.MKBL?MKBL.card():'')+
    cx('Percentual, base e vencimento','percent',['regras.pct','regras.venc'],rcCampo('basePadrao','Base padrão da cobrança',rcSel('basePadrao',BASESL().map(function(b){return [b.id,b.nome]}),CFG.recebimento.basePadrao),'Vale para todas as lojas. No Fechamento do mês, cada loja pode usar outra base.'))+cx('Fechamento e meses sem movimento','calendar-check',['regras.abre','regras.ultimo','regras.semMov'])+cx('Comprovantes e baixas','receipt-text',['regras.tol','regras.baixaDias'])+cx('Parcelamento','handshake',['regras.parcela','regras.maxParc','regras.period'])+'</div>'+barraSalvar();
 }
 var ACOES={equipe:'Só avisar a equipe',rev:'Enviar mensagem com revisão',auto:'Enviar mensagem sem revisão'};

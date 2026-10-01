@@ -1,0 +1,14 @@
+lote: Estado do BL sem resposta
+depois de: Portas entre o BL e o IT.MK
+
+Portas e leituras entre o BL e o IT.MK [Frontend] {v1.0}
+- Aviso quando o BL não responde
+  historia: Como analista de cobrança, quero um aviso claro quando o BL não responde, para saber que estou vendo a última leitura boa e que pedidos ao BL estão parados.
+  aceite: Nas telas Pagadores e Lojas, Marketplaces e Fechamento do mês aparece um aviso no topo com a data e a hora da última leitura boa
+  aceite: Os pedidos ao BL (gerar ou reenviar Pix, pedir reconexão e pedir teste) ficam bloqueados com a explicação, e o resto do IT.MK continua funcionando
+  aceite: O botão Tentar de novo refaz a leitura, e o aviso some quando o BL volta
+  aceite: Em Configurações, Regras padrão, o cartão Leitura do BL mostra a situação da leitura
+  aceite: Sem barra de rolagem horizontal e sem espaço vazio em nenhuma largura de computador
+  prioridade: Deve 3
+  valor: 7 sem isso o analista não sabe se o dado é velho
+  pontos: 3
