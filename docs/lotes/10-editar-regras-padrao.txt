@@ -1,0 +1,5 @@
+# Regra de bloqueio mudou: a loja é bloqueada se não pagar até o último dia do mês do vencimento (decisão de 02/10/2026). Não existe mais "dias até bloquear".
+
+editar: Regras padrão e base padrão
+  tirar aceite: Mostra regras de parcelamento e dias até bloquear
+  aceite: Mostra as regras de parcelamento e o prazo de bloqueio, que é o último dia do mês do vencimento e não pode ser editado como número de dias
