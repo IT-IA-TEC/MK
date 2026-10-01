@@ -2,6 +2,8 @@
 
 Consulta feita em 01/10/2026 para o P.O. do IT.MK. Linguagem simples. Tudo que não foi confirmado está marcado "NÃO CONFIRMADO". Nenhum limite ou preço foi inventado: só aparecem números que estavam na fonte citada.
 
+**Atualização de 01/10/2026:** o dono enviou a especificação OFICIAL da API da WhatsGW (`docs/kb/refs/whatsgw-api-openapi.json`, fonte [F18]). Os pontos que estavam "NÃO CONFIRMADO" por causa do site fora do ar foram trocados pelo fato confirmado, com a marca "(confirmado em F18)". O detalhe técnico completo está no `docs/kb/12-whatsgw-api.md`. O que o arquivo não diz continua "NÃO CONFIRMADO".
+
 Fontes ficam na tabela do fim (seção 14). Os números entre colchetes, como [F3], apontam para ela.
 
 ---
@@ -44,27 +46,28 @@ Fontes ficam na tabela do fim (seção 14). Os números entre colchetes, como [F
 - Por mensagem: pagamento por uso; 25 primeiras mensagens grátis no teste; só no modo Flexível.
 - Teste: 2 dias grátis (instância) ou 25 mensagens (por mensagem).
 - O site cita "até 1.000 destinatários por chamada" e diz que a taxa de envio "varia conforme a maturidade do número e regras do WhatsApp" [F1]. Não há taxa fixa publicada (NÃO CONFIRMADO).
+- Confirmado em F18: o método `SendBulk` aceita "até 1000 mensagens" por chamada, podendo misturar texto, mídia e botões. A API não diz em que ritmo o lote sai (NÃO CONFIRMADO).
 - Preços podem mudar: conferir no site antes de contratar.
 
 ### 2.4 API de envio (resumo técnico simples)
-Fonte: artigo oficial da WhatsGW e GitHub [F2][F3]. A documentação completa (`app.whatsgw.com.br/api/docs/whatsgw`) **estava fora do ar (erro 503)** na consulta, então o que segue é o mínimo confirmado.
-- Envio: `POST https://app.whatsgw.com.br/api/WhatsGw/Send`, corpo em JSON [F3].
+Fonte: artigo oficial da WhatsGW e GitHub [F2][F3] e, agora, a **especificação oficial OpenAPI** enviada pelo dono [F18]. A página de documentação (`app.whatsgw.com.br/api/docs/whatsgw`) estava fora do ar (erro 503) na primeira consulta; a especificação [F18] a substitui. Detalhe completo no `docs/kb/12-whatsgw-api.md`.
+- Envio: `POST https://app.whatsgw.com.br/api/WhatsGw/Send`, corpo em JSON ou `form-urlencoded` [F3] (confirmado em F18; o servidor REST oficial é `https://app.whatsgw.com.br/api`).
 - Campos mínimos: `apikey` (chave de acesso), `phone_number` (formato `5511999999999`), `message_type`, `message_body` [F3].
-- O artigo só confirma `message_type = text`. Mídia (imagem, PDF, vídeo) e áudio: o GitHub diz que a API envia "texto, imagens, vídeos, PDFs e documentos" [F2], mas **os nomes dos campos para mídia e áudio NÃO foram confirmados**.
-- Autenticação: a chave `apikey` vai dentro do corpo [F3]. Não vimos assinatura de requisição nem lista de IPs (NÃO CONFIRMADO).
+- O artigo só confirmava `message_type = text`. **Confirmado em F18:** `message_type` aceita `text`, `image`, `document`, `video`, `audio` e `ptt` (áudio de voz). Para mídia: `message_body` leva a URL ou o arquivo em base64; `message_caption` (legenda); `message_body_mimetype` e `message_body_filename` (obrigatórios em base64); `download = 1` faz a API baixar o link. Mídia exige POST. Tamanho máximo de arquivo: NÃO CONFIRMADO.
+- Autenticação: a chave `apikey` vai dentro do corpo [F3] (confirmado em F18, em todos os métodos; a chave é da empresa, não do telefone). A especificação também não traz assinatura de requisição, assinatura de webhook nem lista de IPs (NÃO CONFIRMADO fora do arquivo).
 - Recebimento: duas formas [F3]
   - **Webhook**: cadastrar o endereço do nosso servidor em "Administração > Telefones". A WhatsGW envia `sender`, `message_body`, `message_type`. Nosso servidor deve responder HTTP 200.
-  - **GetEvents** (consulta periódica): `GET https://app.whatsgw.com.br/api/WhatsGw/GetEvents` com a apikey. Serve quando não dá para expor um endereço público.
-- Status de entrega e de conexão: um resumo de busca indica webhooks de status do telefone em outros provedores; **para a WhatsGW o formato exato NÃO CONFIRMADO**.
+  - **GetEvents** (consulta periódica): `GET https://app.whatsgw.com.br/api/WhatsGw/GetEvents` com a apikey. Serve quando não dá para expor um endereço público. Confirmado em F18: o GetEvents usa o servidor `https://pooling.whatsgw.com.br/api` (não o `app`), devolve eventos pendentes e exige **intervalo mínimo de 7 segundos** entre chamadas (antes disso "será gerada uma exceção").
+- Status de entrega e de conexão (confirmado em F18): evento `status` com `message_state` = `delivered2server`, `delivered2user`, `read`, `notwa` (sem WhatsApp) ou `notsent`; evento `phonestate` com `state` = `connected` ou `disconnected`; evento `account_health` (`ok`, `restricted`, `critical`). Formatos no `docs/kb/12-whatsgw-api.md`, seção 4. O significado de cada `message_state` não é explicado no arquivo (NÃO CONFIRMADO).
 
 ### 2.5 QR code, sessão e desconexão
 - Fluxo geral: registrar, sincronizar o WhatsApp (extensão ou instância), ler o QR code, testar envio [F3].
-- Não foi possível ler a página da WhatsGW sobre status e queda de sessão (NÃO CONFIRMADO): como avisam que o número caiu, em quanto tempo e se há webhook de desconexão.
+- Confirmado em F18: **há webhook de desconexão** (`phonestate` com `state = disconnected`), aviso de conta restrita ou desautenticada (`account_health` com `restricted` ou `critical`, códigos 401, 403 e 411) e evento `qrcode` quando a instância pede nova leitura. `RestartInstance` reinicia e, com `type = 1`, gera novo QR se precisar. **Em quanto tempo o aviso chega depois da queda: NÃO CONFIRMADO.**
 - Regra prática para o IT.MK: tratar a desconexão como algo que **vai acontecer** (o celular some, a sessão expira, o WhatsApp derruba). O robô precisa parar sozinho e avisar (seção 9).
 
 ### 2.6 Termos de uso e risco de ban da WhatsGW
 - Os Termos da própria WhatsGW **não foram lidos** (NÃO CONFIRMADO). Pedir ao fornecedor por escrito: responsabilidade em caso de banimento, reembolso, SLA e onde ficam guardadas as mensagens.
-- A WhatsGW **não declara que o Flexível é permitido pelo WhatsApp**. Ela só diz que o Oficial tem menor risco [F1].
+- A WhatsGW **não declara que o Flexível é permitido pelo WhatsApp**. Ela só diz que o Oficial tem menor risco [F1]. Confirmado em F18: a especificação chama o tipo 1 (QRCode) de "conexão não-oficial" e o tipo 3 de "Oficial (Meta / WhatsApp Cloud)".
 
 ---
 
@@ -123,8 +126,8 @@ Fonte: artigo oficial da WhatsGW e GitHub [F2][F3]. A documentação completa (`
 | Risco de banimento do número | Maior; sem aviso garantido; recurso incerto (fontes secundárias, ver 6) | "Menor risco" segundo a WhatsGW [F1]; ainda há limite e queda de qualidade [F13] |
 | Limite de envio | Não publicado; depende da "maturidade do número" [F1] | Níveis e regras publicados [F13] |
 | Custo | Instância a partir de R$99/mês ou por mensagem [F1] | Por mensagem entregue de modelo; R$ NÃO CONFIRMADO [F4] |
-| Botões e recursos ricos | Não (segundo o site, botões são do Oficial) [F1] | Sim [F1][F5] |
-| Confirmação de entrega | Por webhook da WhatsGW (formato NÃO CONFIRMADO) | Webhooks de status da Meta [F5] |
+| Botões e recursos ricos | O site diz que botões são do Oficial [F1], **mas a especificação F18 traz botões, lista, enquete, contato, localização, reação e citação "somente por instância" (QR)**, com aviso de que os botões voltaram em 15/02/2025 e o WhatsApp pode mudar o comportamento. Divergência a confirmar com o suporte | Sim; no oficial os botões vêm no template [F1][F5][F18] |
+| Confirmação de entrega | Por webhook da WhatsGW, evento `status` (confirmado em F18) | Webhooks de status da Meta [F5]; a WhatsGW também usa o evento `status` (F18) |
 | Número usado | O número comum da empresa; se banir, perde o número e o histórico | Número dedicado à API |
 | Política de cobrança de dívida | Mesma política vale em tese; sem filtro técnico | **Lista "cobrança de dívidas" como proibida** [F8] |
 
@@ -139,7 +142,7 @@ Leitura simples:
 
 Resposta curta, com fonte:
 - **A empresa WhatsGW não é a Meta.** Ela é uma revendedora/intermediária. Ela oferece **os dois modos** [F1].
-- **No modo que o protótipo descreve (QR code), é NÃO OFICIAL.** O próprio site chama o outro modo de "Oficial (usa a API da Meta)" e o de QR de "Flexível" [F1]. Se a Meta não aprova o QR, o QR é não oficial.
+- **No modo que o protótipo descreve (QR code), é NÃO OFICIAL** (confirmado em F18: a especificação diz "conexão não-oficial, lida por QRCode ou Pairing Code"). O próprio site chama o outro modo de "Oficial (usa a API da Meta)" e o de QR de "Flexível" [F1]. Se a Meta não aprova o QR, o QR é não oficial.
 - Fontes secundárias (blogs de mercado, não oficiais) afirmam que conexões por QR code "operam fora dos termos de serviço da Meta" [F14]. Isso é opinião de terceiros; use como alerta, não como prova.
 - O texto oficial do WhatsApp proíbe automação e criar "APIs que funcionem substancialmente igual aos nossos serviços" para terceiros [F9]. É base para o risco, mas **a Meta não cita a WhatsGW pelo nome** (NÃO CONFIRMADO qualquer ação contra ela).
 
@@ -217,7 +220,7 @@ Lido em `prototipo/js/robo.js` e `prototipo/js/conversas.js` em 01/10/2026. "Exi
 | Feriado | Lista de feriados e chave "não enviar em feriados" | lista fixa de 8 datas | A chave existe; **a checagem de feriado não aparece na verificação de envio**: falta ligar |
 | Robô errar | Modo sombra (só sugere, pessoa aprova ou edita) | Ligado | Existe, com taxa de aprovação sem edição |
 | Pagador novo no robô | Situação "Em teste": só sugere, não envia | por pagador | Existe |
-| Número cair | Aviso "número desconectado", nada sai até reconectar | n/a | Existe (estado e botão "Já reconectei"). **Falta detecção automática vinda da WhatsGW** |
+| Número cair | Aviso "número desconectado", nada sai até reconectar | n/a | Existe (estado e botão "Já reconectei"). **Falta ligar a detecção automática.** A WhatsGW oferece os eventos `phonestate` e `account_health` e o método `PhoneState` (confirmado em F18) |
 | Parar tudo | Pausa geral com motivo, quem e quando | n/a | Existe, registra na auditoria |
 | Parar um cliente | Situação por pagador ("Não atende") e pausas automáticas | n/a | Existe |
 | Humano assume | "Assumir conversa" pausa o robô na conversa | n/a | Existe |
@@ -227,12 +230,12 @@ Lido em `prototipo/js/robo.js` e `prototipo/js/conversas.js` em 01/10/2026. "Exi
 | Prova do que foi feito | Auditoria registra mudanças, pausas, aprovações | n/a | Existe; não apagar |
 
 Lacunas do protótipo em relação a este manual (não verificadas em outras telas):
-1. Não achei controle de **opt-out** ("parar", "sair"): nenhuma palavra de parada tratada nem lista "não contatar".
+1. Não achei controle de **opt-out** ("parar", "sair"): nenhuma palavra de parada tratada nem lista "não contatar". Confirmado em F18: a API da WhatsGW também não oferece opt-out; o IT.MK precisa construir.
 2. Não achei **aquecimento do número** (subir o volume aos poucos de forma automática).
 3. Não achei **taxa de bloqueio/denúncia** como indicador, nem corte automático por ela.
 4. Não achei **limite semanal** por pagador.
 5. Não achei **registro do opt-in** (quando e como o pagador aceitou).
-6. Não achei como o robô trata **mídia e áudio recebidos** além de exibir (comprovantes têm fluxo próprio).
+6. Não achei como o robô trata **mídia e áudio recebidos** além de exibir (comprovantes têm fluxo próprio). Confirmado em F18: mídia recebida chega no webhook como base64 em `message_body`, com `message_body_mimetype` e `message_body_extension`; o IT.MK precisa decodificar e guardar.
 7. Não achei **número separado** do atendimento humano.
 
 ---
@@ -249,7 +252,7 @@ Lacunas do protótipo em relação a este manual (não verificadas em outras tel
 8. R8. Dúvida, contestação, parcelamento, pedido de nota, ameaça, tom agressivo: passa para humano.
 9. R9. Auditoria nunca apaga; só acrescenta. Dado pessoal em excesso é tratado conforme decisão D6.
 10. R10. Chave `apikey` da WhatsGW fica guardada em cofre/variável secreta, nunca no código nem na tela.
-11. R11. Webhook recebido responde 200 rápido e processa depois; ignora mensagem repetida (mesmo id).
+11. R11. Webhook recebido responde 200 rápido e processa depois; ignora mensagem repetida (mesmo id). Confirmado em F18: o endereço deve responder 200; ids disponíveis: `waid` (id no WhatsApp) e `message_id` (id interno da WhatsGW). A especificação não traz regra de reenvio nem assinatura (NÃO CONFIRMADO).
 12. R12. Se aparecer sinal de restrição (queda repetida, falha de envio em sequência, aumento de reclamações), pausa geral automática e aviso.
 13. R13. Modo sombra fica ligado até a taxa de aprovação sem edição ser aceita pelo dono (meta: decisão D5).
 14. R14. Teste de conexão e envio de teste só para número interno da equipe.
@@ -279,8 +282,8 @@ Formato para colar nos itens BL-xx (marque em caixa quando pronto).
 ### 12.1 Conexão com a WhatsGW
 - [ ] Número conectado aparece no painel com data de conexão.
 - [ ] "Testar conexão" mostra sucesso ou falha real (não mensagem fixa).
-- [ ] Desconexão da WhatsGW muda o painel para "Desconectado" em tempo definido (tempo: preencher após ler a doc) e pausa os envios.
-- [ ] Alerta de desconexão chega à equipe fora da tela (canal definido em D-extra; NÃO CONFIRMADO qual).
+- [ ] Desconexão da WhatsGW (evento `phonestate` = `disconnected`, confirmado em F18) muda o painel para "Desconectado" e pausa os envios. Tempo máximo do aviso: NÃO CONFIRMADO (perguntar à WhatsGW; ver `docs/kb/12-whatsgw-api.md`, seção 9).
+- [ ] Alerta de desconexão chega à equipe fora da tela (a WhatsGW avisa o IT.MK por webhook; o canal para avisar a equipe é decisão do dono: NÃO CONFIRMADO qual).
 - [ ] Reconexão exige leitura do QR e confirmação humana antes de retomar.
 - [ ] `apikey` fora do código, fora de log e fora da tela.
 
@@ -326,14 +329,14 @@ Formato para colar nos itens BL-xx (marque em caixa quando pronto).
 Riscos:
 1. **Perda do número** (alto, sem controle total). Mitigação: seção 9; número exclusivo; plano B (Oficial).
 2. **Política da Meta lista cobrança de dívidas como proibida** [F8]: risco para o canal oficial (D2).
-3. **Dependência da WhatsGW** (ela está no meio: se cair, o robô para; o site da documentação estava fora do ar na consulta).
+3. **Dependência da WhatsGW** (ela está no meio: se cair, o robô para; o site da documentação estava fora do ar na primeira consulta, mas a especificação oficial já foi entregue pelo dono).
 4. **Reclamação do pagador** (Procon, CDC, LGPD).
 5. **Mensagem enganosa ou ameaçadora** gerada por erro: mitigado por "só modelo aprovado".
 6. **Dado pessoal em excesso** na auditoria.
 7. **Custos**: instância ou por mensagem no Flexível; por mensagem no Oficial. Valores do Oficial em R$ NÃO CONFIRMADOS.
 
 NÃO verificado (lista direta):
-- Documentação técnica completa da WhatsGW (503): campos de mídia e áudio, formato de status de entrega e de conexão, códigos de erro, limites técnicos, política de repetição de webhook.
+- Documentação técnica da WhatsGW: **agora confirmados em F18** os campos de mídia e áudio, o formato de status de entrega e de conexão e o limite de 1000 do SendBulk. **Continuam NÃO CONFIRMADOS:** lista de códigos de erro, limite de chamadas por minuto de `Send`, limite de tamanho de texto e arquivo, formato da resposta de sucesso do `Send`, tempo do aviso de queda, política de repetição e assinatura do webhook (ver `docs/kb/12-whatsgw-api.md`, seções 8 e 9).
 - Termos de uso e política de reembolso da WhatsGW.
 - Tabela de preços da Meta em R$ para o Brasil e o preço de modelos de utilidade fora da janela.
 - Texto literal da política da Meta sobre cobrança de dívidas (veio por resumo automático).
@@ -353,7 +356,7 @@ NÃO verificado (lista direta):
 | F1 | WhatsGW, site oficial (oficial x flexível, preços, limites, teste) | https://whatsgw.com.br/ | Lido. Preços e frases citadas |
 | F2 | WhatsGW, repositório oficial no GitHub | https://github.com/whatsgw/whatsgw | Lido (resumo) |
 | F3 | WhatsGW, artigo oficial de integração (envio, webhook, GetEvents) | https://whatsgw.com.br/2023/07/12/como-sua-aplicacao-em-qualquer-linguagem-pode-enviar-mensagens-via-whatsapp/ | Lido (artigo de 2023; pode estar desatualizado) |
-| F3b | WhatsGW, documentação da API | https://app.whatsgw.com.br/api/docs/whatsgw | **Erro 503, não lido** |
+| F3b | WhatsGW, documentação da API | https://app.whatsgw.com.br/api/docs/whatsgw | Erro 503 na consulta; **substituída pela especificação oficial F18** |
 | F3c | WhatsGW, suporte (Postman) | https://app.whatsgw.com.br/suporte.aspx?id=69 | **Erro 503, não lido** |
 | F4 | Meta, preços da WhatsApp Business Platform | https://developers.facebook.com/docs/whatsapp/pricing | Lido (referência até jun/2026; sem tabela em R$) |
 | F5 | Meta, mensagens de serviço e Cloud API (janela 24 h, endpoint, webhooks) | https://developers.facebook.com/docs/whatsapp/cloud-api/guides/send-messages | Lido |
@@ -369,13 +372,14 @@ NÃO verificado (lista direta):
 | F15 | ANPD, guia de legítimo interesse (notícia) | https://www.gov.br/anpd/pt-br/assuntos/noticias/anpd-lanca-guia-orientativo-sobre-legitimo-interesse | **Erro 401**; só resumo de busca |
 | F16 | Blog Asaas sobre cobrança por WhatsApp (opinião) | https://blog.asaas.com/cobranca-pelo-whatsapp/ | Só no resultado de busca |
 | F17 | CDC, Lei 8.078/1990 | https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm | **Erro 503, não lido** |
+| F18 | WhatsGW, especificação oficial da API (OpenAPI 3.1, 88 caminhos, 16 eventos de webhook), enviada pelo dono | `docs/kb/refs/whatsgw-api-openapi.json` | Lido inteiro em 01/10/2026. Resumo em `docs/kb/12-whatsgw-api.md` |
 
 Arquivos internos lidos: `CLAUDE.md`, `docs/base-po.md`, `docs/kb-mapa.md` (a base de conhecimento não cobre WhatsGW), `prototipo/js/robo.js`, `prototipo/js/conversas.js`.
 
 ---
 
 ## 15. Próximos passos sugeridos (viram itens novos, escritos pelo dono)
-1. Pedir à WhatsGW por escrito: documentação completa, termos, status/webhook de desconexão, política de ban, e se a conexão Oficial aceita cobrança.
+1. Pedir à WhatsGW por escrito: termos de uso, política de ban, se a conexão Oficial aceita cobrança e as dúvidas técnicas que a especificação não responde (lista W1 a W19 em `docs/kb/12-whatsgw-api.md`, seção 9). A documentação e o webhook de desconexão já foram confirmados em F18.
 2. Pedir parecer jurídico: política da Meta sobre cobrança de dívidas, base legal LGPD, horário e tom.
 3. Escolher canal e número (D1, D3).
 4. Fechar os itens de lacuna do protótipo (seção 9) antes de ligar envio real.
