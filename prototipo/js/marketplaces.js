@@ -115,7 +115,7 @@ function blocos(m){
   var out=[];
   out.push({id:'cad',t:'Cadastro',it:[
     {k:'cad.login',l:'Nome de login',t:'txt'},{k:'cad.publico',l:'Nome público',t:'txt'},{fx:'Marketplace',v:function(x){return m}},{fx:'CNPJ da loja (informativo)',v:function(x){var d=String(x.cnpj||'');return d.length===14?d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,'$1.$2.$3/$4-$5'):'—'}},{fx:'GS / ID da loja',v:function(x){var c=conDe(x.gs,m);return x.gs+(c&&c.idExt?' · ID '+c.idExt:'')}},
-    {k:'cad.link',l:'Link da loja',t:'txt'},{fx:'Data de início',v:function(x){return x.ini||'—'}},{k:'cad.pct',l:'Percentual da 40%',t:'num',suf:'%',padrao:'40'},{fx:'Responsável',v:function(x){return x.resp}},
+    {k:'cad.link',l:'Link da loja',t:'txt'},{fx:'Data de início',v:function(x){return x.ini||'—'}},{fx:'Percentual da 40% (vem do BL)',v:function(){return '40%'}},{fx:'Responsável',v:function(x){return x.resp}},
     {k:'cad.antiga',l:'Data da publicação mais antiga (referência de antiguidade)',t:'data',info:'Será calculada quando houver lista de produtos. Manual até lá.'}]});
   if(K)out[0].it.unshift({info:'Kwai: sem documentação oficial acessível. Todos os campos da ficha ficam Manual (a confirmar com a Kwai).'});
   var cat=[];

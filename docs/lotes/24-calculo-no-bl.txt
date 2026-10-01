@@ -1,0 +1,22 @@
+lote: Cálculo da cobrança no BL
+depois de: Estado do BL sem resposta
+
+Cálculo da cobrança no BL [Integrações] {v1.1}
+meta: o BL guarda o faturado, calcula o imposto e o valor da 40%, e o IT.MK recebe pronto
+- BL: Configurar percentual da 40%, alíquota e base de cálculo
+  tipo: Tarefa
+  responsavel: William
+  prazo: 02/10/2026
+  aceite: Parte do BL: o Java do BL tem campos para configurar o percentual da 40% (padrão 40) e a base de cálculo padrão, e a alíquota do imposto
+  aceite: O percentual e a base podem ser diferentes por loja, e a alteração vale daqui para frente
+  aceite: Cada alteração guarda quem mudou, quando, o valor antigo e o novo, em tabela só de inserção
+  aceite: O que for configurado no BL aparece no IT.MK pela visão de regra de cálculo (percentual_40_padrao, aliquota, base_padrao e as exceções por loja)
+- BL: Calcular imposto e valor da 40% por loja
+  tipo: Tarefa
+  responsavel: William
+  prazo: 02/10/2026
+  aceite: Parte do BL: o valor da 40% é o imposto vezes o percentual da loja, com duas casas e a regra única de arredondamento
+  aceite: A alíquota é o imposto dividido pelo faturado e serve só para conferir
+  aceite: Teste fixo: imposto de R$ 3.140,00 com 40% dá R$ 1.256,00, imposto de R$ 1.375,50 dá R$ 550,20 e imposto de R$ 3.000,00 com percentual 35 dá R$ 1.050,00
+  aceite: Recalcular cria versão nova ligada à anterior, com motivo e autor, e a antiga fica Substituída
+  aceite: O IT.MK lê o resultado pela visão de faturado (faturado, base, imposto, alíquota, percentual e valor da 40%)

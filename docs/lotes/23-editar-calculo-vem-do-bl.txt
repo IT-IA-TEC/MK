@@ -1,0 +1,117 @@
+# Decisão do dono (02/10/2026): o BL guarda o faturado e CALCULA imposto e valor da 40%. Percentual da 40%, alíquota do imposto e base de cálculo são configurados no Java do BL. O IT.MK só recebe pronto e mostra. Aba: qualquer uma (Editar em lote).
+
+# ---------- Frontend ----------
+editar: Etapa de faturamento por loja
+  no épico: Fechamento do mês
+  trocar aceites: sim
+  historia: Como analista de cobrança, quero ver o faturado, o imposto e o valor da 40% de cada loja como o BL calculou, para conferir e cobrar sem digitar de novo.
+  aceite: Lista as lojas com base, faturado, imposto, alíquota, percentual da 40% e valor a pagar, só para ver
+  aceite: Não há edição manual nem importação de planilha no IT.MK; isso é feito no Java do BL
+  aceite: Loja sem faturado vira Sem movimento e não gera cobrança
+  aceite: Valores exatos com duas casas e a regra única de arredondamento
+editar: Coluna Base com seletor
+  no épico: Fechamento do mês
+  titulo: Coluna Base só de leitura
+  trocar aceites: sim
+  historia: Como analista de cobrança, quero ver a base de cálculo de cada loja, para saber de onde vem o valor.
+  aceite: Mostra a base de cada loja (Faturamento total, Valor dos produtos, Pedidos concluídos, Notas fiscais emitidas ou Valor manual) como o BL configurou
+  aceite: Não há seletor; a base se muda no Java do BL
+editar: Alterar base com alcance e duração
+  no épico: Fechamento do mês
+  cancelar: a base passa a ser configurada no Java do BL
+editar: Histórico de mudança de base
+  no épico: Fechamento do mês
+  trocar aceites: sim
+  historia: Como analista de cobrança, quero ver quem mudou a base, quando e de qual para qual, para explicar um valor depois.
+  aceite: Mostra quem, quando, base antiga, base nova, alcance e duração, lidos do BL
+  aceite: Só leitura: nada é editado nem apagado no IT.MK
+editar: Regras padrão e base padrão
+  no épico: Configurações
+  trocar aceites: sim
+  historia: Como responsável pelo financeiro, quero ver as regras padrão da cobrança, para saber como o valor é calculado.
+  aceite: Mostra, só para leitura, o percentual da 40% e a base padrão que o BL configurou
+  aceite: O dia do vencimento, a tolerância do comprovante, o parcelamento e o prazo de bloqueio continuam sendo regras do IT.MK
+  aceite: Um aviso explica que percentual, alíquota e base são configurados no Java do BL
+
+# ---------- Backend ----------
+editar: Calcular cobrança com imposto e valor da 40%
+  no épico: Fechamento do mês no servidor
+  titulo: Receber o cálculo da cobrança do BL
+  trocar aceites: sim
+  historia: Como analista de cobrança, quero que o servidor receba do BL o imposto e o valor da 40% de cada loja, para a cobrança sair igual ao que o BL calculou.
+  aceite: O servidor lê do BL, por visão de leitura, o faturado, a base, o imposto, a alíquota, o percentual da 40% e o valor da 40% de cada loja e competência
+  aceite: O servidor confere que o valor da 40% é o imposto vezes o percentual pela regra única de arredondamento e, se não bater, marca alerta na conferência sem corrigir sozinho
+  aceite: O total da cobrança do pagador é a soma do valor da 40% das lojas conferidas, e loja Não cobrar ou Sem movimento fica fora
+  aceite: Teste fixo: imposto de R$ 3.140,00 com 40% dá R$ 1.256,00, imposto de R$ 1.375,50 dá R$ 550,20 e imposto de R$ 3.000,00 com percentual 35 dá R$ 1.050,00
+editar: Importar planilha com prévia
+  no épico: Fechamento do mês no servidor
+  titulo: BL: Importar planilha com prévia
+  tipo: Tarefa
+  responsavel: William
+  prazo: 02/10/2026
+  aceite: Parte do BL: a importação da planilha de faturado, com prévia de novas, alteradas e sem mudança, é feita no Java do BL
+  aceite: O IT.MK não importa nem edita faturado
+editar: Versões imutáveis do cálculo
+  no épico: Fechamento do mês no servidor
+  trocar aceites: sim
+  historia: Como analista de cobrança, quero guardar cada versão do cálculo recebida do BL e nunca apagar a anterior, para explicar o valor de cada época.
+  aceite: Cada cobrança guarda a versão da regra do BL usada, as entradas (base, faturado, imposto, alíquota, percentual) e o resultado
+  aceite: Quando o BL recalcula, o IT.MK guarda uma versão nova ligada à anterior com motivo e autor, e a antiga fica Substituída, nunca editada
+  aceite: Mudança de percentual ou de base no BL vale daqui para frente e não refaz cobrança gerada nem competência fechada
+  aceite: Existe teste de regressão com casos fixos de entrada e saída para cada versão
+editar: Alterar base com alcance e duração
+  no épico: Faturamento e bases no servidor
+  titulo: BL: Alterar base com alcance e duração
+  tipo: Tarefa
+  responsavel: William
+  prazo: 02/10/2026
+  aceite: Parte do BL: a troca de base (só esta loja, lojas selecionadas ou todas; neste mês ou para sempre) é feita no Java do BL, com histórico
+  aceite: O IT.MK só lê a base e o histórico
+editar: Memória de cálculo e extrato da cobrança
+  no épico: Fechamento do mês no servidor
+  aceite: Os números da memória e do extrato vêm do cálculo recebido do BL e são guardados no IT.MK por versão
+editar: Confirmar fórmula do valor da 40%
+  no épico: Decisões de arquitetura
+  aceite: Decisão do dono (02/10/2026): o BL calcula imposto e valor da 40%; percentual da 40%, alíquota do imposto e base de cálculo são configurados no Java do BL, e o IT.MK só recebe e mostra
+
+# ---------- Database ----------
+editar: BL: Guardar faturado por loja e base
+  no épico: Faturamento e bases no banco
+  trocar aceites: sim
+  aceite: Parte do BL: a tabela faturado_loja guarda competência, loja, base escolhida, valor de cada base, imposto, alíquota, percentual da 40%, valor da 40% e origem (API, planilha ou manual), em numeric(14,2) ou numeric(9,6)
+  aceite: Há chave única por competência, loja e origem, e importar o mesmo lote duas vezes não duplica
+  aceite: Faturado vazio (a calcular), zero (sem movimento) e valor são três estados distintos, garantidos por check
+  aceite: O arredondamento do imposto e do valor da 40% segue a regra única de arredondamento registrada
+  aceite: O IT.MK lê esses valores pela visão de faturado, só para consulta
+editar: Criar bases de cálculo do faturado
+  no épico: Faturamento e bases no banco
+  titulo: BL: Criar bases de cálculo do faturado
+  tipo: Tarefa
+  responsavel: William
+  prazo: 02/10/2026
+  aceite: Parte do BL: a lista de bases e a base padrão ficam no BL, e o IT.MK só lê
+editar: Guardar alteração de base com histórico
+  no épico: Faturamento e bases no banco
+  titulo: BL: Guardar alteração de base com histórico
+  tipo: Tarefa
+  responsavel: William
+  prazo: 02/10/2026
+  aceite: Parte do BL: o histórico de troca de base fica no BL, e o IT.MK só lê
+editar: Criar cobrança e itens por loja
+  no épico: Cobrança e Pix no banco
+  aceite: Os valores de cada item vêm do cálculo recebido do BL e são guardados como recebidos, em numeric(14,2)
+editar: Versionar cálculo e guardar memória de cálculo
+  no épico: Cobrança e Pix no banco
+  trocar aceites: sim
+  historia: Como analista de cobrança, quero que cada valor tenha a memória de cálculo guardada, para explicar o valor ao pagador.
+  aceite: A tabela de cálculo guarda a versão da regra do BL, o percentual numeric(9,6), a base, o faturado, o imposto, a alíquota e o resultado de cada cobrança, e versão velha nunca é editada
+  aceite: Recalcular no BL cria uma versão nova ligada à anterior com motivo e autor, e a antiga fica Substituída
+  aceite: A memória de cálculo guarda competência, loja, base usada, fonte e período do dado, quem conferiu e quando, e as versões
+  aceite: Existe teste de regressão com casos fixos de entrada e saída, e o arredondamento segue a regra única registrada
+editar: Guardar modo padrão, base padrão e regras do fechamento
+  no épico: Configurações no banco
+  trocar aceites: sim
+  historia: Como responsável pelo financeiro, quero o modo padrão de cobrança e as regras do fechamento do IT.MK guardados, para o mês fechar do mesmo jeito sempre.
+  aceite: A configuração guarda o modo padrão de cobrança (um Pix por pagador), o dia do vencimento (hoje 20), a tolerância do comprovante (hoje R$ 0,02) e o máximo de parcelas (hoje 12)
+  aceite: O percentual da 40%, a alíquota do imposto e a base padrão ficam no BL e o IT.MK só os lê
+  aceite: Mudar o padrão não muda cobrança já gerada nem competência fechada

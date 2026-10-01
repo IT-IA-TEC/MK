@@ -1,3 +1,6 @@
 .bl-faixa{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
 .bl-faixa>span{min-width:0}
 .bl-bloq{opacity:.55;cursor:not-allowed}
+/* base de cálculo vem do BL: texto, não seletor */
+.bs-w.off{opacity:1;cursor:default;padding:4px 0;border:0;background:none;box-shadow:none;min-height:0}
+.bs-w.off::after{display:none}

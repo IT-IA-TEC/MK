@@ -154,7 +154,6 @@ function topo(c){
   var st=[['1','Faturado',k.acalc===0,k.acalc+(k.acalc===1?' loja a calcular':' lojas a calcular'),'Todas calculadas'],['2','Conferência',k.conf===k.cob,(k.cob-k.conf)+' a conferir','Tudo conferido'],['3','Envio',k.falta===0,k.falta+(k.falta===1?' cobrança falta':' cobranças faltam'),'Tudo enviado']];
   return '<div class="fe-cab"><div><h1>Fechamento do mês</h1><p class="sub">Competência '+esc(c.rotulo.toLowerCase())+' · vencimento '+c.venc+' · '+(fecha?'<b>Fechada em '+esc(c.fechadaEm)+'</b>':'<b>Em fechamento</b>')+'</p></div>'+
    '<div class="fe-acoes"><label class="sel-p"><span>Competência</span><select class="sel" id="fe-comp">'+Object.keys(comps).map(function(x){return '<option value="'+x+'"'+(x===atual?' selected':'')+'>'+esc(comps[x].rotulo)+(comps[x].fechada?' (fechada)':' (em fechamento)')+'</option>'}).join('')+'</select></label>'+
-   '<button class="btn sec" data-fe="importar" style="width:auto;padding:0 14px"'+(fecha?' disabled':'')+'>Importar dados</button>'+
    '<button class="btn'+(fecha?' sec':' esc')+'" data-fe="fechar" style="width:auto;padding:0 14px"'+(fecha?' disabled':'')+'>Fechar competência</button></div></div>'+
    (fecha?'<div class="fe-aviso">'+ic('lock')+'<span>Competência fechada. Os valores estão travados. Qualquer alteração exige motivo e fica registrada no histórico da loja.</span></div>':'')+
    '<div class="fe-etapas" role="tablist">'+st.map(function(s,i){var on=etapa===i+1;return '<button role="tab" class="fe-et'+(s[2]?' feita':'')+'" data-etapa="'+(i+1)+'" aria-selected="'+on+'"><span class="fe-n">'+(s[2]?ic('check'):s[0])+'</span><span class="fe-t"><b>'+s[1]+'</b><small>'+(s[2]?s[4]:s[3])+'</small></span></button>'}).join('')+'</div>'+
@@ -162,8 +161,8 @@ function topo(c){
 }
 function btnMem(l,pid,gs){return '<button class="ib" data-fe="memoria" data-p="'+pid+'"'+(gs?' data-g="'+gs+'"':'')+' aria-label="Memória de cálculo de '+esc(l)+'" title="Memória de cálculo">'+ic('calculator')+'</button>'}
 function celulaBase(c,l){
-  var o=opcoes(l),d=dicaBase(l);
-  return '<label class="bs-w'+(c.fechada?' off':'')+'"><span class="bs-t">'+esc(baseNome(l.base))+'</span><select class="bs-s" data-basesel="'+l.rid+'"'+(c.fechada?' disabled':'')+' aria-label="Base de cálculo de '+esc(l.n)+'">'+o.map(function(x){return '<option value="'+x.id+'"'+(x.id===l.base?' selected':'')+(x.ok?'':' disabled')+'>'+esc(x.nome)+(x.ok?'':' (não disponível)')+'</option>'}).join('')+'</select></label>'+(d?'<div class="nt bs-d">'+d+'</div>':'');
+  var d=dicaBase(l);
+  return '<div class="bs-w off"><span class="bs-t">'+esc(baseNome(l.base))+'</span></div>'+(d?'<div class="nt bs-d">'+d+'</div>':'');
 }
 function painelHB(){
   return '<div class="cx fe-hb"><button type="button" class="cx-cab fe-hb-b" data-fe="hbtoggle" aria-expanded="'+hbAberto+'" aria-controls="fe-hb-c">'+ic('history')+'<h3>Histórico de mudança de base</h3><span class="c">'+HB.length+'</span>'+ic('chevron-down')+'</button>'+
@@ -173,13 +172,13 @@ function etapa1(c){
   var marc=Object.keys(selLote).filter(function(k){return selLote[k]&&linha(k)}).length;
   var linhas=c.lojas.map(function(l){
     var s=sit(c,l),p=pagador(l.pid),sm=l.fat===0||l.nao;
-    return '<tr class="'+(sm?'sm':'')+'"><td class="ck"><input type="checkbox" data-lojasel="'+l.rid+'"'+(selLote[l.rid]?' checked':'')+(c.fechada?' disabled':'')+' aria-label="Selecionar '+esc(l.n)+'"></td><td data-rot="Loja (GS)"><div class="lj-n">'+esc(l.n)+(l.tag?' <span class="fs '+(l.tag==='Nova'?'ok':'at')+'">'+l.tag+'</span>':'')+'</div><div class="lj-gs">'+esc(l.gs)+'</div><div class="rp">'+(semResp(l)?'<i class="sr-r">Sem responsável</i>':esc(p.nome))+'</div></td>'+
+    return '<tr class="'+(sm?'sm':'')+'"><td data-rot="Loja (GS)"><div class="lj-n">'+esc(l.n)+(l.tag?' <span class="fs '+(l.tag==='Nova'?'ok':'at')+'">'+l.tag+'</span>':'')+'</div><div class="lj-gs">'+esc(l.gs)+'</div><div class="rp">'+(semResp(l)?'<i class="sr-r">Sem responsável</i>':esc(p.nome))+'</div></td>'+
      '<td data-rot="Base" class="bs">'+celulaBase(c,l)+'</td>'+
      '<td data-rot="Total faturado" class="n">'+(l.fat===null?'—':R(l.fat))+(l.origem?'<div class="nt">'+esc(l.origem)+'</div>':'')+'</td><td data-rot="Imposto" class="n">'+(l.imp===null?'—':R(l.imp))+'</td><td data-rot="Alíquota %" class="n">'+(l.fat===null?'—':l.aliq+'%')+'</td><td data-rot="40% (valor a pagar)" class="n v40">'+(l.fat>0&&!l.nao?R(v40(l)):'—')+'</td><td data-rot="Situação">'+chip(s[0],s[1])+'</td>'+
-     '<td class="ac"><button class="ib" data-fe="editar" data-r="'+l.rid+'" aria-label="Editar '+esc(l.n)+'" title="Editar">'+ic('pencil')+'</button><button class="ib" data-fe="hist" data-r="'+l.rid+'" aria-label="Histórico de '+esc(l.n)+'" title="Histórico">'+ic('history')+(l.hist.length?'<em>'+l.hist.length+'</em>':'')+'</button>'+(l.fat>0&&!l.nao?btnMem(l.n,l.pid,l.gs):'')+'</td></tr>';
+     '<td class="ac"><button class="ib" data-fe="hist" data-r="'+l.rid+'" aria-label="Histórico de '+esc(l.n)+'" title="Histórico">'+ic('history')+(l.hist.length?'<em>'+l.hist.length+'</em>':'')+'</button>'+(l.fat>0&&!l.nao?btnMem(l.n,l.pid,l.gs):'')+'</td></tr>';
   }).join('');
-  return '<div class="fe-barra"><div class="fe-nota">O valor da 40% é o imposto vezes o percentual da loja (padrão 40%). A <b>base</b> diz de onde vem o total faturado de cada loja. Muda a base, o faturado, o imposto ou o percentual, o valor é refeito. Loja sem faturado vira “Sem movimento” e não gera cobrança.</div><div class="fe-filtros"><span class="nt">'+marc+(marc===1?' loja marcada':' lojas marcadas')+'</span><button class="btn" data-fe="alterarbase" style="width:auto;padding:0 14px"'+(c.fechada?' disabled':'')+'>Alterar base</button></div></div>'+
-   '<div class="tab-cartao"><table class="tab-fe fe-t1"><thead><tr><th class="ck"><input type="checkbox" data-lojaall aria-label="Marcar todas as lojas"'+(c.fechada?' disabled':'')+'></th><th>Loja (GS) e responsável</th><th>Base</th><th class="n">Total faturado</th><th class="n">Imposto</th><th class="n">Alíquota %</th><th class="n">40% (valor a pagar)</th><th>Situação</th><th></th></tr></thead><tbody>'+linhas+'</tbody></table></div>'+painelHB();
+  return '<div class="fe-barra"><div class="fe-nota">Faturado, base, imposto, percentual e valor da 40% vêm calculados do Java do BL, só para ver. Para mudar base, percentual ou faturado, use o Java do BL. Loja sem faturado vira “Sem movimento” e não gera cobrança.</div></div>'+
+   '<div class="tab-cartao"><table class="tab-fe fe-t1"><thead><tr><th>Loja (GS) e responsável</th><th>Base</th><th class="n">Total faturado</th><th class="n">Imposto</th><th class="n">Alíquota %</th><th class="n">40% (valor a pagar)</th><th>Situação</th><th></th></tr></thead><tbody>'+linhas+'</tbody></table></div>'+painelHB();
 }
 function etapa2(c){
   var cb=cobraveis(c),sem=cb.filter(function(l){return !l.conf&&alertas(c,l).length===0}).length;
