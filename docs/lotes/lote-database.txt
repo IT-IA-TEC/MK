@@ -195,6 +195,16 @@ meta: o banco nasce com ambientes separados, mudança só por arquivo versionado
   valor: 7 dois analistas editando o mesmo acordo é situação comum
   pontos: 3
 
+- Tabela da fila de erros das integrações
+  depende: Criar projetos de teste e produção
+  historia: Como time técnico, quero uma tabela para guardar as mensagens que esgotaram as tentativas, para nada se perder em silêncio e dar para reprocessar.
+  aceite: A tabela guarda origem, tipo de erro, conteúdo, motivo, número de tentativas, criado_em e situação, e só aceita inserção e mudança de situação
+  aceite: Descarte guarda o motivo e quem descartou, e nada é apagado
+  aceite: Tem regra de acesso por linha ligada e teste, e índice por situação e criado_em
+  prioridade: Deve 2
+  valor: 8 erro assíncrono sem fila some e o pagamento fica sem baixa
+  pontos: 3
+
 Cadastro no banco [Database] {v0.1}
 meta: o banco guarda pagadores, lojas, pessoas, etiquetas, plataformas e usuários, e o analista acha qualquer pagador, suas lojas e a ficha completa
 - Criar tabela de pagador com modo de cobrança

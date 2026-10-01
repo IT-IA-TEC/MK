@@ -151,7 +151,7 @@ meta: toda integração nasce com porta por fornecedor, tempo limite, nova tenta
   valor: 8 fornecedor fora do ar não pode travar cobrança nem coleta de todas as lojas
   pontos: 3
 - Criar fila de erros com reprocesso
-  depende: Guardar aviso bruto do provedor
+  depende: Tabela da fila de erros das integrações
   historia: Como time técnico, quero que mensagem que esgotou as tentativas vá para uma fila de erros, para nada se perder em silêncio.
   aceite: Mensagem que esgotou as tentativas grava conteúdo, motivo, número de tentativas, hora e origem na fila de erros, numa tabela persistente e não em memória
   aceite: Usa a porta do servidor para reprocessar um item ou vários de uma vez e para descartar com motivo e nome de quem descartou, e reprocessar o mesmo item dez vezes dá o mesmo resultado
@@ -806,7 +806,7 @@ meta: cada loja é lida sozinha todo dia, o consultor é avisado antes de a cone
 
 Qualidade das integrações [Integrações] {v1.4}
 meta: toda integração passou por teste de aprendizado, fornecedor falso, ensaio no sandbox e revisão de segurança, antes de 04/02/2027
-- Fazer teste de aprendizado de cada API
+- Fazer teste de aprendizado de cada API {v1.0}
   historia: Como time técnico, quero uma chamada real de cada API em ambiente de teste, para fechar o que os manuais marcam como não confirmado.
   aceite: Cada fornecedor tem ao menos uma chamada real em ambiente de teste registrada, e o que ficou não confirmado (formato da resposta do Send, PhoneState, Balance e GetEvents; campo do copia e cola do Inter; quem pagou no aviso do Asaas; refresh do Mercado Livre) virou decisão registrada ou pergunta ao fornecedor
   aceite: Cada resultado tem data, quem testou e o que mudou no critério de aceite do conector
