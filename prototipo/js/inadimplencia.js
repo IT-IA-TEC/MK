@@ -81,11 +81,11 @@ function contadores(){
 function iniciar(){
   if(pronto)return;pronto=true;
   PAGS.forEach(function(p){if(p.fin==='acordo')F.acordo(p)});
-  BL['55610150000109']={sit:'confirmado',tipo:'bloqueio',desde:'12/09/2026',motivo:'Atraso de 18 dias',hist:[{t:'12/09/2026 09:35',q:'Rafael',x:'Bloqueio pedido ao grupo'},{t:'12/09/2026 09:52',q:'Rafael',x:'Bloqueio confirmado pela plataforma'}]};
-  BL['52736810000120']={sit:'confirmado',tipo:'bloqueio',desde:'29/09/2026',motivo:'Atraso de 24 dias',hist:[{t:'29/09/2026 09:35',q:'Rafael',x:'Bloqueio pedido ao grupo'},{t:'29/09/2026 09:52',q:'Rafael',x:'Bloqueio confirmado pela plataforma'}]};
-  BL['42744784000102']={sit:'confirmado',tipo:'bloqueio',desde:'10/09/2026',motivo:'Atraso de 18 dias',hist:[{t:'10/09/2026 10:02',q:'Carlos',x:'Bloqueio pedido ao grupo'},{t:'10/09/2026 10:40',q:'Carlos',x:'Bloqueio confirmado pela plataforma'},{t:'30/09/2026 09:10',q:'Sistema',x:'Pagamento quitou a dívida, desbloqueio a pedir'}]};
-  BL['48120356000131']={sit:'confirmado',tipo:'bloqueio',desde:'02/09/2026',motivo:'Acordo quebrado',hist:[{t:'02/09/2026 11:00',q:'Rafael',x:'Bloqueio confirmado'}]};
-  BL['50941212000141']={sit:'confirmado',tipo:'bloqueio',desde:'15/08/2026',motivo:'Atraso de 45 dias',hist:[{t:'15/08/2026 10:00',q:'Juliana',x:'Bloqueio confirmado'}]};
+  BL['GS5561015']={sit:'confirmado',tipo:'bloqueio',desde:'12/09/2026',motivo:'Atraso de 18 dias',hist:[{t:'12/09/2026 09:35',q:'Rafael',x:'Bloqueio pedido ao grupo'},{t:'12/09/2026 09:52',q:'Rafael',x:'Bloqueio confirmado pela plataforma'}]};
+  BL['GS5273681']={sit:'confirmado',tipo:'bloqueio',desde:'29/09/2026',motivo:'Atraso de 24 dias',hist:[{t:'29/09/2026 09:35',q:'Rafael',x:'Bloqueio pedido ao grupo'},{t:'29/09/2026 09:52',q:'Rafael',x:'Bloqueio confirmado pela plataforma'}]};
+  BL['GS4274478']={sit:'confirmado',tipo:'bloqueio',desde:'10/09/2026',motivo:'Atraso de 18 dias',hist:[{t:'10/09/2026 10:02',q:'Carlos',x:'Bloqueio pedido ao grupo'},{t:'10/09/2026 10:40',q:'Carlos',x:'Bloqueio confirmado pela plataforma'},{t:'30/09/2026 09:10',q:'Sistema',x:'Pagamento quitou a dívida, desbloqueio a pedir'}]};
+  BL['GS4812035']={sit:'confirmado',tipo:'bloqueio',desde:'02/09/2026',motivo:'Acordo quebrado',hist:[{t:'02/09/2026 11:00',q:'Rafael',x:'Bloqueio confirmado'}]};
+  BL['941212000']={sit:'confirmado',tipo:'bloqueio',desde:'15/08/2026',motivo:'Atraso de 45 dias',hist:[{t:'15/08/2026 10:00',q:'Juliana',x:'Bloqueio confirmado'}]};
   SAIDAS=[
     {id:nid++,pid:12,lojas:['AFC MODA FEMININA LTDA'],pedido:'28/09/2026',efetiva:'31/10/2026',sit:'pendente',hist:[{t:'28/09/2026 16:06',q:'Marina',x:'Pedido de saída registrado pela conversa'}]},
     {id:nid++,pid:8,lojas:['ASO MODAS LTDA'],pedido:'14/09/2026',efetiva:'30/09/2026',sit:'pendente',hist:[{t:'14/09/2026 10:20',q:'Juliana',x:'Pedido de saída registrado'}]},

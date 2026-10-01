@@ -167,7 +167,7 @@
 .pn-bar i{display:block;height:100%;border-radius:99px}
 .pn-t{overflow:hidden}
 .pn-alerta{color:var(--travado-t);font-weight:700}
-#conteudo>.dash>section .cx+.cx{margin-top:14px}
+#conteudo>.dash>section>.cx+.cx{margin-top:14px}
 @container (max-width:900px){.pn-k{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* prévia do PDF */
 .pdf-jan{position:fixed;inset:4vh 4vw;z-index:42;background:var(--cartao);border-radius:var(--raio-cartao);box-shadow:var(--sombra-3);display:flex;flex-direction:column;opacity:0;transform:translateY(12px);transition:opacity var(--t-base) var(--curva),transform var(--t-base) var(--curva)}

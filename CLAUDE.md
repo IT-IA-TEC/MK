@@ -50,5 +50,5 @@ Detalhes e motivos em `docs/licoes-aprendidas.md`.
 1. **Dúvida primeiro, arquivo depois.** Listar todas as dúvidas, perguntar, esperar. Só com zero dúvidas gerar e enviar. Sugestão minha nunca vale como decisão do dono.
 2. **Mesmo ritual sempre.** Arquivo ou regra nova → conferir ponto por ponto (certo / só em parte / falta) → montar → validar → enviar os arquivos com a ordem de colar → esperar a confirmação. Nunca trocar esse caminho.
 3. **Só dizer "conferido" o que de fato conferi,** e dizer o que não deu para conferir. Avisar qualquer mudança nas minhas ferramentas.
-4. **Visual: olhar o print.** Testar 1920, 1600, 1360 e 1100, clicar todo o menu e toda aba, olhar a imagem como o dono e cruzar com as regras deste arquivo. "Só para conhecimento" = não mexer.
+4. **Visual: olhar o print.** Testar 1920, 1600, 1360 e 1100, clicar todo o menu e toda aba, olhar a imagem como o dono e cruzar com as regras deste arquivo. Abrir todo módulo e toda aba procurando erro de tela, e auditar cartões desalinhados; ao mudar dado de exemplo, comparar com a versão anterior. "Só para conhecimento" = não mexer.
 5. **Fechar limpo.** Linguagem simples e curta; se disser "não entendi", reescrever de outro jeito. Terminar todo turno com commit, push e `git status` limpo.

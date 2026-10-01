@@ -52,17 +52,17 @@ function montar(key,mes,ano,fechada){
   if(fechada)lojas.forEach(function(l){if(l.pid==='x1'||l.pid==='x3'){l.fat=0;l.imp=0}});
   if(!fechada){
     var byGs=function(g){return lojas.filter(function(l){return l.gs===g})[0]};
-    byGs('55610150000109').fat=null;byGs('55610150000109').imp=null;
-    byGs('54967390000100').fat=null;byGs('54967390000100').imp=null;
-    byGs('60318742000190').fat=null;byGs('60318742000190').imp=null;
-    byGs('42744784000102').fat=0;byGs('42744784000102').imp=0;
-    byGs('59837967000175').fat=0;byGs('59837967000175').imp=0;
-    byGs('46843469000193').imp=0;
-    byGs('50941212000141').aliq=35;
-    byGs('37930011000180').ant=Math.round(v40(byGs('37930011000180'))*.4*100)/100;
-    byGs('48120356000131').nao=true;
-    byGs('52736810000120').saida=true;
-    byGs('49962836000166').hist.push({t:'12/09 09:41',q:'Rafael',c:'Imposto',de:'R$ 3.020,00',para:'R$ 3.140,00',m:'Ajuste após nova nota da plataforma'});
+    byGs('GS5561015').fat=null;byGs('GS5561015').imp=null;
+    byGs('GS5496739').fat=null;byGs('GS5496739').imp=null;
+    byGs('KW187420').fat=null;byGs('KW187420').imp=null;
+    byGs('GS4274478').fat=0;byGs('GS4274478').imp=0;
+    byGs('983796700').fat=0;byGs('983796700').imp=0;
+    byGs('GS4684346').imp=0;
+    byGs('941212000').aliq=35;
+    byGs('GS3793001').ant=Math.round(v40(byGs('GS3793001'))*.4*100)/100;
+    byGs('GS4812035').nao=true;
+    byGs('GS5273681').saida=true;
+    byGs('GS4996283').hist.push({t:'12/09 09:41',q:'Rafael',c:'Imposto',de:'R$ 3.020,00',para:'R$ 3.140,00',m:'Ajuste após nova nota da plataforma'});
   }
   var rb=lcg(ano*12+mes+7);
   lojas.forEach(function(l){l.api=temApi(l);derivar(l,rb);l.base='faturamento_total';var b=baseInicial(l);if(b!=='faturamento_total')setBase(l,b)});

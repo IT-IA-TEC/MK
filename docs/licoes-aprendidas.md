@@ -122,6 +122,16 @@ Fonte: leitura de toda a conversa. Cada erro tem: o que aconteceu, por que passo
   4. Estimar e avisar quando algo leva mais tempo.
   5. Paralelizar por padrão. (aplicado)
 
+## 13. Mudei os dados de exemplo e quebrei telas que eu não abri
+- **O que houve:** ao trocar os códigos das lojas (GS por plataforma), o Fechamento e a aba Faturamento do Marketplaces pararam de funcionar. O dono só veria ao abrir. Achei na conferência de cartões desalinhados.
+- **Por que passou:** testei só as telas que mudei, não todas as que usam aquele dado.
+- **5 soluções:**
+  1. Ao mudar um dado de exemplo, buscar todo uso dele no código.
+  2. Rodar a varredura que abre todo módulo e toda aba e lista erros de tela.
+  3. Comparar números e abas com a versão anterior (iguais, salvo o que mudou de propósito).
+  4. Rodar a auditoria de alinhamento de cartões nas 4 larguras.
+  5. Fazer essa varredura em toda entrega visual. (aplicado)
+
 ## O ritual fixo (nunca mudar)
 1. Chega arquivo ou regra nova → conferir ponto por ponto → responder certo / só em parte / falta.
 2. Listar todas as dúvidas → perguntar todas → esperar.
