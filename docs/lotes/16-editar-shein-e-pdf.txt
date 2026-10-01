@@ -1,0 +1,16 @@
+# Foco só na Shein por enquanto (decisão de 02/10/2026). Mercado Livre, Shopee e Kwai ficam em espera até o BL confirmar. O PDF é do Java. Aba: qualquer uma (Editar em lote).
+
+editar: Abas de catálogo e violações
+  no épico: Ficha da loja
+  aceite: Por enquanto o foco é a Shein; os campos do Mercado Livre, da Shopee e da Kwai ficam em espera até o BL confirmar com a documentação de cada um
+  situação: Pronto para testar
+
+editar: Faixa de saúde única
+  no épico: Relatório da análise
+  aceite: A correspondência de cores do Mercado Livre fica registrada como a confirmar pelo BL, e a Shein é a plataforma de referência por enquanto
+  situação: Pronto para testar
+
+editar: Exportar PDF
+  no épico: Relatório da análise
+  titulo: Java: Exportar PDF
+  aceite: Parte do Java final: o PDF de verdade é gerado pelo Java; o desenho só tem o botão e a prévia
