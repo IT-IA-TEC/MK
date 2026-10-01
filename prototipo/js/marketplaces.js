@@ -26,19 +26,19 @@ function chip(t,c){return '<span class="fs '+c+'">'+t+'</span>'}
 function validade(c){
   if(c.mkt==='Shein')return null;if(!c.autEm)return undefined;
   var a=c.autEm.split('-'),d=new Date(+a[0],+a[1]-1,+a[2]);
-  if(c.mkt==='Kwai')d.setDate(d.getDate()+365);else if(c.mkt==='Shopee')d.setDate(d.getDate()+(+c.validDias||365));else d.setMonth(d.getMonth()+6);return d;
+  if(c.mkt==='Kwai')return null;if(c.mkt==='Shopee'){if(c.validDias==='livre'){if(!c.validData)return undefined;var b=c.validData.split('-');return new Date(+b[0],+b[1]-1,+b[2])}d.setDate(d.getDate()+(+c.validDias||365));return d}d.setMonth(d.getMonth()+6);return d;
 }
 function sitEf(c){var v=validade(c);if(c.sit==='Conectada'&&v&&v<hoje())return 'Vencida';return c.sit}
 function validTxt(c){
-  if(c.mkt==='Shein')return '<span class="nt">Sem validade fixa</span>';var v=validade(c);if(!v)return '<span class="nt">—</span>';
+  if(c.mkt==='Shein')return '<span class="nt">Sem validade fixa</span>';if(c.mkt==='Kwai')return '<span class="nt">A confirmar</span>';var v=validade(c);if(!v)return '<span class="nt">—</span>';
   var n=Math.round((v-hoje())/86400000);return fd(v)+'<div class="nt">'+(n<0?'venceu há '+(-n)+' dias':'faltam '+n+' dias')+'</div>';
 }
 function conDe(gs,mkt){return DB.con.filter(function(c){return c.gs===gs&&c.mkt===mkt})[0]}
 function sitLoja(x){var c=conDe(x.l.gs,x.l.plat);return c?sitEf(c):'Sem conexão'}
 /* ---------- dados iniciais ---------- */
-var PERMS_ML=['Pedidos','Reclamações','Promoções','Faturamento','Métricas'],PERMS_KW=['user_info','merchant_item','merchant_order'];
+var PERMS_ML=['Usuários (padrão)','Publicação e sincronização','Comunicação pré e pós-venda','Publicidade','Métricas do negócio','Vendas e envios','Promoções, cupons e descontos','Faturamento'],PERMS_KW=['user_info','merchant_item','merchant_order'];
 function novaCon(x,mkt,sit,aut){
-  var p=x.p,l=x.l,c={id:DB.nid++,gs:l.gs,mkt:mkt||l.plat,sit:sit||'Sem conexão',login:'',publico:'',idExt:'',tipo:'',pais:mkt==='Mercado Livre'||l.plat==='Mercado Livre'?'Brasil (MLB)':'',tipoVend:'',tipoLojaSp:'',validDias:'365',quem:'',autEm:'',perms:[],obs:'',seg:{chave:null,token:null},at:null};
+  var p=x.p,l=x.l,c={id:DB.nid++,gs:l.gs,mkt:mkt||l.plat,sit:sit||'Sem conexão',login:'',publico:'',idExt:'',tipo:'',pais:mkt==='Mercado Livre'||l.plat==='Mercado Livre'?'Brasil (MLB)':'',tipoVend:'',tipoLojaSp:'',validDias:'365',validData:'',quem:'',autEm:'',perms:[],obs:'',seg:{chave:null,token:null},at:null};
   return c;
 }
 function iniciar(){
@@ -54,7 +54,7 @@ function iniciar(){
     if(mk==='Shopee'){c.tipoVend=i%2?'CPF':'CNPJ';c.tipoLojaSp=i%3?'Local':'Cross-border';c.validDias=['30','90','180','365'][i%4]}
     if(mk==='Shein')c.tipo=tipos[i%3];
     if(sit!=='Aguardando autorização'){c.quem=x.p.nome;c.autEm=iso(d)}
-    c.perms=mk==='Kwai'?PERMS_KW.slice():mk==='Mercado Livre'?PERMS_ML.slice(0,4):[];
+    c.perms=mk==='Kwai'?PERMS_KW.slice():mk==='Mercado Livre'?PERMS_ML.slice(0,3).concat(PERMS_ML.slice(4,6)):[];
     if(sit==='Com erro')c.obs=mk==='Mercado Livre'?'Autorização feita por operador da conta. Precisa ser o administrador.':'Autorização revogada pelo vendedor.';
     c.seg.chave={t:agora(),q:'Rafael Lima'};if(sit==='Conectada')c.seg.token={t:agora(),q:'Rafael Lima'};
     c.at={t:fd(new Date(hoje().getTime()-(1+Math.floor(r()*20))*86400000))+' 10:'+d2(Math.floor(r()*60)),q:['Marina Costa','Rafael Lima','Juliana Prado'][i%3]};
@@ -117,27 +117,29 @@ function blocos(m){
     {k:'cad.login',l:'Nome de login',t:'txt'},{k:'cad.publico',l:'Nome público',t:'txt'},{fx:'Marketplace',v:function(x){return m}},{fx:'GS / ID da loja',v:function(x){var c=conDe(x.gs,m);return x.gs+(c&&c.idExt?' · ID '+c.idExt:'')}},
     {k:'cad.link',l:'Link da loja',t:'txt'},{fx:'Data de início',v:function(x){return x.ini||'—'}},{k:'cad.pct',l:'Percentual da 40%',t:'num',suf:'%',padrao:'40'},{fx:'Responsável',v:function(x){return x.resp}},
     {k:'cad.antiga',l:'Data da publicação mais antiga (referência de antiguidade)',t:'data',info:'Será calculada quando houver lista de produtos. Manual até lá.'}]});
+  if(K)out[0].it.unshift({info:'Kwai: sem documentação oficial acessível. Todos os campos da ficha ficam Manual (a confirmar com a Kwai).'});
   var cat=[];
-  if(S){cat=[{info:'A cota de SKC da Shein renova todo mês.'},{k:'cat.limite',l:'Limite total de SKC',t:'num'},{k:'cat.publicados',l:'SKC publicados',t:'num'},{k:'cat.saldo',l:'Saldo de SKC',t:'calc',f:function(d){return tem(d,'cat.limite')?String(N(d,'cat.limite')-N(d,'cat.publicados')):'—'}},{k:'cat.ativos',l:'Produtos ativos',t:'num'},{k:'cat.esgotados',l:'Produtos esgotados',t:'num'},{k:'cat.inativos',l:'Produtos inativos',t:'num'},{k:'cat.total',l:'Total de produtos',t:'calc',f:function(d){var t=N(d,'cat.ativos')+N(d,'cat.esgotados')+N(d,'cat.inativos');return t?String(t):'—'}}]}
+  if(S){cat=[{info:'A cota é por SKC. A regra de renovação está a confirmar com a Shein.'},{k:'cat.limite',l:'Limite total de SKC',t:'num'},{k:'cat.publicados',l:'SKC publicados',t:'num'},{k:'cat.saldo',l:'Saldo de SKC',t:'calc',f:function(d){return tem(d,'cat.limite')?String(N(d,'cat.limite')-N(d,'cat.publicados')):'—'}},{k:'cat.ativos',l:'Produtos ativos',t:'num'},{k:'cat.esgotados',l:'Produtos esgotados',t:'num'},{k:'cat.inativos',l:'Produtos inativos',t:'num'},{k:'cat.total',l:'Total de produtos',t:'calc',f:function(d){var t=N(d,'cat.ativos')+N(d,'cat.esgotados')+N(d,'cat.inativos');return t?String(t):'—'}}]}
   else if(M){cat=[{k:'cat.ativos',l:'Anúncios ativos',t:'num'},{k:'cat.pausados',l:'Anúncios pausados',t:'num'},{k:'cat.encerrados',l:'Anúncios encerrados',t:'num'},{k:'cat.rest_classico',l:'Anúncios restantes · Clássico',t:'num'},{k:'cat.rest_premium',l:'Anúncios restantes · Premium',t:'num'}]}
-  else if(P){cat=[{info:'Situação dos itens e limites por categoria vêm da Shopee.'},{k:'cat.sp_normal',l:'Itens normais',t:'num'},{k:'cat.sp_banido',l:'Itens banidos',t:'num'},{k:'cat.sp_nlistado',l:'Itens não listados',t:'num'},{k:'cat.sp_rev',l:'Itens em revisão',t:'num'},{k:'cat.sp_exc_v',l:'Itens excluídos pelo vendedor',t:'num'},{k:'cat.sp_exc_s',l:'Itens excluídos pela Shopee',t:'num'},{k:'cat.sp_limites',l:'Limites por categoria',t:'area'},{k:'cat.estoque',l:'Estoque total (soma dos modelos)',t:'num'}]}
-  else{cat=[{info:'A Kwai não tem campo de limite de publicação nesta documentação.'},{sec:'Situação de revisão'},{k:'cat.rev_em',l:'Em revisão',t:'num'},{k:'cat.rev_ap',l:'Aprovado',t:'num'},{k:'cat.rev_rep',l:'Reprovado',t:'num'},{k:'cat.rev_viol',l:'Reprovado por violação',t:'num'},{sec:'Situação de venda'},{k:'cat.v_fora',l:'Fora do ar',t:'num'},{k:'cat.v_no',l:'No ar',t:'num'},{k:'cat.v_fora_rev',l:'Fora do ar em revisão',t:'num'},{k:'cat.v_ban',l:'Banido',t:'num'},{k:'cat.v_edit',l:'Aguardando edição',t:'num'}]}
+  else if(P){cat=[{info:'Situação dos itens e regras de publicação da categoria vêm da Shopee.'},{k:'cat.sp_normal',l:'Itens normais',t:'num'},{k:'cat.sp_banido',l:'Itens banidos',t:'num'},{k:'cat.sp_nlistado',l:'Itens não listados',t:'num'},{k:'cat.sp_rev',l:'Itens em revisão',t:'num'},{k:'cat.sp_exc_v',l:'Itens excluídos pelo vendedor',t:'num'},{k:'cat.sp_exc_s',l:'Itens excluídos pela Shopee',t:'num'},{k:'cat.sp_limites',l:'Regras de publicação da categoria (preço, estoque, título, fotos)',t:'area'},{k:'cat.estoque',l:'Estoque total (soma dos modelos)',t:'num'}]}
+  else{cat=[{info:'Limite de publicação da Kwai: a confirmar. Não há fonte oficial.'},{sec:'Situação de revisão'},{k:'cat.rev_em',l:'Em revisão',t:'num'},{k:'cat.rev_ap',l:'Aprovado',t:'num'},{k:'cat.rev_rep',l:'Reprovado',t:'num'},{k:'cat.rev_viol',l:'Reprovado por violação',t:'num'},{sec:'Situação de venda'},{k:'cat.v_fora',l:'Fora do ar',t:'num'},{k:'cat.v_no',l:'No ar',t:'num'},{k:'cat.v_fora_rev',l:'Fora do ar em revisão',t:'num'},{k:'cat.v_ban',l:'Banido',t:'num'},{k:'cat.v_edit',l:'Aguardando edição',t:'num'}]}
   out.push({id:'cat',t:'Catálogo',it:cat});
   var viol=[{lista:1,k:'viol.lista',l:'Violações',add:'Adicionar violação',cols:[{c:'data',l:'Data',t:'data'},{c:'motivo',l:'Motivo',t:'txt'},{c:'pen',l:'Penalidade',t:'txt'},{c:'pts',l:'Pontos',t:'txt'},{c:'sit',l:'Situação',t:'txt'},{c:'rec',l:'Permite recurso',t:'sel',op:['Sim','Não']},{c:'prazo',l:'Prazo do recurso',t:'data'}]},
    {lista:1,k:'viol.recursos',l:'Recursos',add:'Adicionar recurso',cols:[{c:'data',l:'Data',t:'data'},{c:'viol',l:'Violação ligada',t:'violsel'},{c:'res',l:'Resultado',t:'sel',op:['Apresentado','Aprovado','Rejeitado']}]},
-   {k:'viol.aval_neg',l:'Avaliações negativas com recurso disponível',t:'num',info:S||K?'Manual na Shein e na Kwai.':''},
+   {k:'viol.aval_neg',l:'Avaliações negativas com recurso disponível',t:'num',info:S||K?'Manual na Shein e na Kwai.':M?'Manual no Mercado Livre.':''},
    {sec:'Contadores'},
    {k:'viol.total',l:'Total de violações',t:'calc',f:function(d){return String((d['viol.lista']||[]).length)}},
    {k:'viol.apres',l:'Recursos apresentados',t:'calc',f:function(d){return String((d['viol.recursos']||[]).length)}},
    {k:'viol.aprov',l:'Recursos aprovados',t:'calc',f:function(d){return String((d['viol.recursos']||[]).filter(function(x){return x.res==='Aprovado'}).length)}},
    {k:'viol.rej',l:'Recursos rejeitados',t:'calc',f:function(d){return String((d['viol.recursos']||[]).filter(function(x){return x.res==='Rejeitado'}).length)}},
    {k:'viol.taxa',l:'Taxa de aprovação dos recursos da semana anterior',t:'calc',f:function(d){var w=semanaAnt(d),r=(d['viol.recursos']||[]).filter(function(x){if(!x.data)return false;var a=x.data.split('-'),dt=new Date(+a[0],+a[1]-1,+a[2]);return dt>=w[0]&&dt<=w[1]});if(!r.length)return '—';return Math.round(r.filter(function(x){return x.res==='Aprovado'}).length/r.length*100)+'%'}}];
+  if(M)viol.unshift({info:'No Mercado Livre a penalidade vem em texto (motivo e solução), não em pontos. Pontos não existem aqui. O recurso de infração não foi confirmado.'});
   if(S)viol.push({sec:'Penalidade financeira (extrato)'},{k:'viol.debitado',l:'Valor debitado',t:'num',suf:'R$'},{k:'viol.compensado',l:'Valor compensado',t:'num',suf:'R$'});
   else viol.push({na:1,l:'Penalidade financeira: não se aplica neste marketplace'});
   if(P)viol=[{k:'viol.pontos',l:'Pontos de penalidade do trimestre',t:'num'},
    {lista:1,k:'viol.punicoes',l:'Punições (em curso e encerradas)',add:'Adicionar punição',cols:[{c:'tipo',l:'Tipo',t:'txt'},{c:'inicio',l:'Início',t:'data'},{c:'fim',l:'Fim',t:'data'},{c:'lim_list',l:'Limite de listagem',t:'txt'},{c:'lim_ped',l:'Limite de pedidos',t:'txt'}]},
    {lista:1,k:'viol.itens',l:'Itens com problema',add:'Adicionar item',cols:[{c:'item',l:'Item',t:'txt'},{c:'motivo',l:'Motivo',t:'txt'},{c:'prazo',l:'Prazo para corrigir',t:'data'}]},
-   {na:1,l:'Recurso: a Shopee não tem recurso. Só aparece o efeito na pontuação.'},{sec:'Contadores'},
+   {na:1,l:'Recurso: não há recurso por API na Shopee (ele existe no Seller Center). O efeito aparece como pontos ajustados.',txt:'Sem recurso por API'},{sec:'Contadores'},
    {k:'viol.total',l:'Total de punições',t:'calc',f:function(d){return String((d['viol.punicoes']||[]).length)}},
    {k:'viol.curso',l:'Punições em curso',t:'calc',f:function(d){var h=iso(hoje());return String((d['viol.punicoes']||[]).filter(function(x){return !x.fim||x.fim>=h}).length)}},
    {k:'viol.itens_n',l:'Itens com problema',t:'calc',f:function(d){return String((d['viol.itens']||[]).length)}}];
@@ -165,15 +167,16 @@ function blocos(m){
     {lista:1,k:'diag.cd',l:'Produtos classificados como C1, C2, D1 e D2',add:'Adicionar produto',cols:[{c:'produto',l:'Produto',t:'txt'},{c:'cls',l:'Classificação',t:'sel',op:['C1','C2','D1','D2']}]}]});
   if(P)out[out.length-1].it=[{k:'diag.sp_nivel',l:'Nível do diagnóstico de conteúdo',t:'sel',op:['Melhorar','Qualificado','Excelente']},{k:'diag.sp_tipo',l:'Tipo de problema',t:'area'},{k:'diag.prob',l:'Produtos com problemas',t:'num'},{k:'diag.data',l:'Data de atualização do diagnóstico',t:'data'},{k:'diag.neg',l:'Taxa geral de avaliações negativas',t:'txt'}];
   var des=[];
-  if(M)des=[{k:'desemp.cor',l:'Nível: cor da reputação',t:'sel',op:['Verde','Amarelo','Laranja','Vermelho']},{k:'desemp.lider',l:'Faixa de Mercado Líder',t:'sel',op:['Sem faixa','MercadoLíder','MercadoLíder Gold','MercadoLíder Platinum']},{k:'desemp.recl',l:'Taxa de reclamações',t:'num',suf:'%'},{k:'desemp.canc',l:'Taxa de cancelamentos',t:'num',suf:'%'},{k:'desemp.atraso',l:'Taxa de atraso no despacho',t:'num',suf:'%'},{na:1,l:'DSR e ranking de fulfillment: não se aplicam ao Mercado Livre'}];
+  if(M)des=[{k:'desemp.cor',l:'Nível: cor da reputação',t:'sel',op:['Verde','Amarelo','Laranja','Vermelho'],info:'A API devolve o nível com número e cor (ex.: 5_green). Conferir se há mais de 4 níveis antes de ligar o conector.'},{k:'desemp.lider',l:'Faixa de Mercado Líder',t:'sel',op:['Sem faixa','Silver','Gold','Platinum'],info:'A API devolve a medalha Silver, Gold ou Platinum. A equivalência com MercadoLíder está a confirmar.'},{k:'desemp.recl',l:'Taxa de reclamações',t:'num',suf:'%'},{k:'desemp.canc',l:'Taxa de cancelamentos',t:'num',suf:'%'},{k:'desemp.atraso',l:'Taxa de atraso no despacho',t:'num',suf:'%'},{na:1,l:'DSR e ranking de fulfillment: não se aplicam ao Mercado Livre'}];
   else des=[{k:'desemp.nq',l:'Nota de qualidade',t:'txt'},{k:'desemp.nl',l:'Nota de logística',t:'txt'},{k:'desemp.dsr',l:'Pontuação geral do DSR',t:'txt'},{k:'desemp.nivel',l:'Nível de qualidade da loja',t:'txt'},{lista:1,k:'desemp.nao',l:'Critérios marcados como “Não atende”',add:'Adicionar critério',cols:[{c:'crit',l:'Critério',t:'txt'}]},{k:'desemp.pont',l:'Índice de pontualidade da coleta',t:'txt'},{k:'desemp.rank',l:'Ranking de fulfillment',t:'txt'}];
   if(P)des=[{k:'desemp.sp_nota',l:'Nota da loja (1 a 4)',t:'sel',op:['1','2','3','4']},{k:'desemp.sp_nao_cumpre',l:'Taxa de não cumprimento',t:'num',suf:'%'},{k:'desemp.sp_cancel',l:'Taxa de cancelamento',t:'num',suf:'%'},{k:'desemp.sp_devol',l:'Taxa de devolução',t:'num',suf:'%'},{k:'desemp.sp_atraso',l:'Taxa de atraso de envio',t:'num',suf:'%'},{k:'desemp.sp_preparo',l:'Tempo de preparo',t:'num',suf:'dias'},{k:'desemp.sp_chat',l:'Resposta no chat',t:'num',suf:'%'},{k:'desemp.sp_notaloja',l:'Avaliação dos compradores (nota da loja)',t:'num'},{na:1,l:'Selo “Preferido”: não existe na Shopee'}];
+  if(S||K)des.unshift({info:S?'Na Shein, desempenho, violações e diagnóstico ficam Manual (sem API confirmada).':'Na Kwai, tudo fica Manual (a confirmar).'});
   if(M)des.unshift({k:'desemp.faixa',l:'Faixa de saúde da loja',t:'calc',f:function(d){return faixaDeCor(d['desemp.cor'])},info:'Convertida da cor da reputação'});
   else if(P)des.push({k:'desemp.faixa',l:'Faixa de saúde da loja',t:'calc',f:function(d){return faixaDeNota(d['desemp.sp_nota'])},info:'Convertida da nota de 1 a 4'});
   else des.push({k:'desemp.faixa',l:'Faixa de saúde da loja (preenchida por analista)',t:'sel',op:['Excelente','Boa','Regular','Ruim']});
   out.push({id:'desemp',t:'Desempenho',it:des});
   var fin=[{k:'fat.pedidos',l:'Pedidos no mês',t:'num'},{k:'fat.total',l:'Faturamento no mês',t:'num',suf:'R$'}];
-  if(K)fin.push({na:1,l:'Taxas e comissões: não existem na Kwai'});
+  if(K)fin.push({info:'Taxas e comissões da Kwai: a confirmar. Não há fonte oficial.'});
   else fin.push({sec:'Taxas e comissões'},{k:'fin.comissao',l:M?'Tarifa de venda':'Comissão',t:'num',suf:'R$'},{k:'fin.servico',l:'Taxa de serviço',t:'num',suf:'R$'},{k:'fin.transacao',l:'Taxa de transação',t:'num',suf:'R$'},{k:'fin.repasse',l:'Repasse',t:'num',suf:'R$'});
   out.push({id:'fin',t:'Financeiro',it:fin});
   return out;
@@ -194,6 +197,15 @@ var ABAS_F=['cad','cat','viol','dev','prod','preco','mkt','diag','desemp','fin',
 var NOMES_F={cad:'Cadastro',cat:'Catálogo',viol:'Violações e recursos',dev:'Devoluções e pós-venda',prod:'Produtos analisados',preco:'Preços e concorrência',mkt:'Marketing',diag:'Diagnóstico e qualidade',desemp:'Desempenho',fin:'Financeiro',hist:'Histórico de análises'};
 var fichaModo='preencher',relSnap='',fichaAba='cad',fichaGs=null,cmpA='',cmpB='atual',cmpTodos=false;
 /* ---------- desenho da ficha da loja ---------- */
+/* origem prevista por API (manual de APIs, tabela campo x API). 'a' = vem por API, 'p' = vem em parte. Até o conector ser ligado o campo segue Manual e editável. */
+var VIA={
+'Mercado Livre':{a:'cat.ativos cat.pausados cat.encerrados cat.rest_classico cat.rest_premium viol.lista dev.lista desemp.cor desemp.lider desemp.recl desemp.canc desemp.atraso diag.nota diag.prob fin.comissao titulo preco preco_loja',p:'cad.publico cad.link cad.antiga fin.servico fin.transacao mkt.camp'},
+'Shopee':{a:'cad.publico cat.sp_normal cat.sp_banido cat.sp_nlistado cat.sp_rev cat.sp_exc_v cat.sp_exc_s cat.sp_limites viol.pontos viol.punicoes viol.itens dev.lista titulo desc attrs fotos video peso preco var estoque mkt.camp mkt.cupom mkt.cupom_qtd mkt.cupom_tipos mkt.cupom_desc mkt.cupom_datas diag.sp_nivel diag.sp_tipo diag.prob desemp.sp_nota desemp.sp_nao_cumpre desemp.sp_cancel desemp.sp_devol desemp.sp_atraso desemp.sp_preparo desemp.sp_chat desemp.sp_notaloja fin.comissao fin.servico fin.transacao fin.repasse',p:'cad.antiga cat.estoque med diag.neg'},
+'Shein':{a:'dev.lista',p:'cad.antiga cat.limite cat.publicados cat.ativos cat.esgotados cat.inativos titulo desc attrs fotos peso var estoque preco fin.comissao fin.servico fin.repasse'}};
+function via(gs,k){var m=mkt(gs),t=VIA[m];if(!t)return '';var b=k.replace(/^p[0-2]\./,'').replace(/^(preco|prod)\./,function(x){return x}),n=[k,b];
+  var ok=function(l){return (' '+l+' ').indexOf(' '+n[0]+' ')>-1||(' '+l+' ').indexOf(' '+n[1]+' ')>-1};
+  return ok(t.a)?'Virá por API quando o conector for ligado.':ok(t.p)?'Virá em parte por API quando o conector for ligado.':''}
+var VIA_GS=null;
 function chipO(o){return '<span class="mo '+o+'" title="'+(o==='manual'?'Preenchido à mão. Quando o motor for ligado, vira API e deixa de ser editável.':o==='calc'?'Calculado pelo sistema.':'Vem da API.')+'">'+(o==='manual'?'Manual':o==='calc'?'Calculado':'API')+'</span>'}
 function metaTxt(o,k){var m=o.m[k];return m?'Preenchido por '+esc(m.q)+' em '+esc(m.t.indexOf('/')>-1?m.t:fd(new Date())):'Ainda não preenchido'}
 function campoHtml(f,o,key,i){
@@ -204,11 +216,11 @@ function campoHtml(f,o,key,i){
   else if(f.t==='area')h+='<textarea class="cb-area" rows="3" id="mf-'+esc(key)+'" data-mf="'+esc(key)+'">'+esc(v)+'</textarea>';
   else if(f.t==='data')h+='<input type="date" id="mf-'+esc(key)+'" data-mf="'+esc(key)+'" value="'+esc(v)+'">';
   else h+='<div class="cf-in"><input id="mf-'+esc(key)+'" data-mf="'+esc(key)+'" value="'+esc(v)+'"'+(f.padrao&&!v?' placeholder="Padrão '+f.padrao+'"':'')+'>'+(f.suf?'<span>'+f.suf+'</span>':'')+'</div>';
-  return h+'</div>'+chipO('manual')+'<small class="nt">'+metaTxt(o,key)+(f.info?' · '+esc(f.info):'')+'</small></div>';
+  var vi=via(VIA_GS,key);return h+'</div>'+chipO('manual')+'<small class="nt">'+metaTxt(o,key)+(f.info?' · '+esc(f.info):'')+(vi?' · '+vi:'')+'</small></div>';
 }
 function listaHtml(f,o,ro){
   var arr=o.d[f.k]||[];
-  return '<div class="ml"><div class="ml-cab"><b>'+esc(f.l)+'</b>'+chipO(ro?'api':'manual')+(ro?'':'<button class="btn sec" data-mk="addlista" data-k="'+f.k+'" style="width:auto;padding:0 12px;height:30px">'+esc(f.add)+'</button>')+'</div>'+
+  var vl=ro?'':via(VIA_GS,f.k);return '<div class="ml"><div class="ml-cab"><b>'+esc(f.l)+'</b>'+chipO(ro?'api':'manual')+(vl?'<span class="nt">'+vl+'</span>':'')+(ro?'':'<button class="btn sec" data-mk="addlista" data-k="'+f.k+'" style="width:auto;padding:0 12px;height:30px">'+esc(f.add)+'</button>')+'</div>'+
    (arr.length?'<div class="tab-cartao"><table class="tab-fe tab-ml"><thead><tr>'+f.cols.map(function(c){return '<th>'+esc(c.l)+'</th>'}).join('')+(ro?'':'<th></th>')+'</tr></thead><tbody>'+arr.map(function(x,i){return '<tr>'+f.cols.map(function(c){var v=x[c.c]||'';return '<td data-rot="'+esc(c.l)+'">'+esc(c.t==='data'?fiso(v):v||'—')+'</td>'}).join('')+(ro?'':'<td class="c"><button class="ib" data-mk="rmlista" data-k="'+f.k+'" data-i="'+i+'" aria-label="Remover linha" title="Remover">'+ic('trash-2')+'</button></td>')+'</tr>'}).join('')+'</tbody></table></div>':'<div class="fe-vazio">Nada registrado.</div>')+'</div>';
 }
 function tipoShein(gs){var c=conDe(gs,'Shein');return c?c.tipo:''}
@@ -218,7 +230,7 @@ function devApi(gs){
   return L.slice(0,2+n);
 }
 function blocoHtml(b,o,gs){
-  var pre='',ro=false;
+  var pre='',ro=false;VIA_GS=gs;
   if(b.id==='dev'&&mkt(gs)==='Shein'){
     var tp=tipoShein(gs);ro=tp==='Auto-operada'||tp==='Semi-gerenciada';
     pre='<div class="fe-aviso"><span><b>Origem: '+(ro?'API':'Manual')+'.</b> '+(ro?'Na loja '+tp.toLowerCase()+', a Shein envia as devoluções sozinha. Os registros abaixo vêm da API e não podem ser editados.':tp==='Full-gerenciada'?'Na loja full-gerenciada, a Shein não envia as devoluções. Preencha à mão.':'Esta loja ainda não tem o tipo de loja na conexão. Enquanto isso, preencha à mão. O tipo se informa em Conexões.')+'</span></div>';
@@ -234,13 +246,13 @@ function blocoHtml(b,o,gs){
         else if(f.t==='sel')c='<select class="sel" data-mf="'+key+'" aria-label="'+esc(f.l)+', produto '+(i+1)+'"><option value="">—</option>'+f.op.map(function(x){return '<option'+(x===v?' selected':'')+'>'+esc(x)+'</option>'}).join('')+'</select>';
         else if(f.t==='area')c='<textarea class="cb-area" rows="2" data-mf="'+key+'" aria-label="'+esc(f.l)+', produto '+(i+1)+'">'+esc(v)+'</textarea>';
         else c='<input data-mf="'+key+'" value="'+esc(v)+'" title="'+esc(metaTxt(o,key))+'" aria-label="'+esc(f.l)+', produto '+(i+1)+'">';
-        return '<td data-rot="Produto '+(i+1)+'">'+c+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table></div><div class="nt">Campos manuais. Quando o motor for ligado, os de API passam a mostrar o selo API e deixam de ser editáveis.</div>';
+        return '<td data-rot="Produto '+(i+1)+'">'+c+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table></div><div class="nt">Campos manuais. '+(VIA[mkt(gs)]?'Os que a API cobre (título, descrição, atributos, fotos, preço, variações e estoque, conforme a plataforma) virão por API quando o conector for ligado.':'Na Kwai todos os campos ficam manuais (a confirmar).')+'</div>';
     return h;
   }
   b.it.forEach(function(f){
     if(f.info&&!f.k&&!f.lista)h+='<div class="fe-aviso"><span>'+esc(f.info)+'</span></div>';
     else if(f.sec)h+='<div class="f-sub" style="margin-top:6px">'+esc(f.sec)+'</div>';
-    else if(f.na)h+='<div class="mf na"><span class="mf-l">'+esc(f.l)+'</span><b>Não se aplica</b></div>';
+    else if(f.na)h+='<div class="mf na"><span class="mf-l">'+esc(f.l)+'</span><b>'+(f.txt||'Não se aplica')+'</b></div>';
     else if(f.fx)h+='<div class="mf"><span class="mf-l">'+esc(f.fx)+'</span><div class="mf-v"><b>'+esc(f.v({gs:gs,ini:lojaPor(gs).l.ini,resp:lojaPor(gs).p.nome}))+'</b></div><span class="mo cad">Cadastro</span><small class="nt">Vem do cadastro da loja</small></div>';
     else if(f.lista)h+=listaHtml(f,o,ro);
     else h+=campoHtml(f,o,f.k);
@@ -295,7 +307,7 @@ function indVal(r,id){
    case 'dev':return {t:fmtN(r.dev),n:r.dev};
    case 'faixa':return {t:r.faixa||'—',o:r.faixa};
    case 'fat':return {t:r.fat===null?'—':R(r.fat),n:r.fat,sub:r.pedidos===null?'':fmtN(r.pedidos)+' pedidos'};
-   case 'taxas':return r.taxas==='na'?{t:'Não se aplica',na:1}:{t:r.taxas===null?'—':R(r.taxas),n:r.taxas};
+   case 'taxas':return r.taxas==='na'?{t:'A confirmar',na:1}:{t:r.taxas===null?'—':R(r.taxas),n:r.taxas};
    case 'camp':return {t:fmtN(r.camp)+(r.camp===1?' campanha':' campanhas'),n:r.camp,sub:r.cupons===null?'cupons não informados':fmtN(r.cupons)+(r.cupons===1?' cupom':' cupons')};
   }
 }
@@ -429,7 +441,7 @@ function painel(){
   var pend=sel.filter(function(r){return r.s.t!=='Em dia'}).sort(function(a,b){return (b.s.dias===null?9999:b.s.dias)-(a.s.dias===null?9999:a.s.dias)});
   var lista='<div class="cx pn-w"><div class="cx-cab"><h3>Lojas sem análise ou desatualizadas</h3><span class="c" style="margin-left:auto">'+pend.length+'</span></div>'+(pend.length?'<table class="tab-fe tab-ml"><thead><tr><th>Loja</th><th>Plataforma</th><th>Responsável</th><th>Situação da análise</th><th>Última análise</th><th></th></tr></thead><tbody>'+pend.map(function(r){return '<tr><td data-rot="Loja"><div class="lj-n">'+esc(r.x.l.n)+'</div><div class="lj-gs">'+esc(r.x.l.gs)+'</div></td><td data-rot="Plataforma">'+logo(r.x.l.plat)+'</td><td data-rot="Responsável" class="rp">'+esc(r.x.p.nome)+'</td><td data-rot="Situação da análise">'+seloHtml(r.x.l.gs)+'</td><td data-rot="Última análise">'+(r.s.data?fiso(r.s.data)+'<div class="nt">há '+r.s.dias+' dias</div>':'<span class="nt">Nunca</span>')+'</td><td class="rc-ac" data-rot="Ação"><button class="btn sec" data-mk="focar" data-gs="'+esc(r.x.l.gs)+'" style="width:auto;padding:0 10px;height:30px">Abrir ficha</button></td></tr>'}).join('')+'</tbody></table>':'<div class="fe-vazio">Todas as lojas estão com a análise em dia.</div>')+'</div>';
   var med=function(m,id){var rs=L.filter(function(x){return x.l.plat===m&&ultimaAn(x.l.gs)}).map(function(x){return indicD(ultimaAn(x.l.gs).d,m)});if(!rs.length)return '<span class="nt">Sem análise</span>';
-    var vs=rs.map(function(r){return id==='faixa'?(r.faixa?FX.indexOf(r.faixa):null):id==='taxas'?(r.taxas==='na'?'na':r.taxas):r[id]});if(vs.some(function(v){return v==='na'}))return '<span class="nt">Não se aplica</span>';vs=vs.filter(function(v){return v!==null&&v!==undefined});if(!vs.length)return '<span class="nt">—</span>';
+    var vs=rs.map(function(r){return id==='faixa'?(r.faixa?FX.indexOf(r.faixa):null):id==='taxas'?(r.taxas==='na'?'na':r.taxas):r[id]});if(vs.some(function(v){return v==='na'}))return '<span class="nt">A confirmar</span>';vs=vs.filter(function(v){return v!==null&&v!==undefined});if(!vs.length)return '<span class="nt">—</span>';
     var a=vs.reduce(function(s,v){return s+v},0)/vs.length;return id==='faixa'?FX[Math.round(a)]:(id==='fat'||id==='taxas')?R(a):fmtN(Math.round(a*10)/10)};
   var IM=[['ativos','Produtos ativos'],['viol','Violações e penalidades'],['dev','Devoluções'],['faixa','Faixa de saúde (média)'],['fat','Faturamento no mês'],['taxas','Taxas e comissões']];
   var medias='<div class="cx pn-w"><div class="cx-cab"><h3>Indicadores médios por plataforma</h3><span class="nt" style="margin-left:auto">Média das lojas, pela análise mais recente de cada uma</span></div><table class="tab-fe tab-ml"><thead><tr><th>Indicador</th>'+MKTS.map(function(m){return '<th>'+m+'</th>'}).join('')+'</tr></thead><tbody>'+IM.map(function(i){return '<tr><td data-rot="Indicador"><b>'+i[1]+'</b></td>'+MKTS.map(function(m){return '<td data-rot="'+m+'">'+med(m,i[0])+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table></div>';
@@ -504,7 +516,7 @@ function cadastroCon(gs,m){
   document.body.appendChild(v);document.body.appendChild(g);
   function paint(){
     var mk=st.mkt,ml=mk==='Mercado Livre',kw=mk==='Kwai',sh=mk==='Shein';
-    var tmp={mkt:mk,autEm:st.autEm,validDias:st.validDias},val=validade(tmp);
+    var tmp={mkt:mk,autEm:st.autEm,validDias:st.validDias,validData:st.validData},val=validade(tmp);
     var segs=[['chave','Chave secreta'],['token','Token de acesso']].map(function(s){var x=st.seg[s[0]];return '<div class="mk-seg"><div><b>'+s[1]+'</b><div class="nt">'+(x?'Cadastrado em '+esc(x.t)+' por '+esc(x.q):'Não cadastrado')+'</div></div>'+
       (st.abrir===s[0]||!x?'<div class="mk-seg-in"><input type="password" autocomplete="new-password" id="sg-'+s[0]+'" placeholder="Cole o valor. Ele nunca é exibido" aria-label="'+s[1]+'"><button class="btn sec" data-cx="gravarseg" data-s="'+s[0]+'" style="width:auto;padding:0 12px">Gravar</button></div>':'<button class="btn sec" data-cx="trocar" data-s="'+s[0]+'" style="width:auto;padding:0 12px">Trocar</button>')+'</div>'}).join('');
     g.innerHTML='<button class="fechar fechar-abs" aria-label="Fechar">'+ic('x')+'</button><div class="mk-cab"><div><h3>'+(novo?'Nova conexão':'Cadastro da conexão')+'</h3><div class="mk-sub">'+(st.gs?logo(mk):'')+'<span class="nt">Os campos são preenchidos à mão por enquanto.</span></div></div></div><div class="gaveta-corpo"><form id="cx-form" class="mk-corpo" novalidate>'+
@@ -513,12 +525,12 @@ function cadastroCon(gs,m){
      '<div class="campo"><label for="cx-login">Nome de login</label><input id="cx-login" value="'+esc(st.login)+'"></div><div class="campo"><label for="cx-pub">Nome público</label><input id="cx-pub" value="'+esc(st.publico)+'"></div>'+
      '<div class="campo"><label for="cx-id">'+ROT_ID[mk]+'</label><input id="cx-id" value="'+esc(st.idExt)+'"></div>'+
      (sh?'<div class="campo"><label for="cx-tipo">Tipo de loja</label><select class="sel" id="cx-tipo"><option value="">Selecione</option>'+['Auto-operada','Semi-gerenciada','Full-gerenciada'].map(function(x){return '<option'+(st.tipo===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select></div>':'')+
-     (mk==='Shopee'?'<div class="campo"><label for="cx-tv">Tipo de vendedor</label><select class="sel" id="cx-tv"><option value="">Selecione</option>'+['CPF','CNPJ'].map(function(x){return '<option'+(st.tipoVend===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select></div><div class="campo"><label for="cx-tl">Tipo de loja</label><select class="sel" id="cx-tl"><option value="">Selecione</option>'+['Local','Cross-border'].map(function(x){return '<option'+(st.tipoLojaSp===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select></div><div class="campo"><label for="cx-vd">Validade da autorização</label><select class="sel" id="cx-vd">'+['7','30','90','180','365'].map(function(x){return '<option value="'+x+'"'+(String(st.validDias)===x?' selected':'')+'>'+x+' dias</option>'}).join('')+'</select></div>':'')+
+     (mk==='Shopee'?'<div class="campo"><label for="cx-tv">Tipo de vendedor</label><select class="sel" id="cx-tv"><option value="">Selecione</option>'+['CPF','CNPJ'].map(function(x){return '<option'+(st.tipoVend===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select></div><div class="campo"><label for="cx-tl">Tipo de loja</label><select class="sel" id="cx-tl"><option value="">Selecione</option>'+['Local','Cross-border'].map(function(x){return '<option'+(st.tipoLojaSp===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select></div><div class="campo"><label for="cx-vd">Validade da autorização</label><select class="sel" id="cx-vd">'+['7','30','90','180','365'].map(function(x){return '<option value="'+x+'"'+(String(st.validDias)===x?' selected':'')+'>'+x+' dias</option>'}).join('')+'<option value="livre"'+(st.validDias==='livre'?' selected':'')+'>Data livre (até 365 dias)</option></select></div>'+(st.validDias==='livre'?'<div class="campo"><label for="cx-vdata">Vence em</label><input id="cx-vdata" type="date" value="'+esc(st.validData||'')+'"><small class="erro" id="cx-vdata-e" hidden></small></div>':''):'')+
      (ml?'<div class="campo"><label for="cx-pais">País / site</label><select class="sel" id="cx-pais"><option>Brasil (MLB)</option></select></div>':'')+
      '<div class="campo"><label for="cx-sit">Situação</label><select class="sel" id="cx-sit">'+SITS.filter(function(s){return s!=='Vencida'}).map(function(s){return '<option'+(st.sit===s?' selected':'')+'>'+s+'</option>'}).join('')+'</select></div>'+
      '<div class="campo"><label for="cx-quem">Quem autorizou</label><input id="cx-quem" value="'+esc(st.quem)+'" placeholder="Texto livre"></div><div class="campo"><label for="cx-aut">Data da autorização</label><input id="cx-aut" type="date" value="'+esc(st.autEm)+'"></div>'+
-     '<div class="campo"><label>Validade da autorização</label><div class="ed-calc" id="cx-val">'+(sh?'Sem validade fixa':val?fd(val):'Informe a data da autorização')+'</div><small class="nt">'+(kw?'Kwai: 365 dias.':mk==='Shopee'?'Shopee: '+(st.validDias||365)+' dias.':ml?'Mercado Livre: 6 meses.':'Shein: sem validade fixa.')+'</small></div></div>'+
-     '<div class="campo" style="margin-top:12px"><label>Permissões concedidas</label>'+(ml?'<div class="cf-multi">'+PERMS_ML.map(function(p){return '<label class="lembrar"><input type="checkbox" data-perm="'+p+'"'+(st.perms.indexOf(p)>-1?' checked':'')+'>'+p+'</label>'}).join('')+'</div>':kw?'<div class="cf-multi">'+PERMS_KW.map(function(p){return '<label class="lembrar"><input type="checkbox" data-perm="'+p+'"'+(st.perms.indexOf(p)>-1?' checked':'')+'><span class="mono">'+p+'</span></label>'}).join('')+'</div>':'<small class="nt">Na Shein, as permissões seguem o tipo do aplicativo. Não há escolha por conexão.</small>')+'</div>'+
+     '<div class="campo"><label>Validade da autorização</label><div class="ed-calc" id="cx-val">'+(sh?'Sem validade fixa':kw?'A confirmar':val?fd(val):'Informe a data da autorização')+'</div><small class="nt">'+(kw?'Kwai: validade de 365 dias não confirmada. A confirmar, por isso não é calculada como Vencida.':mk==='Shopee'?'Shopee: '+(st.validDias==='livre'?'data livre, até 365 dias':(st.validDias||365)+' dias')+'. Com o conector, a data virá da API (não é calculada).':ml?'Mercado Livre: 6 meses é a validade do token de renovação. O token de acesso dura 6 horas. A conexão cai antes (Com erro) se ficar 4 meses sem chamada, se o vendedor trocar a senha ou revogar.':'Shein: sem validade fixa. Se o vendedor cancelar ou reautorizar (a chave secreta muda), marque Com erro.')+'</small></div></div>'+
+     '<div class="campo" style="margin-top:12px"><label>Permissões concedidas</label>'+(ml?'<div class="cf-multi">'+PERMS_ML.map(function(p){return '<label class="lembrar"><input type="checkbox" data-perm="'+p+'"'+(st.perms.indexOf(p)>-1?' checked':'')+'>'+p+'</label>'}).join('')+'</div>':kw?'<div class="cf-multi">'+PERMS_KW.map(function(p){return '<label class="lembrar"><input type="checkbox" data-perm="'+p+'"'+(st.perms.indexOf(p)>-1?' checked':'')+'><span class="mono">'+p+'</span></label>'}).join('')+'</div>':'<small class="nt">Na Shein, as permissões seguem o tipo do aplicativo. Não há escolha por conexão.</small>')+(kw?'<small class="nt">Permissões da Kwai: a confirmar. Não há fonte oficial para o Kwai Brasil.</small>':ml?'<small class="nt">Nomes oficiais do Mercado Livre. Reclamações e devoluções ficam em Comunicação pré e pós-venda e em Vendas e envios. Reputação vem de Usuários.</small>':'')+'</div>'+
      '<div class="campo" style="margin-top:12px"><label for="cx-obs">Observações</label><textarea id="cx-obs" class="cb-area" rows="3">'+esc(st.obs)+'</textarea></div>'+
      '<div class="f-sub" style="margin-top:14px">Chaves e tokens (só gravam, nunca mostram)</div>'+segs+
      '</form></div><div class="gaveta-pe f-pe"><button class="btn sec" data-cx="cancelar" style="width:auto;padding:0 16px">Cancelar</button><button class="btn" data-cx="salvar" style="width:auto;padding:0 18px">Salvar conexão</button></div>';
@@ -526,14 +538,14 @@ function cadastroCon(gs,m){
   }
   function ler(){
     var q=function(i){var e=g.querySelector('#'+i);return e?e.value:''};
-    st.gs=novo?q('cx-gs'):st.gs;st.mkt=novo?q('cx-mkt'):st.mkt;st.login=q('cx-login');st.publico=q('cx-pub');st.idExt=q('cx-id');if(g.querySelector('#cx-tipo'))st.tipo=q('cx-tipo');if(g.querySelector('#cx-pais'))st.pais=q('cx-pais');if(g.querySelector('#cx-tv')){st.tipoVend=q('cx-tv');st.tipoLojaSp=q('cx-tl');st.validDias=q('cx-vd')||'365'}st.sit=q('cx-sit');st.quem=q('cx-quem');st.autEm=q('cx-aut');st.obs=q('cx-obs');
+    st.gs=novo?q('cx-gs'):st.gs;st.mkt=novo?q('cx-mkt'):st.mkt;st.login=q('cx-login');st.publico=q('cx-pub');st.idExt=q('cx-id');if(g.querySelector('#cx-tipo'))st.tipo=q('cx-tipo');if(g.querySelector('#cx-pais'))st.pais=q('cx-pais');if(g.querySelector('#cx-tv')){st.tipoVend=q('cx-tv');st.tipoLojaSp=q('cx-tl');st.validDias=q('cx-vd')||'365';st.validData=q('cx-vdata')||(st.validDias==='livre'?st.validData:'')}st.sit=q('cx-sit');st.quem=q('cx-quem');st.autEm=q('cx-aut');st.obs=q('cx-obs');
     st.perms=[].slice.call(g.querySelectorAll('[data-perm]')).filter(function(x){return x.checked}).map(function(x){return x.dataset.perm});
   }
   paint();requestAnimationFrame(function(){v.classList.add('aberto');g.classList.add('aberto')});
   function fechar(){v.classList.remove('aberto');g.classList.remove('aberto');document.removeEventListener('keydown',tecla);setTimeout(function(){v.remove();g.remove();if(ant&&ant.focus)ant.focus()},240)}
   function tecla(e){if(e.key==='Escape'&&!document.querySelector('.modal'))fechar()}
   document.addEventListener('keydown',tecla);v.addEventListener('click',fechar);
-  g.addEventListener('change',function(e){var t=e.target;if(t.id==='cx-mkt'||t.id==='cx-aut'||t.id==='cx-vd'){ler();if(t.id==='cx-mkt'){st.perms=t.value==='Kwai'?PERMS_KW.slice():[];st.tipo='';st.pais=t.value==='Mercado Livre'?'Brasil (MLB)':''}paint()}});
+  g.addEventListener('change',function(e){var t=e.target;if(t.id==='cx-mkt'||t.id==='cx-aut'||t.id==='cx-vd'||t.id==='cx-vdata'){ler();if(t.id==='cx-mkt'){st.perms=t.value==='Kwai'?PERMS_KW.slice():[];st.tipo='';st.pais=t.value==='Mercado Livre'?'Brasil (MLB)':''}paint()}});
   g.addEventListener('click',function(e){
     var t=e.target;if(t.closest('.fechar')||t.closest('[data-cx="cancelar"]')){fechar();return}
     var b=t.closest('[data-cx]');if(!b)return;var a=b.dataset.cx;
@@ -542,8 +554,10 @@ function cadastroCon(gs,m){
     if(a==='salvar'){ler();var er=g.querySelector('#cx-gs-e');
       if(!st.gs){er.textContent='Escolha a loja.';er.hidden=false;return}
       if(novo&&conDe(st.gs,st.mkt)){er.textContent='Esta loja já tem conexão neste marketplace. Abra o cadastro dela.';er.hidden=false;return}
+      if(st.mkt==='Shopee'&&st.validDias==='livre'){var ev=g.querySelector('#cx-vdata-e'),dv=st.validData,ea=false;if(!dv)ea='Informe a data de vencimento.';else if(st.autEm&&dv<=st.autEm)ea='A data de vencimento deve ser depois da autorização.';else if(st.autEm){var a0=st.autEm.split('-'),lim=new Date(+a0[0],+a0[1]-1,+a0[2]);lim.setDate(lim.getDate()+365);if(dv>iso(lim))ea='A Shopee aceita data livre só até 365 dias.'}
+        if(ea&&ev){ev.textContent=ea;ev.hidden=false;return}}
       var r=c||novaCon({l:lojaPor(st.gs).l,p:lojaPor(st.gs).p},st.mkt,st.sit);
-      ['gs','mkt','sit','login','publico','idExt','tipo','pais','quem','autEm','perms','obs','seg'].forEach(function(k){r[k]=st[k]});r.at={t:agora(),q:EU};
+      ['gs','mkt','sit','login','publico','idExt','tipo','pais','tipoVend','tipoLojaSp','validDias','validData','quem','autEm','perms','obs','seg'].forEach(function(k){r[k]=st[k]});r.at={t:agora(),q:EU};
       if(!c)DB.con.push(r);fechar();refaz();U.toast('Conexão salva. Preenchido por '+EU+'.')}
   });
 }
