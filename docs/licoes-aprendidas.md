@@ -132,6 +132,16 @@ Fonte: leitura de toda a conversa. Cada erro tem: o que aconteceu, por que passo
   4. Rodar a auditoria de alinhamento de cartões nas 4 larguras.
   5. Fazer essa varredura em toda entrega visual. (aplicado)
 
+## 14. Troquei um arquivo que o dono já tinha executado
+- **O que houve:** mandei o 21, achei um problema e mandei de novo o 21 corrigido. O dono já tinha executado o primeiro.
+- **Por que passou:** validei depois de enviar, não antes.
+- **5 soluções:**
+  1. Conferir tudo (validador, épico repetido, frente) antes de enviar.
+  2. Nunca reenviar com o mesmo número: criar arquivo novo de correção.
+  3. Dizer qual arquivo já foi enviado e qual é a correção.
+  4. Deixar no repositório o arquivo exatamente como foi enviado.
+  5. Registrar a regra no CLAUDE.md. (aplicado)
+
 ## O ritual fixo (nunca mudar)
 1. Chega arquivo ou regra nova → conferir ponto por ponto → responder certo / só em parte / falta.
 2. Listar todas as dúvidas → perguntar todas → esperar.

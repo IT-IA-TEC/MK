@@ -1,0 +1,5 @@
+# Corrige o item criado pelo arquivo 21: garante a frente Frontend e a versão v1.0. Aba: qualquer uma (Editar em lote).
+
+editar: Aviso quando o BL não responde
+  frente: Frontend
+  versão: v1.0
