@@ -1,0 +1,1032 @@
+# Parte do BL: estes itens passam a ser construídos no banco e no Java do BL. O IT.MK só lê e pede por portas.
+# Cada item vira Tarefa externa (não conta nos pontos do IT.MK), com título começando por "BL: " e responsável William.
+
+editar: Criar cliente no Asaas sem duplicar
+  no épico: Pix com Asaas
+  titulo: BL: Criar cliente no Asaas sem duplicar
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Criar cobrança Pix no Asaas com copia e cola
+  no épico: Pix com Asaas
+  titulo: BL: Criar cobrança Pix no Asaas com copia e cola
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Remover cobrança do Asaas ao fim do prazo
+  no épico: Pix com Asaas
+  titulo: BL: Remover cobrança do Asaas ao fim do prazo
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Conferir juros e multa desligados no Asaas
+  no épico: Pix com Asaas
+  titulo: BL: Conferir juros e multa desligados no Asaas
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Parcelar no Asaas com um Pix por parcela
+  no épico: Pix com Asaas
+  titulo: BL: Parcelar no Asaas com um Pix por parcela
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Receber aviso do Asaas com token
+  no épico: Pix com Asaas
+  titulo: BL: Receber aviso do Asaas com token
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Processar eventos de pagamento do Asaas
+  no épico: Pix com Asaas
+  titulo: BL: Processar eventos de pagamento do Asaas
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Cuidar da fila pausada e da chave do Asaas
+  no épico: Pix com Asaas
+  titulo: BL: Cuidar da fila pausada e da chave do Asaas
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Reconciliar Pix do Asaas por consulta
+  no épico: Pix com Asaas
+  titulo: BL: Reconciliar Pix do Asaas por consulta
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Ensaiar o Asaas no sandbox
+  no épico: Pix com Asaas
+  titulo: BL: Ensaiar o Asaas no sandbox
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Pedir análise da integração ao Banco Inter
+  no épico: Pix com Banco Inter
+  titulo: BL: Pedir análise da integração ao Banco Inter
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Autenticar no Inter com OAuth e certificado
+  no épico: Pix com Banco Inter
+  titulo: BL: Autenticar no Inter com OAuth e certificado
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Renovar certificado e chave do Inter
+  no épico: Pix com Banco Inter
+  titulo: BL: Renovar certificado e chave do Inter
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Criar cobrança cobv no Inter
+  no épico: Pix com Banco Inter
+  titulo: BL: Criar cobrança cobv no Inter
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Receber aviso do Inter por certificado de cliente
+  no épico: Pix com Banco Inter
+  titulo: BL: Receber aviso do Inter por certificado de cliente
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Dar baixa pelo endToEndId do Inter
+  no épico: Pix com Banco Inter
+  titulo: BL: Dar baixa pelo endToEndId do Inter
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Comparar quem pagou com CPF mascarado
+  no épico: Pix com Banco Inter
+  titulo: BL: Comparar quem pagou com CPF mascarado
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Consultar e reenviar avisos do Inter
+  no épico: Pix com Banco Inter
+  titulo: BL: Consultar e reenviar avisos do Inter
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Ensaiar o Inter no sandbox
+  no épico: Pix com Banco Inter
+  titulo: BL: Ensaiar o Inter no sandbox
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Cadastrar conta ISV e aplicativo ERP na Shopee
+  no épico: Conector da Shopee
+  titulo: BL: Cadastrar conta ISV e aplicativo ERP na Shopee
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Declarar IPs e endereços de retorno da Shopee
+  no épico: Conector da Shopee
+  titulo: BL: Declarar IPs e endereços de retorno da Shopee
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Autorizar vendedor na Shopee por link
+  no épico: Conector da Shopee
+  titulo: BL: Autorizar vendedor na Shopee por link
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Guardar validade e renovar token da Shopee
+  no épico: Conector da Shopee
+  titulo: BL: Guardar validade e renovar token da Shopee
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Assinar chamadas da Shopee
+  no épico: Conector da Shopee
+  titulo: BL: Assinar chamadas da Shopee
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Ler pedidos, itens e regras por categoria na Shopee
+  no épico: Conector da Shopee
+  titulo: BL: Ler pedidos, itens e regras por categoria na Shopee
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Ler violações, punições e devoluções na Shopee
+  no épico: Conector da Shopee
+  titulo: BL: Ler violações, punições e devoluções na Shopee
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Ler desempenho e financeiro na Shopee
+  no épico: Conector da Shopee
+  titulo: BL: Ler desempenho e financeiro na Shopee
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Receber avisos Push da Shopee
+  no épico: Conector da Shopee
+  titulo: BL: Receber avisos Push da Shopee
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Criar o aplicativo único do Mercado Livre
+  no épico: Conector do Mercado Livre
+  titulo: BL: Criar o aplicativo único do Mercado Livre
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Autorizar vendedor no Mercado Livre com conta administradora
+  no épico: Conector do Mercado Livre
+  titulo: BL: Autorizar vendedor no Mercado Livre com conta administradora
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Renovar token do Mercado Livre e gravar o novo refresh
+  no épico: Conector do Mercado Livre
+  titulo: BL: Renovar token do Mercado Livre e gravar o novo refresh
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Pedir permissões e liberar IPs no Mercado Livre
+  no épico: Conector do Mercado Livre
+  titulo: BL: Pedir permissões e liberar IPs no Mercado Livre
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Receber notificações do Mercado Livre
+  no épico: Conector do Mercado Livre
+  titulo: BL: Receber notificações do Mercado Livre
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Ler reputação, anúncios, reclamações e devoluções no Mercado Livre
+  no épico: Conector do Mercado Livre
+  titulo: BL: Ler reputação, anúncios, reclamações e devoluções no Mercado Livre
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Ler faturamento e tarifas no Mercado Livre
+  no épico: Conector do Mercado Livre
+  titulo: BL: Ler faturamento e tarifas no Mercado Livre
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Abrir conta de desenvolvedor e aplicativo na Shein
+  no épico: Conector da Shein
+  titulo: BL: Abrir conta de desenvolvedor e aplicativo na Shein
+  tipo: Tarefa
+  responsavel: William
+  prazo: 17/12/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Autorizar loja da Shein por link e trocar o código
+  no épico: Conector da Shein
+  titulo: BL: Autorizar loja da Shein por link e trocar o código
+  tipo: Tarefa
+  responsavel: William
+  prazo: 17/12/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Assinar requisições da Shein
+  no épico: Conector da Shein
+  titulo: BL: Assinar requisições da Shein
+  tipo: Tarefa
+  responsavel: William
+  prazo: 17/12/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Ler pedidos e devoluções da Shein por tipo de loja
+  no épico: Conector da Shein
+  titulo: BL: Ler pedidos e devoluções da Shein por tipo de loja
+  tipo: Tarefa
+  responsavel: William
+  prazo: 17/12/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Manter manual o que a Shein não entrega
+  no épico: Conector da Shein
+  titulo: BL: Manter manual o que a Shein não entrega
+  tipo: Tarefa
+  responsavel: William
+  prazo: 17/12/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Receber avisos da Shein e tratar reautorização
+  no épico: Conector da Shein
+  titulo: BL: Receber avisos da Shein e tratar reautorização
+  tipo: Tarefa
+  responsavel: William
+  prazo: 17/12/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Registrar a documentação da Kwai recebida
+  no épico: Conector da Kwai
+  titulo: BL: Registrar a documentação da Kwai recebida
+  tipo: Tarefa
+  responsavel: William
+  prazo: 17/12/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Fazer teste de aprendizado da API da Kwai
+  no épico: Conector da Kwai
+  titulo: BL: Fazer teste de aprendizado da API da Kwai
+  tipo: Tarefa
+  responsavel: William
+  prazo: 17/12/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Manter a ficha da Kwai manual até confirmar
+  no épico: Conector da Kwai
+  titulo: BL: Manter a ficha da Kwai manual até confirmar
+  tipo: Tarefa
+  responsavel: William
+  prazo: 17/12/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Agendar sincronização por loja
+  no épico: Sincronização e avisos de conexão
+  titulo: BL: Agendar sincronização por loja
+  tipo: Tarefa
+  responsavel: William
+  prazo: 17/12/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Avisar o consultor antes do vencimento
+  no épico: Sincronização e avisos de conexão
+  titulo: BL: Avisar o consultor antes do vencimento
+  tipo: Tarefa
+  responsavel: William
+  prazo: 17/12/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Mudar a conexão para Vencida ou Com erro
+  no épico: Sincronização e avisos de conexão
+  titulo: BL: Mudar a conexão para Vencida ou Com erro
+  tipo: Tarefa
+  responsavel: William
+  prazo: 17/12/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Entregar os erros de integração por loja
+  no épico: Sincronização e avisos de conexão
+  titulo: BL: Entregar os erros de integração por loja
+  tipo: Tarefa
+  responsavel: William
+  prazo: 17/12/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Guiar a reconexão de uma loja
+  no épico: Sincronização e avisos de conexão
+  titulo: BL: Guiar a reconexão de uma loja
+  tipo: Tarefa
+  responsavel: William
+  prazo: 17/12/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Decidir provedor de Pix e pedido ao Inter
+  no épico: Decisões de integração
+  titulo: BL: Decidir provedor de Pix e pedido ao Inter
+  tipo: Tarefa
+  responsavel: William
+  prazo: 15/10/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, por visão de leitura, o resultado desta integração (situação, datas e erros), sem o IT.MK guardar segredo nem chamar o fornecedor
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Decidir titular da conta que recebe o Pix
+  no épico: Decisões de integração
+  titulo: BL: Decidir titular da conta que recebe o Pix
+  tipo: Tarefa
+  responsavel: William
+  prazo: 15/10/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, por visão de leitura, o resultado desta integração (situação, datas e erros), sem o IT.MK guardar segredo nem chamar o fornecedor
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Decidir hospedagem com IP fixo e certificado de cliente
+  no épico: Decisões de integração
+  titulo: BL: Decidir hospedagem com IP fixo e certificado de cliente
+  tipo: Tarefa
+  responsavel: William
+  prazo: 15/10/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, por visão de leitura, o resultado desta integração (situação, datas e erros), sem o IT.MK guardar segredo nem chamar o fornecedor
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Decidir endereços de retorno e de aviso por plataforma
+  no épico: Decisões de integração
+  titulo: BL: Decidir endereços de retorno e de aviso por plataforma
+  tipo: Tarefa
+  responsavel: William
+  prazo: 15/10/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, por visão de leitura, o resultado desta integração (situação, datas e erros), sem o IT.MK guardar segredo nem chamar o fornecedor
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Decidir ordem dos conectores de marketplace
+  no épico: Decisões de integração
+  titulo: BL: Decidir ordem dos conectores de marketplace
+  tipo: Tarefa
+  responsavel: William
+  prazo: 15/10/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, por visão de leitura, o resultado desta integração (situação, datas e erros), sem o IT.MK guardar segredo nem chamar o fornecedor
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Decidir contas de desenvolvedor e dona dos aplicativos
+  no épico: Decisões de integração
+  titulo: BL: Decidir contas de desenvolvedor e dona dos aplicativos
+  tipo: Tarefa
+  responsavel: William
+  prazo: 15/10/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, por visão de leitura, o resultado desta integração (situação, datas e erros), sem o IT.MK guardar segredo nem chamar o fornecedor
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Pedir documentação da Kwai e da Shein
+  no épico: Decisões de integração
+  titulo: BL: Pedir documentação da Kwai e da Shein
+  tipo: Tarefa
+  responsavel: William
+  prazo: 15/10/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, por visão de leitura, o resultado desta integração (situação, datas e erros), sem o IT.MK guardar segredo nem chamar o fornecedor
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Fazer teste de aprendizado de cada API
+  no épico: Qualidade das integrações
+  titulo: BL: Fazer teste de aprendizado de cada API
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, por visão de leitura, o resultado desta integração (situação, datas e erros), sem o IT.MK guardar segredo nem chamar o fornecedor
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Montar fornecedor falso para cada integração
+  no épico: Qualidade das integrações
+  titulo: BL: Montar fornecedor falso para cada integração
+  tipo: Tarefa
+  responsavel: William
+  prazo: 04/02/2027
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, por visão de leitura, o resultado desta integração (situação, datas e erros), sem o IT.MK guardar segredo nem chamar o fornecedor
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Ensaiar no sandbox de cada fornecedor
+  no épico: Qualidade das integrações
+  titulo: BL: Ensaiar no sandbox de cada fornecedor
+  tipo: Tarefa
+  responsavel: William
+  prazo: 04/02/2027
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, por visão de leitura, o resultado desta integração (situação, datas e erros), sem o IT.MK guardar segredo nem chamar o fornecedor
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Testar o Pix de ponta a ponta
+  no épico: Qualidade das integrações
+  titulo: BL: Testar o Pix de ponta a ponta
+  tipo: Tarefa
+  responsavel: William
+  prazo: 04/02/2027
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, por visão de leitura, o resultado desta integração (situação, datas e erros), sem o IT.MK guardar segredo nem chamar o fornecedor
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Revisar a segurança dos webhooks
+  no épico: Qualidade das integrações
+  titulo: BL: Revisar a segurança dos webhooks
+  tipo: Tarefa
+  responsavel: William
+  prazo: 04/02/2027
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, por visão de leitura, o resultado desta integração (situação, datas e erros), sem o IT.MK guardar segredo nem chamar o fornecedor
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Criar conexão por loja e plataforma
+  no épico: Conexões e segredos no banco
+  titulo: BL: Criar conexão por loja e plataforma
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Guardar segredos no Vault só de gravação
+  no épico: Conexões e segredos no banco
+  titulo: BL: Guardar segredos no Vault só de gravação
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Guardar credenciais do Inter e do Asaas
+  no épico: Conexões e segredos no banco
+  titulo: BL: Guardar credenciais do Inter e do Asaas
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Guardar validade da conexão por plataforma
+  no épico: Conexões e segredos no banco
+  titulo: BL: Guardar validade da conexão por plataforma
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Guardar aplicativo por plataforma
+  no épico: Conexões e segredos no banco
+  titulo: BL: Guardar aplicativo por plataforma
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Trocar e revogar segredo com registro
+  no épico: Conexões e segredos no banco
+  titulo: BL: Trocar e revogar segredo com registro
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Criar análise de loja como foto imutável
+  no épico: Análise de loja no banco
+  titulo: BL: Criar análise de loja como foto imutável
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja, a análise mais recente e as anteriores (indicadores, faixa de saúde, selo, violações, devoluções e campanhas) com a origem de cada campo
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Guardar campos da análise com origem
+  no épico: Análise de loja no banco
+  titulo: BL: Guardar campos da análise com origem
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja, a análise mais recente e as anteriores (indicadores, faixa de saúde, selo, violações, devoluções e campanhas) com a origem de cada campo
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Guardar violações, devoluções e campanhas
+  no épico: Análise de loja no banco
+  titulo: BL: Guardar violações, devoluções e campanhas
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja, a análise mais recente e as anteriores (indicadores, faixa de saúde, selo, violações, devoluções e campanhas) com a origem de cada campo
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Calcular indicadores e faixa de saúde única
+  no épico: Análise de loja no banco
+  titulo: BL: Calcular indicadores e faixa de saúde única
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja, a análise mais recente e as anteriores (indicadores, faixa de saúde, selo, violações, devoluções e campanhas) com a origem de cada campo
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Criar selo da análise e consultas do painel
+  no épico: Análise de loja no banco
+  titulo: BL: Criar selo da análise e consultas do painel
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja, a análise mais recente e as anteriores (indicadores, faixa de saúde, selo, violações, devoluções e campanhas) com a origem de cada campo
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Guardar pedidos e notas
+  no épico: Faturamento e bases no banco
+  titulo: BL: Guardar pedidos e notas
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja, base e competência, o faturado, os pedidos e as notas, no formato de dinheiro exato com duas casas
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Guardar faturado por loja e base
+  no épico: Faturamento e bases no banco
+  titulo: BL: Guardar faturado por loja e base
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja, base e competência, o faturado, os pedidos e as notas, no formato de dinheiro exato com duas casas
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Criar Pix com estados
+  no épico: Cobrança e Pix no banco
+  titulo: BL: Criar Pix com estados
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Controlar validade após o vencimento
+  no épico: Cobrança e Pix no banco
+  titulo: BL: Controlar validade após o vencimento
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Guardar aviso bruto do provedor
+  no épico: Recebimentos no banco
+  titulo: BL: Guardar aviso bruto do provedor
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Guardar provedor de Pix, ambiente e chave Pix
+  no épico: Configurações no banco
+  titulo: BL: Guardar provedor de Pix, ambiente e chave Pix
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Tabela da fila de erros das integrações
+  no épico: Base do banco
+  titulo: BL: Tabela da fila de erros das integrações
+  tipo: Tarefa
+  responsavel: William
+  prazo: 15/10/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura, os erros e alertas das integrações com loja, plataforma, motivo e ação sugerida
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Criar tabela de plataformas e capacidades
+  no épico: Cadastro no banco
+  titulo: BL: Criar tabela de plataformas e capacidades
+  tipo: Tarefa
+  responsavel: William
+  prazo: 15/10/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Cadastrar conexão por loja
+  no épico: Conexões com marketplaces no servidor
+  titulo: BL: Cadastrar conexão por loja
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Validade e situação Vencida por plataforma
+  no épico: Conexões com marketplaces no servidor
+  titulo: BL: Validade e situação Vencida por plataforma
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Segredo só de gravação na conexão
+  no épico: Conexões com marketplaces no servidor
+  titulo: BL: Segredo só de gravação na conexão
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Convite e porta de autorização
+  no épico: Conexões com marketplaces no servidor
+  titulo: BL: Convite e porta de autorização
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Aplicativos por plataforma
+  no épico: Conexões com marketplaces no servidor
+  titulo: BL: Aplicativos por plataforma
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Capacidades por plataforma no contrato
+  no épico: Conexões com marketplaces no servidor
+  titulo: BL: Capacidades por plataforma no contrato
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja e plataforma, a situação da conexão (Conectada, Vencida, Com erro), a validade e a data da última sincronização
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Salvar análise como foto imutável
+  no épico: Análise de loja no servidor
+  titulo: BL: Salvar análise como foto imutável
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja, a análise mais recente e as anteriores (indicadores, faixa de saúde, selo, violações, devoluções e campanhas) com a origem de cada campo
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Campos da análise por plataforma com origem
+  no épico: Análise de loja no servidor
+  titulo: BL: Campos da análise por plataforma com origem
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja, a análise mais recente e as anteriores (indicadores, faixa de saúde, selo, violações, devoluções e campanhas) com a origem de cada campo
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Faixa de saúde e indicadores comparáveis
+  no épico: Análise de loja no servidor
+  titulo: BL: Faixa de saúde e indicadores comparáveis
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja, a análise mais recente e as anteriores (indicadores, faixa de saúde, selo, violações, devoluções e campanhas) com a origem de cada campo
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Painel da carteira com selo da análise
+  no épico: Análise de loja no servidor
+  titulo: BL: Painel da carteira com selo da análise
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja, a análise mais recente e as anteriores (indicadores, faixa de saúde, selo, violações, devoluções e campanhas) com a origem de cada campo
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Relatório da análise com comparação
+  no épico: Análise de loja no servidor
+  titulo: BL: Relatório da análise com comparação
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja, a análise mais recente e as anteriores (indicadores, faixa de saúde, selo, violações, devoluções e campanhas) com a origem de cada campo
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Comparar plataformas do mesmo cliente
+  no épico: Análise de loja no servidor
+  titulo: BL: Comparar plataformas do mesmo cliente
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja, a análise mais recente e as anteriores (indicadores, faixa de saúde, selo, violações, devoluções e campanhas) com a origem de cada campo
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Porta única de provedor de Pix
+  no épico: Cobrança e Pix no servidor
+  titulo: BL: Porta única de provedor de Pix
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Gerar Pix por cobrança
+  no épico: Cobrança e Pix no servidor
+  titulo: BL: Gerar Pix por cobrança
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Validade de 30 dias e remoção da cobrança
+  no épico: Cobrança e Pix no servidor
+  titulo: BL: Validade de 30 dias e remoção da cobrança
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Juros e multa desligados
+  no épico: Cobrança e Pix no servidor
+  titulo: BL: Juros e multa desligados
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Endpoint do aviso de pagamento
+  no épico: Cobrança e Pix no servidor
+  titulo: BL: Endpoint do aviso de pagamento
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Reconciliação diária de avisos perdidos
+  no épico: Cobrança e Pix no servidor
+  titulo: BL: Reconciliação diária de avisos perdidos
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Base de cálculo como estratégia por plataforma
+  no épico: Faturamento e bases no servidor
+  titulo: BL: Base de cálculo como estratégia por plataforma
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja, base e competência, o faturado, os pedidos e as notas, no formato de dinheiro exato com duas casas
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Faturado por loja e competência
+  no épico: Faturamento e bases no servidor
+  titulo: BL: Faturado por loja e competência
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja, base e competência, o faturado, os pedidos e as notas, no formato de dinheiro exato com duas casas
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Pedidos e notas do faturado
+  no épico: Faturamento e bases no servidor
+  titulo: BL: Pedidos e notas do faturado
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, em visão de leitura por loja, base e competência, o faturado, os pedidos e as notas, no formato de dinheiro exato com duas casas
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Guardar configuração de recebimento
+  no épico: Configurações no servidor
+  titulo: BL: Guardar configuração de recebimento
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL
+
+editar: Credenciais do provedor só de gravação
+  no épico: Configurações no servidor
+  titulo: BL: Credenciais do provedor só de gravação
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: é construído no banco e no Java do BL, não no IT.MK
+  aceite: O BL devolve ao IT.MK, pela porta de Pix do Java do BL, o código do Pix, o copia e cola, o link, a validade e o identificador, e avisa o pagamento por evento que o IT.MK só escuta
+  aceite: O que o BL devolve fica escrito no item com o nome da tabela, visão ou porta e o formato dos campos, e o IT.MK nunca escreve no banco do BL

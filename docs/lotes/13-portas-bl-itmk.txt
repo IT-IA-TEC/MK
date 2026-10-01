@@ -1,0 +1,79 @@
+lote: Portas entre o BL e o IT.MK
+depois de: Entrega e ambientes
+
+Portas e leituras entre o BL e o IT.MK [Integrações] {v1.0}
+meta: o IT.MK pede ao BL o que precisa por portas combinadas e lê o resultado, sem nunca escrever no banco do BL
+- BL: Porta do Java do BL para o IT.MK pedir um Pix {v1.1}
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: o Java do BL oferece uma porta que recebe CPF do pagador, plataforma e código da loja, valor com duas casas, vencimento e número da parcela
+  aceite: A porta devolve o código do Pix, o copia e cola, o link, a validade e o identificador, ou um erro do negócio com motivo
+  aceite: Repetir o mesmo pedido não gera um segundo Pix (efeito único), e o IT.MK escolhe um Pix por pagador, por loja ou por parcela no pedido
+  aceite: Só o IT.MK, com credencial própria, consegue chamar a porta, e nenhum segredo de provedor sai do BL
+- BL: Porta para cancelar ou remover um Pix {v1.1}
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: porta que recebe o identificador do Pix e devolve se foi cancelado ou removido do provedor
+  aceite: Pix já pago não é cancelado e a resposta diz o motivo
+- BL: Porta para pedir a reconexão de uma loja {v1.0}
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: porta que recebe plataforma e código da loja, inicia a reconexão e devolve a situação da conexão
+  aceite: Quem reconecta é o BL; o IT.MK só pede e depois lê a situação
+- BL: Visões de leitura para o IT.MK {v1.0}
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: visões só de leitura com situação e validade da conexão, análise da loja, faturamento por loja, base e competência, e erros das integrações
+  aceite: Cada visão traz CPF do pagador, plataforma e código da loja, e o CNPJ só como informação
+  aceite: Dinheiro vem com duas casas exatas, e o usuário do IT.MK só consegue consultar (SELECT)
+- BL: Evento de pagamento do Pix para o IT.MK escutar {v1.1}
+  tipo: Tarefa
+  responsavel: William
+  prazo: 26/11/2026
+  aceite: Parte do BL: quando o provedor avisa um pagamento, o BL grava o aviso e publica um evento de leitura com identificador do Pix, valor, data e quem pagou
+  aceite: O mesmo aviso repetido não gera dois eventos, e eventos perdidos podem ser relidos por intervalo
+- BL: Base das integrações do BL {v1.0}
+  tipo: Tarefa
+  responsavel: William
+  prazo: 05/11/2026
+  aceite: Parte do BL: tempo limite e nova tentativa limitada, fila de erros com reprocesso, logs sem segredo e chave geral para desligar cada integração
+  aceite: Os erros ficam em visão de leitura para o IT.MK mostrar
+
+Pedidos e leituras do BL no servidor do IT.MK [Backend] {v1.0}
+meta: o servidor do IT.MK usa as portas e as leituras do BL sem escrever nada nele
+- Ler as visões do BL
+  historia: Como analista de cobrança, quero ver conexão, análise e faturamento das lojas como o BL calculou, para cobrar com dado confiável sem digitar de novo.
+  aceite: O servidor lê as visões do BL só com consulta (SELECT), com tempo limite e nova tentativa limitada
+  aceite: Se o BL não responde, a tela mostra o aviso e o resto do IT.MK continua funcionando
+  aceite: Nada lido do BL é gravado no IT.MK além do necessário para a cobrança (valor, competência e identificador)
+  prioridade: Deve 2
+  valor: 9 sem leitura a carteira e as telas ficam vazias
+  pontos: 5
+- Pedir o Pix ao BL pela porta {v1.1}
+  historia: Como analista de cobrança, quero que o IT.MK peça o Pix ao BL e guarde o resultado, para cobrar sem falar com o provedor.
+  aceite: O servidor chama a porta de Pix do BL com o identificador da cobrança, e repetir o pedido não gera Pix novo
+  aceite: Guarda código, copia e cola, link, validade e identificador do Pix devolvidos
+  aceite: Falha ou demora do BL vira erro do negócio visível, sem perder a cobrança
+  aceite: Valor em R$ exato com duas casas e a mesma regra única de arredondamento do projeto
+  prioridade: Deve 2
+  valor: 10 sem Pix não há cobrança
+  pontos: 5
+- Escutar o pagamento avisado pelo BL {v1.1}
+  historia: Como analista de cobrança, quero que a baixa do Pix aconteça sozinha quando o BL avisa o pagamento, para não conferir à mão.
+  aceite: O servidor escuta o evento de pagamento do BL só em leitura e dá baixa pela regra do IT.MK
+  aceite: Evento repetido não duplica a baixa, e diferença de valor vira divergência para uma pessoa avaliar
+  aceite: Se a escuta cai, volta sozinha e relê o que passou no intervalo
+  prioridade: Deve 2
+  valor: 9 é a baixa automática
+  pontos: 5
+- Pedir cancelamento de Pix e reconexão de loja ao BL {v1.1}
+  historia: Como analista de cobrança, quero pedir ao BL para cancelar um Pix ou reconectar uma loja, para resolver sem sair do IT.MK.
+  aceite: O servidor chama as portas de cancelamento e de reconexão do BL e mostra o resultado
+  aceite: Cada pedido grava quem pediu, quando e o que o BL respondeu
+  prioridade: Deveria 3
+  valor: 6 evita trabalho manual no BL
+  pontos: 3
