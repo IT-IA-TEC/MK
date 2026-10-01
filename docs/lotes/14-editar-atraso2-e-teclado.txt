@@ -1,0 +1,9 @@
+# Atraso 2 passa para o dia 5 (decisão de 02/10/2026, editável em Configurações) e o teste de teclado do Frontend foi feito.
+
+editar: BL-336
+  tirar aceite: As etapas partem das seis do protótipo: Lembrete no dia -2, Vencimento no dia 0, Atraso 1 no dia 3, Atraso 2 no dia 10, Aviso de bloqueio 3 dias antes do último dia do mês do vencimento e Pedir bloqueio nesse último dia
+  aceite: As etapas partem das seis do protótipo: Lembrete no dia -2, Vencimento no dia 0, Atraso 1 no dia 3, Atraso 2 no dia 5, Aviso de bloqueio 3 dias antes do último dia do mês do vencimento e Pedir bloqueio nesse último dia
+
+editar: Foco e navegação por teclado
+  no épico: Qualidade das telas
+  situação: Pronto para testar
