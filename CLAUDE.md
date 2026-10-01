@@ -29,3 +29,9 @@
 ## Base de conhecimento dos agentes
 - Mapa em `docs/kb-mapa.md` (repositório IT-HUB-IA/Agent-s-Conhecimento, 89 mil arquivos) e manuais prontos em `docs/kb/`.
 - Antes de montar plano de qualquer frente (Frontend, Backend, Database, Integrações), leia o manual da frente em `docs/kb/` e busque no repositório o que faltar. O que a base não cobre (ex.: Supabase, WhatsGW) deve ser dito como "não coberto pela base".
+
+## Dinheiro (regra técnica do projeto)
+- Valor em R$ é sempre exato. Nunca usar `double` ou `float` para dinheiro.
+- No banco: `numeric` com duas casas. Em Java: `BigDecimal` com duas casas, ou centavos em número inteiro. O time técnico escolhe, mas tem de ser exato.
+- Existe uma só regra de arredondamento para o projeto inteiro, escrita no critério de aceite de todo item que calcula valor (Fechamento, Pix, juros e multa, rateio entre lojas, acordos e parcelas).
+- Pix de valor fixo não aceita pagamento parcial. Parcelamento usa um Pix por parcela.
