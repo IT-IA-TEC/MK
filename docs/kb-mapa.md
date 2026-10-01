@@ -28,3 +28,21 @@ Nesses casos o plano deve dizer "não coberto pela base" e apontar a fonte ofici
 
 ## Categorias (documentos)
 algoritmos-e-estruturas-de-dados 2207 · arquitetura-de-software 3472 · backend 15 · bancos-de-dados 782 · carreira-e-habilidades 5796 · codigo-limpo 462 · data-science 642 · database 741 · desenvolvimento-agil 3046 · design 181 · devops 7870 · empresa-e-cultura-organizacional 2014 · entrevistas-e-preparacao 2496 · frontend 273 · integracoes 5013 · lideranca-e-gestao-de-equipe 1212 · linguagens-de-programacao 2612 · metodologias-ageis-avancadas 1377 · p-o-produto 86 · padroes-e-design-de-software 2640 · seguranca 750.
+
+## Manuais prontos (docs/kb/)
+| Arquivo | Assunto | Origem |
+|---|---|---|
+| 01-po-produto | P.O. e produto | base (categoria p-o-produto) |
+| 02-agil-e-metodos | Scrum, estimativa, Kanban, BDD, XP, TDD, métricas | base |
+| 03-arquitetura-padroes-codigo | Arquitetura, DDD, padrões, código limpo | base |
+| 04-dados-backend-seguranca | Dados, backend, segurança (OWASP) | base |
+| 05-integracoes | Spring Integration e padrões de integração | base |
+| 06-frontend-design-equipes | Frontend, design, UX, liderança | base |
+| 07-supabase-postgres | Supabase e Postgres | documentação oficial (01/10/2026) |
+| 08-javafx-java-spring | JavaFX, Java, Spring | documentação oficial (01/10/2026) |
+| 09-pix-asaas-inter | Pix, Asaas, Banco Inter | documentação oficial (01/10/2026) |
+| 10-whatsgw-whatsapp | WhatsGW e WhatsApp: riscos e política | site e política da Meta |
+| 11-apis-marketplaces | Shein, Mercado Livre, Shopee, Kwai | documentação oficial (Kwai não confirmado) |
+| 12-whatsgw-api | API da WhatsGW (OpenAPI enviado pelo dono) | `docs/kb/refs/whatsgw-api-openapi.json` |
+
+Marcas nos manuais: [BASE] veio da base; [COMPL.] conhecimento geral; [NÃO COBERTO] / "não confirmado" = sem fonte.
