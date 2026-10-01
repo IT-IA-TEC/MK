@@ -1,0 +1,23 @@
+versão: v0.1
+  entrega: 02/10/2026
+  meta: o analista entra no sistema e acha qualquer pagador, suas lojas e a ficha completa
+
+versão: v1.0
+  entrega: 02/10/2026
+  meta: o analista vê a situação de cada loja nas quatro plataformas, preenche a análise e compara com a anterior
+
+versão: v1.1
+  entrega: 02/10/2026
+  meta: o analista fecha o mês, gera os Pix e confere o dinheiro que entrou
+
+versão: v1.2
+  entrega: 03/10/2026
+  meta: atraso, acordo, contestação e conversa são tratados dentro do sistema
+
+versão: v1.3
+  entrega: 03/10/2026
+  meta: o robô cobra sozinho, com limites, aprovação de uma pessoa e auditoria
+
+versão: v1.4
+  entrega: 03/10/2026
+  meta: o dono vê tudo no Dashboard e todas as telas passam na conferência de qualidade

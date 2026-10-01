@@ -1,0 +1,25 @@
+# Todos os prazos fecham até 03/10/2026 (decisão do dono). Primeiro grave o 18 (datas das versões). Aba: qualquer uma (Editar em lote).
+
+editar todos: versão v0.1
+  prazo: 02/10/2026
+editar todos: versão v1.0
+  prazo: 02/10/2026
+editar todos: versão v1.1
+  prazo: 02/10/2026
+editar todos: versão v1.2
+  prazo: 03/10/2026
+editar todos: versão v1.3
+  prazo: 03/10/2026
+editar todos: versão v1.4
+  prazo: 03/10/2026
+
+editar: Marcar o vínculo da 40% nos clientes no sistema do BL
+  prazo: 02/10/2026
+editar: Criar a credencial de leitura da base do BL
+  prazo: 02/10/2026
+editar: Criar na ficha do BL os campos que o IT.MK precisa
+  prazo: 02/10/2026
+editar: Liberar o aviso em tempo real nas tabelas da ficha do BL
+  prazo: 02/10/2026
+editar: Entregar o acesso da VPS ao time técnico
+  prazo: 02/10/2026
