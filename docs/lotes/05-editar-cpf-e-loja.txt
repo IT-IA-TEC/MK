@@ -1,6 +1,3 @@
-lote: Ajuste CPF e loja
-depois de: Database, Backend, Integrações
-
 # Regras novas: pagador é sempre uma pessoa com CPF. A ficha do cliente e as lojas ficam 100% no banco do BL, e o IT.MK só lê, sempre direto. Loja = plataforma + código. CNPJ é só informativo.
 
 editar: BL-293
