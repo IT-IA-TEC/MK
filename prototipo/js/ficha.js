@@ -14,11 +14,13 @@ function base(p){return 1800+p.id*730}
 function valorMes(p){return p.lojas.map(function(l,i){return [l.n,Math.round(base(p)*(1+((i*3+p.id)%5)/10))]})}
 function cobranca(p){var it=valorMes(p);return {comp:'setembro/2026',itens:it,total:it.reduce(function(a,x){return a+x[1]},0)}}
 function dOff(off){var d=new Date();d.setDate(d.getDate()+off);return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear()}
+/* rateio exato em centavos: a soma das parcelas é sempre igual ao total */
+function ratear(total,n){var c=Math.round(total*100),b=Math.floor(c/n),r=c-b*n,o=[];for(var i=0;i<n;i++)o.push((b+(i<r?1:0))/100);return o}
 function acordoDe(p){
   if(!p.acordo&&p.fin==='acordo'){
-    var v=Math.round(cobranca(p).total/3),ps=[],b=p.id===9?-5:p.id===4?0:5;
-    for(var i=1;i<=5;i++)ps.push({n:i,venc:dOff(b+(i-2)*30),valor:v,st:i<2?'paga':(i===2&&p.id===9)?'atrasada':'aberta'});
-    p.acordo={parcelas:ps,estado:'ativo'};
+    var tt=cobranca(p).total,vs=ratear(tt,5),ps=[],b=p.id===9?-5:p.id===4?0:5;
+    for(var i=1;i<=5;i++)ps.push({n:i,venc:dOff(b+(i-2)*30),valor:vs[i-1],st:i<2?'paga':(i===2&&p.id===9)?'atrasada':'aberta'});
+    p.acordo={parcelas:ps,estado:'ativo',total:tt};
   }
   return p.acordo;
 }
@@ -60,11 +62,11 @@ function html(p,aba){
     '<div class="f-bts"><button class="btn esc" data-fa="bloquear">Bloquear todas e enviar</button><button class="btn sec" data-fa="liberar">Liberar todas e enviar</button></div>';
   var hist=A?A.historicoHtml(p):'';
   var RB=window.MKRobo&&MKRobo.api(),rs=RB?RB.situacao(p.id):null;
-  var robo=rs?'<div class="f-robo"><div class="f-kv"><span>Situação do robô</span><b><span class="fs '+(rs.st==='Atende'?'vd':rs.st==='Em teste'?'ok':'gr')+'">'+rs.st+'</span></b></div>'+(rs.motivo?'<div class="f-kv"><span>Motivo</span><b>'+esc(rs.motivo)+'</b></div>':'')+'<div class="f-kv"><span>Desde</span><b>'+esc(rs.desde)+'</b></div><div class="f-kv"><span>Alterado por</span><b>'+esc(rs.quem)+'</b></div><div class="f-bts">'+['Atende','Não atende','Em teste'].map(function(s){return '<button class="btn '+(rs.st===s?'esc':'sec')+'" data-fa="robo" data-st="'+s+'"'+(rs.st===s?' disabled':'')+'>'+s+'</button>'}).join('')+'</div>'+
+  var robo=rs?'<div class="f-robo"><div class="f-kv"><span>Situação do robô</span><b><span class="fs '+(rs.st==='Atende'?'vd':rs.st==='Em teste'?'ok':'gr')+'">'+rs.st+'</span></b></div>'+(rs.motivo?'<div class="f-kv"><span>Motivo</span><b>'+esc(rs.motivo)+'</b></div>':'')+'<div class="f-kv"><span>Desde</span><b>'+esc(rs.desde)+'</b></div><div class="f-kv"><span>Alterado por</span><b>'+esc(rs.quem)+'</b></div><div class="f-bts">'+['Atende','Não atende','Em teste'].map(function(s){return '<button class="btn '+(rs.st===s?'esc':'sec')+'" data-fa="robo" data-st="'+s+'"'+(rs.st===s?' disabled':'')+'>'+s+'</button>'}).join('')+'<button class="btn sec" data-fa="optout"'+(rs.optOut?' disabled':'')+' title="O cliente pediu para não receber mais mensagens">'+(rs.optOut?'Pediu para parar (registrado)':'Pediu para parar')+'</button></div>'+
     '<div class="f-sub">Modo de cobrança</div><div class="f-bts">'+[['','Padrão do sistema'],['pagador','Um Pix por pagador'],['loja','Um Pix por loja']].map(function(m){return '<button class="btn '+((p.modoCob||'')===m[0]?'esc':'sec')+'" data-fa="modocob" data-m="'+m[0]+'">'+m[1]+'</button>'}).join('')+'</div><div class="nt">'+(p.modoCob==='loja'?'Uma cobrança e um Pix para cada loja.':'Uma cobrança e um Pix para todas as lojas do pagador.')+' Padrão definido em Configurações.</div></div>':'';
   var acomp=p.promessa?'<div class="f-kv"><span>Promessa ativa</span><b>Pagar em '+esc(p.promessa.data)+'</b></div><div class="f-kv"><span>Prazo de retorno</span><b>'+esc(p.retorno||'Sem retorno marcado')+'</b></div>':'<div class="f-vazio">Nenhuma promessa ativa.</div>';
   acomp+='<div class="f-bts"><button class="btn sec" data-fa="resultado">Registrar resultado</button></div>';
-  var acordo=ac?ac.parcelas.map(function(x){var cl=x.st==='paga'?'vd':x.st==='atrasada'?'gr':'ok',tx=x.st==='paga'?'Paga':x.st==='atrasada'?'Atrasada':'A vencer';return '<div class="f-lin"><div><div class="pg">Parcela '+x.n+' de '+ac.parcelas.length+'</div><div class="nt">Vence '+esc(x.venc)+'</div></div><div class="f-dir"><b class="din">'+R(x.valor)+'</b><span class="atraso '+cl+'">'+tx+'</span></div></div>'}).join(''):'<div class="f-vazio">Este pagador não tem acordo.</div><div class="f-bts"><button class="btn" data-fa="acordo">Criar acordo</button></div>';
+  var acordo=ac?ac.parcelas.map(function(x){var cl=x.st==='paga'?'vd':x.st==='atrasada'?'gr':'ok',tx=x.st==='paga'?'Paga':x.st==='atrasada'?'Atrasada':'A vencer';return '<div class="f-lin"><div><div class="pg">Parcela '+x.n+' de '+ac.parcelas.length+'</div><div class="nt">Vence '+esc(x.venc)+'</div></div><div class="f-dir"><b class="din">'+R(x.valor)+'</b><span class="atraso '+cl+'">'+tx+'</span><span class="nt">'+(x.st==='paga'?'Pix pago':'Pix próprio da parcela')+'</span></div></div>'}).join(''):'<div class="f-vazio">Este pagador não tem acordo.</div><div class="f-bts"><button class="btn" data-fa="acordo">Criar acordo</button></div>';
   var comp=cs.map(function(c,i){return '<div class="f-lin"><div style="min-width:0"><div class="pg">'+esc(c.arq)+'</div><div class="nt">Recebido em '+esc(c.data)+(c.valor?' · '+R(c.valor):'')+'</div></div><div class="f-dir">'+(c.st==='conferir'?'<span class="atraso at">A conferir</span><button class="btn sec" style="width:auto;padding:0 12px" data-fa="conferir" data-i="'+i+'">Conferir</button>':'<span class="atraso vd">Conferido</span>')+'</div></div>'}).join('');
   var tl='<ol class="tempo">'+tempo(p).map(function(e){return '<li><span class="nt mono">'+esc(e[0])+'</span><span>'+esc(e[1])+'</span></li>'}).join('')+'</ol>';
   var pe=pes.map(function(x){return '<div class="f-lin"><div style="min-width:0"><div class="pg">'+esc(x[0])+'</div><div class="nt">'+esc(x[1])+'</div></div><div class="nt mono">'+esc(x[2])+'</div></div>'}).join('');
@@ -91,6 +93,7 @@ function mount(el,p){
     var a=e.target.closest('[data-fa]');if(!a)return;
     var acao=a.dataset.fa;
     function refaz(){mount(el,p);avisar(p)}
+    if(acao==='optout'){U.modal({titulo:'Cliente pediu para parar?',ok:'Registrar',html:'<p class="dica-m">O robô deixa de enviar qualquer mensagem para '+esc(p.nome)+'. Só uma pessoa pode desfazer.</p>',onOk:function(){MKRobo.api().optOut(p.id);evento(p,'Pediu para parar de receber mensagens do robô');refaz();U.toast('Opt-out registrado.')}});return}
     if(acao==='memoria'){window.MKMemoria&&MKMemoria.abrir(p.id);return}
     if(acao==='modocob'){p.modoCob=a.dataset.m;evento(p,'Modo de cobrança: '+(a.dataset.m==='loja'?'um Pix por loja':a.dataset.m==='pagador'?'um Pix por pagador':'padrão do sistema'));refaz();U.toast('Modo de cobrança salvo.');return}
     if(acao==='robo'){var st=a.dataset.st,RBa=MKRobo.api(),fim=function(mot){RBa.definir(p.id,st,mot);evento(p,'Robô: '+st+(mot?' ('+mot+')':''));refaz();U.toast('Situação do robô salva.')};
@@ -113,9 +116,9 @@ function mount(el,p){
     }else if(acao==='acordo'){
       U.modal({titulo:'Criar acordo',ok:'Criar acordo',html:'<div class="campo"><label for="ac-n">Número de parcelas</label><select class="sel" id="ac-n">'+[2,3,4,5,6].map(function(n){return '<option>'+n+'</option>'}).join('')+'</select></div><div class="campo" style="margin-top:12px"><label for="ac-d">Vencimento da primeira parcela</label><input id="ac-d" type="date"></div><small class="erro" id="ac-e" hidden>Informe o vencimento da primeira parcela.</small>',
         onOk:function(m){var d=m.querySelector('#ac-d').value;if(!d){m.querySelector('#ac-e').hidden=false;return false}
-          var n=+m.querySelector('#ac-n').value,tot=financeiro(p).aberto||cobranca(p).total,v=Math.round(tot/n),ps=[],dt=d.split('-');
-          for(var i=0;i<n;i++){var mes=((+dt[1]-1+i)%12)+1,ano=+dt[0]+Math.floor((+dt[1]-1+i)/12);ps.push({n:i+1,venc:dt[2]+'/'+('0'+mes).slice(-2)+'/'+ano,valor:v,st:'aberta'})}
-          p.acordo={parcelas:ps,estado:'ativo'};p.fin='acordo';delete p.dias;evento(p,'Acordo criado em '+n+' parcelas');refaz();U.toast('Acordo criado.')}});
+          var n=+m.querySelector('#ac-n').value,tot=financeiro(p).aberto||cobranca(p).total,vs=ratear(tot,n),ps=[],dt=d.split('-');
+          for(var i=0;i<n;i++){var mes=((+dt[1]-1+i)%12)+1,ano=+dt[0]+Math.floor((+dt[1]-1+i)/12);ps.push({n:i+1,venc:dt[2]+'/'+('0'+mes).slice(-2)+'/'+ano,valor:vs[i],st:'aberta'})}
+          p.acordo={parcelas:ps,estado:'ativo',total:tot};p.fin='acordo';delete p.dias;evento(p,'Acordo criado em '+n+' parcelas');refaz();U.toast('Acordo criado.')}});
     }else if(acao==='conferir'){
       var c=comprovantes(p)[+a.dataset.i];c.st='conferido';evento(p,'Comprovante '+c.arq+' conferido');refaz();U.toast('Comprovante conferido.');
     }

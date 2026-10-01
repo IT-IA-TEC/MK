@@ -57,10 +57,12 @@ function iniciar(){
     motivos:{baixa:['Passivo antigo sem chance de cobrança','Pagamento não registrado','Cobrança lançada por engano'],rejeicao:['Comprovante ilegível','Valor não confere','Não é pagamento da VHSS','Duplicado'],cancelamento:['Pagador desistiu','Pedido feito por engano','Loja continua ativa']},
     dados:{cnpj:'00.000.000/0001-00',recebedor:'VHSS Store',banco:'Itaú',suporteNome:'Atendimento IT.MK',suporteFone:'(11) 4002-8922',suporteEmail:'suporte@itmk.com.br',horario:'Segunda a sexta, das 9h às 18h',contas:[{id:1,banco:'Itaú',ag:'0312',conta:'44710-3',tipo:'Conta principal (Pix)'},{id:2,banco:'Itaú',ag:'0312',conta:'44711-1',tipo:'Conta de reserva'}]},
     recebimento:{provedor:'Asaas',ambiente:'teste',chavePix:'00.000.000/0001-00',validadeLinkDias:30,jurosMultaLigado:false,multaPct:2,jurosPct:1,modoPix:'pagador',basePadrao:'faturamento_total',
-      acesso:{'Asaas':{t:'12/08/2026 10:05',q:'Rafael Lima'},'Banco Inter':null},cert:null,certSenha:null,aviso:{sit:'Recebendo',ultimo:{t:'29/09/2026 14:32',v:'R$ 2.478,84'}}},
+      acesso:{'Asaas':{t:'12/08/2026 10:05',q:'Rafael Lima'},'Banco Inter':null},cert:null,certSenha:null,clientId:'',seg:{tokenAviso:{t:'12/08/2026 10:06',q:'Rafael Lima'},key:null},aviso:{sit:'Recebendo',ultimo:{t:'29/09/2026 14:32',v:'R$ 2.478,84'}}},
     log:[{t:'01/09/2026 08:40',q:'Marina Costa',o:'Regras padrão · Tolerância de comprovante',de:'R$ 0,05',para:'R$ 0,02'},{t:'25/08/2026 17:12',q:'Rafael Lima',o:'Régua · Atraso 2 · Dia',de:'7',para:'10'}]
   };
   CFG.usuarios.forEach(function(u){u.aprovaRobo=true});
+  CFG.modelos.forEach(function(m){if(m.id==='rapidas'){m.situacao='Não se aplica';return}m.situacao='Aprovado';m.situacaoPor='Marina Costa';m.situacaoEm='01/09/2026 09:15'});
+  CFG.modelos.filter(function(m){return m.id==='solic_desb'})[0].situacao='Rascunho';CFG.modelos.filter(function(m){return m.id==='solic_desb'})[0].situacaoPor='';CFG.modelos.filter(function(m){return m.id==='solic_desb'})[0].situacaoEm='';
   sincAtend();
 }
 /* ---------- componentes ---------- */
@@ -105,12 +107,12 @@ function abaRegras(){
 var ACOES={equipe:'Só avisar a equipe',rev:'Enviar mensagem com revisão',auto:'Enviar mensagem sem revisão'};
 function quando(d){return d<0?'antes':d===0?'no dia':'depois'}
 function abaRegua(){
-  var et=CFG.etapas.slice().sort(function(a,b){return a.dia-b.dia}),mods=CFG.modelos.filter(function(m){return m.texto});
+  var et=CFG.etapas.slice().sort(function(a,b){return a.dia-b.dia}),mods=aprovados();
   return '<div class="fe-barra"><div class="fe-info">Sequência automática por dias em relação ao vencimento. Promessa ativa e acordo em dia pausam a régua.</div><button class="btn" data-cf="novaetapa" style="width:auto;padding:0 14px">Nova etapa</button></div>'+
    '<div class="tab-cartao"><table class="tab-fe tab-cf"><colgroup><col style="width:13%"><col style="width:27%"><col style="width:24%"><col style="width:20%"><col style="width:6%"><col style="width:10%"></colgroup><thead><tr><th>Etapa</th><th>Quando (em relação ao vencimento)</th><th>Ação</th><th>Modelo de mensagem</th><th class="c">Ativa</th><th></th></tr></thead><tbody>'+
    et.map(function(e){return '<tr><td data-rot="Etapa"><div class="lj-n">'+esc(e.nome)+'</div></td><td data-rot="Quando"><div class="cf-quando"><input class="sel" data-et="'+e.id+'" data-ef="dias" inputmode="numeric" value="'+Math.abs(e.dia)+'" '+(e.dia===0?'disabled':'')+' aria-label="Dias da etapa '+esc(e.nome)+'"><select class="sel" data-et="'+e.id+'" data-ef="quando" aria-label="Quando, etapa '+esc(e.nome)+'">'+[['antes','dias antes'],['no dia','no dia'],['depois','dias depois']].map(function(o){return '<option value="'+o[0]+'"'+(quando(e.dia)===o[0]?' selected':'')+'>'+o[1]+'</option>'}).join('')+'</select></div></td>'+
     '<td data-rot="Ação"><select class="sel" data-et="'+e.id+'" data-ef="acao" aria-label="Ação, etapa '+esc(e.nome)+'">'+Object.keys(ACOES).map(function(k){return '<option value="'+k+'"'+(e.acao===k?' selected':'')+'>'+ACOES[k]+'</option>'}).join('')+'</select></td>'+
-    '<td data-rot="Modelo de mensagem"><select class="sel" data-et="'+e.id+'" data-ef="modelo" aria-label="Modelo, etapa '+esc(e.nome)+'">'+mods.map(function(m){return '<option value="'+m.id+'"'+(e.modelo===m.id?' selected':'')+'>'+esc(m.nome)+'</option>'}).join('')+'</select></td>'+
+    '<td data-rot="Modelo de mensagem"><select class="sel" data-et="'+e.id+'" data-ef="modelo" aria-label="Modelo, etapa '+esc(e.nome)+'">'+modOps(e.modelo,mods)+'</select>'+(modPend(e.modelo)?'<small class="erro cf-pend">Modelo precisa de nova aprovação.</small>':'')+'</td>'+
     '<td class="c" data-rot="Ativa">'+sw('et.'+e.id+'.ativa',e.ativa,'Etapa '+e.nome+' ativa')+'</td><td class="c"><button class="btn sec" data-cf="rmetapa" data-id="'+e.id+'" style="width:auto;padding:0 10px;height:30px">Remover</button></td></tr>'}).join('')+'</tbody></table></div>'+
    '<div class="cf-grade2"><div class="cx"><div class="cx-cab">'+ic('pause-circle')+'<h3>Pausas automáticas</h3></div><div class="cf-corpo">'+
     '<div class="cf-sw"><div><b>Promessa ativa pausa a régua</b><small>Enquanto houver promessa com data, nenhuma etapa dispara para o pagador.</small></div>'+sw('pausas.promessa',CFG.pausas.promessa,'Promessa pausa a régua')+'</div>'+
@@ -119,6 +121,8 @@ function abaRegua(){
    '<div class="cx"><div class="cx-cab">'+ic('user-cog')+'<h3>Exceção por pagador</h3><button class="btn sec cx-bt" data-cf="novaexc" style="width:auto;padding:0 12px;height:30px">Adicionar exceção</button></div><div class="cf-corpo" style="padding-top:0"><p class="nt" style="padding:10px 0">A exceção é definida na ficha do pagador e substitui o tom leve ou forte de antes: Não cobrar, régua mais leve ou régua mais firme.</p>'+
     (CFG.excecoes.length?CFG.excecoes.map(function(x){return '<div class="cf-lin"><div style="min-width:0"><b>'+esc(x.pagador)+'</b></div>'+chipR(x.regra)+'<button class="ib" data-cf="rmexc" data-id="'+x.id+'" aria-label="Remover exceção de '+esc(x.pagador)+'" title="Remover">'+ic('x')+'</button></div>'}).join(''):'<div class="fe-vazio">Nenhuma exceção. Todos seguem a régua padrão.</div>')+'</div></div></div>';
 }
+function modPend(id){var m=CFG.modelos.filter(function(x){return x.id===id})[0];return !!m&&m.situacao!=='Aprovado'}
+function modOps(atual,mods){var o=mods.map(function(m){return '<option value="'+m.id+'"'+(atual===m.id?' selected':'')+'>'+esc(m.nome)+'</option>'}).join('');if(modPend(atual)){var m=CFG.modelos.filter(function(x){return x.id===atual})[0];o='<option value="'+m.id+'" selected>'+esc(m.nome)+' ('+m.situacao.toLowerCase()+')</option>'+o}return o}
 function chipR(r){return '<span class="fs '+(r==='Não cobrar'?'cn':r==='Régua mais firme'?'gr':'ok')+'">'+r+'</span>'}
 var VARS={nome:'Primeiro nome do pagador',competencia:'Mês da cobrança',lojas:'Lista de lojas',faturado:'Total faturado',imposto:'Imposto',quarenta:'Valor da 40%',total:'Total a pagar',vencimento:'Data de vencimento',pix:'Pix (CNPJ e recebedor)',dias:'Dias de atraso',suporte:'Contato de suporte',valor:'Valor'};
 var modeloSel='cobranca';
@@ -126,15 +130,20 @@ function amostra(){
   var d=CFG.dados;return {nome:'Adriano',competencia:'agosto/2026',lojas:'• LOJA KP MODAS LTDA (GS 56011980000182)\n  Faturado R$ 62.880,00 · Imposto R$ 5.099,30 · 40%: R$ 2.039,72\n• ADRIANO APARECIDO SANTOS PEREIRA (GS 37930011000180)\n  Faturado R$ 13.250,00 · Imposto R$ 1.097,81 · 40%: R$ 439,12',faturado:'R$ 76.130,00',imposto:'R$ 6.197,11',quarenta:'R$ 2.478,84',total:'R$ 2.478,84',vencimento:'20/09/2026',pix:d.cnpj+' · '+d.recebedor+' · '+d.banco,dias:'11',suporte:d.suporteNome+' '+d.suporteFone,valor:'R$ 1.855,50'};
 }
 function previa(t){var a=amostra();return t.replace(/\{(\w+)\}/g,function(m,k){return a[k]!==undefined?a[k]:m})}
+function chipSit(m){var s=m.situacao;return '<span class="fs '+(s==='Aprovado'?'vd':s==='Reprovado'?'gr':'at')+'">'+s+'</span>'}
+function sitTexto(m){return m.situacaoPor?m.situacao+' por '+esc(m.situacaoPor)+' em '+esc(m.situacaoEm)+'.':'Ainda não foi aprovado. Qualquer usuário pode aprovar.'}
+function etapasDe(id){return CFG.etapas.filter(function(e){return e.modelo===id})}
+function aprovados(){return CFG.modelos.filter(function(m){return m.texto&&m.situacao==='Aprovado'})}
+function mudarSit(m,nova,motivo){var ant=m.situacao;m.situacao=nova;if(nova==='Rascunho'){m.situacaoPor='';m.situacaoEm=''}else{m.situacaoPor=EU;m.situacaoEm=agora()}reg('Modelos · '+m.nome+' · Situação',ant,nova+(nova==='Rascunho'?'':' por '+EU)+(motivo?' ('+motivo+')':''))}
 function abaModelos(){
   var m=CFG.modelos.filter(function(x){return x.id===modeloSel})[0]||CFG.modelos[0];
-  var lista=CFG.modelos.map(function(x){return '<button class="md-i" data-md="'+x.id+'" aria-pressed="'+(x.id===m.id)+'">'+esc(x.nome)+'</button>'}).join('');
+  var lista=CFG.modelos.map(function(x){return '<button class="md-i" data-md="'+x.id+'" aria-pressed="'+(x.id===m.id)+'"><span>'+esc(x.nome)+'</span>'+(x.rapidas?'':chipSit(x))+'</button>'}).join('');
   var ed;
   if(m.rapidas){
     ed='<div class="cx-cab">'+ic('zap')+'<h3>'+esc(m.nome)+'</h3><button class="btn sec cx-bt" data-cf="novarapida" style="width:auto;padding:0 12px;height:30px">Nova resposta</button></div><div class="md-corpo">'+m.rapidas.map(function(r,i){return '<div class="md-rap"><div class="campo"><label for="rp-a'+i+'">Atalho</label><div class="cf-in"><span>/</span><input id="rp-a'+i+'" data-rp="'+i+'" data-rf="atalho" value="'+esc(r.atalho)+'"></div></div><div class="campo"><label for="rp-t'+i+'">Texto</label><textarea class="cb-area" rows="3" id="rp-t'+i+'" data-rp="'+i+'" data-rf="texto">'+esc(r.texto)+'</textarea><div class="nt md-pv-r">Prévia: '+esc(previa(r.texto))+'</div></div><button class="ib" data-cf="rmrapida" data-i="'+i+'" aria-label="Remover resposta '+esc(r.atalho)+'" title="Remover">'+ic('trash-2')+'</button></div>'}).join('')+'<div class="cf-salvar"><span class="nt">As respostas são salvas ao sair de cada campo.</span></div></div>';
   }else{
     var d=DRAFT['m.'+m.id];var txt=d!==undefined?d:m.texto;
-    ed='<div class="cx-cab">'+ic('message-square-text')+'<h3>'+esc(m.nome)+'</h3></div><div class="md-corpo"><div class="campo"><label for="md-t">Texto do modelo</label><textarea class="cb-area" id="md-t" rows="9" data-mt="'+m.id+'">'+esc(txt)+'</textarea></div>'+
+    ed='<div class="cx-cab">'+ic('message-square-text')+'<h3>'+esc(m.nome)+'</h3></div><div class="md-corpo"><div class="md-sit">'+chipSit(m)+'<span class="nt">'+sitTexto(m)+(m.situacao==='Rascunho'&&etapasDe(m.id).length?' As etapas da régua que usam este modelo estão sem envio até nova aprovação.':'')+'</span><div class="cf-sv-b">'+(m.situacao!=='Aprovado'?'<button class="btn" data-cf="mdaprovar" data-id="'+m.id+'" style="width:auto;padding:0 14px;height:30px"'+(d!==undefined&&d!==m.texto?' disabled title="Salve o texto antes de aprovar"':'')+'>Aprovar</button>':'')+(m.situacao!=='Reprovado'?'<button class="btn sec" data-cf="mdreprovar" data-id="'+m.id+'" style="width:auto;padding:0 14px;height:30px">Reprovar</button>':'')+'</div></div><div class="campo"><label for="md-t">Texto do modelo</label><textarea class="cb-area" id="md-t" rows="9" data-mt="'+m.id+'">'+esc(txt)+'</textarea></div>'+
      '<div class="f-sub">Variáveis (toque para inserir)</div><div class="md-vars">'+m.vars.map(function(v){return '<button type="button" class="tag md-v" data-var="'+v+'" title="'+esc(VARS[v])+'">{'+v+'}</button>'}).join('')+'</div>'+
      '<div class="f-sub">Prévia com dados de exemplo</div><pre class="pv-txt md-pv" id="md-pv">'+esc(previa(txt))+'</pre></div>'+
      '<div class="cf-salvar"><span class="nt" id="md-pend">'+(d!==undefined&&d!==m.texto?'Alteração pendente.':'Nenhuma alteração pendente.')+'</span><div class="cf-sv-b"><button class="btn sec" data-cf="mddescartar" style="width:auto;padding:0 14px"'+(d!==undefined&&d!==m.texto?'':' disabled')+'>Descartar</button><button class="btn" data-cf="mdsalvar" data-id="'+m.id+'" style="width:auto;padding:0 16px"'+(d!==undefined&&d!==m.texto?'':' disabled')+'>Salvar modelo</button></div></div>';
@@ -160,21 +169,25 @@ function abaEtiquetas(){
 }
 /* ---------- recebimento por Pix (grava na hora, sem botão Salvar) ---------- */
 var RCUI={};
-var REC_NOMES={provedor:'Provedor do Pix',ambiente:'Ambiente',chavePix:'Chave Pix recebedora',validadeLinkDias:'Validade do link após o vencimento',jurosMultaLigado:'Juros e multa',multaPct:'Multa',jurosPct:'Juros ao mês',modoPix:'Modo padrão do Pix',basePadrao:'Base padrão da cobrança'};
+function mais1ano(){var d=new Date();d.setFullYear(d.getFullYear()+1);return d}
+function dt(d){return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear()}
+function menos90(v){var q=v.split('/');var d=new Date(+q[2],+q[1]-1,+q[0]);d.setDate(d.getDate()-90);return dt(d)}
+var REC_NOMES={clientId:'Client ID (Inter)',provedor:'Provedor do Pix',ambiente:'Ambiente',chavePix:'Chave Pix recebedora',validadeLinkDias:'Validade do link após o vencimento',jurosMultaLigado:'Juros e multa',multaPct:'Multa',jurosPct:'Juros ao mês',modoPix:'Modo padrão do Pix',basePadrao:'Base padrão da cobrança'};
 var REC_TXT={teste:'Teste',producao:'Produção',pagador:'Um Pix por pagador',loja:'Um Pix por loja'};
 function BASESL(){return (window.MKFechamento&&MKFechamento.bases&&MKFechamento.bases())||[{id:'faturamento_total',nome:'Faturamento total'},{id:'produtos',nome:'Valor dos produtos (sem frete)'},{id:'pedidos',nome:'Pedidos concluídos'},{id:'notas',nome:'Notas fiscais emitidas'},{id:'manual',nome:'Valor manual'}]}
 function baseNomeC(id){var b=BASESL().filter(function(x){return x.id===id})[0];return b?b.nome:id}
 function rcSel(k,ops,v){return '<select class="sel" id="rc-'+k+'" data-rc="'+k+'">'+ops.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===v?' selected':'')+'>'+esc(o[1])+'</option>'}).join('')+'</select>'}
 function rcCampo(k,l,ctl,d){return '<div class="campo cf-c"><label for="rc-'+k+'">'+l+'</label>'+ctl+(d?'<small class="nt">'+d+'</small>':'')+'</div>'}
 function rcNum(k,v,suf){return '<div class="cf-in"><input id="rc-'+k+'" data-rc="'+k+'" inputmode="decimal" value="'+esc(String(v).replace('.',','))+'">'+(suf?'<span>'+suf+'</span>':'')+'</div>'}
-function segRow(k,rot,meta){
+function segRow(k,rot,meta,ajuda){
   var abre=RCUI[k]||!meta;
-  return '<div class="mk-seg"><div><b>'+rot+'</b><div class="nt">'+(meta?'Cadastrado em '+esc(meta.t)+' por '+esc(meta.q):'Não cadastrado')+'</div></div>'+
+  return '<div class="mk-seg"><div><b>'+rot+'</b><div class="nt">'+(meta?'Cadastrado em '+esc(meta.t)+' por '+esc(meta.q):'Não cadastrado')+'</div>'+(ajuda?'<small class="nt cf-dica">'+ajuda+'</small>':'')+'</div>'+
    (abre?'<div class="mk-seg-in"><input type="password" autocomplete="new-password" id="rc-seg-'+k+'" placeholder="Cole o valor. Ele nunca é exibido" aria-label="'+esc(rot)+'"><button class="btn sec" data-cf="rcgravar" data-s="'+k+'" style="width:auto;padding:0 12px">Gravar</button></div>':'<button class="btn sec" data-cf="rctrocar" data-s="'+k+'" style="width:auto;padding:0 12px">Trocar</button>')+'</div>';
 }
 function configurado(R){
   if(!R.acesso[R.provedor])return 'Falta cadastrar a chave de acesso.';
-  if(R.provedor==='Banco Inter'){if(!R.cert)return 'Falta enviar o certificado.';if(!R.certSenha)return 'Falta cadastrar a senha do certificado.'}
+  if(R.provedor==='Banco Inter'){if(!R.clientId)return 'Falta informar o Client ID.';if(!R.cert)return 'Falta enviar o certificado .crt.';if(!R.seg.key)return 'Falta enviar a chave .key.'}
+  else if(!R.seg.tokenAviso)return 'Falta cadastrar o token do aviso de pagamento.';
   return '';
 }
 function cardsReceb(){
@@ -182,15 +195,21 @@ function cardsReceb(){
   var c1='<div class="cx"><div class="cx-cab">'+ic('plug-zap')+'<h3>Provedor do Pix</h3></div><div class="cf-corpo">'+
    rcCampo('provedor','Provedor do Pix',rcSel('provedor',[['Asaas','Asaas'],['Banco Inter','Banco Inter']],R.provedor))+
    rcCampo('ambiente','Ambiente',rcSel('ambiente',[['teste','Teste'],['producao','Produção']],R.ambiente),R.ambiente==='teste'?'No teste nenhum Pix vale de verdade.':'Em produção, os Pix são reais.')+
-   segRow('acesso','Chave de acesso',R.acesso[R.provedor])+
-   (inter?'<div class="mk-seg"><div><b>Certificado</b><div class="nt">'+(R.cert?esc(R.cert.nome)+' · enviado em '+esc(R.cert.t)+' por '+esc(R.cert.q):'Nenhum arquivo enviado')+'</div></div><input type="file" id="rc-cert" data-rc="cert" accept=".pfx,.p12,.pem" aria-label="Certificado do Banco Inter"></div>'+segRow('senha','Senha do certificado',R.certSenha):'')+
+   (inter?rcCampo('clientId','Client ID','<input id="rc-clientId" data-rc="clientId" autocomplete="off" value="'+esc(R.clientId)+'">','Código público da integração, criado no Internet Banking do Inter.')+
+    segRow('acesso','Client Secret',R.acesso[R.provedor],'Só grava. Depois de salvo, não aparece mais.')+
+    '<div class="mk-seg"><div><b>Certificado .crt</b><div class="nt">'+(R.cert?esc(R.cert.nome)+' · enviado em '+esc(R.cert.t)+' por '+esc(R.cert.q):'Nenhum arquivo enviado')+'</div>'+
+     (R.cert?'<div class="nt cf-val">Válido até <b>'+esc(R.cert.validade)+'</b> (1 ano). Aviso de renovação em '+esc(menos90(R.cert.validade))+', 90 dias antes.</div>':'<small class="nt cf-dica">O certificado vale 1 ano. O sistema avisa 90 dias antes de vencer.</small>')+'</div><input type="file" id="rc-cert" data-rc="cert" accept=".crt" aria-label="Certificado .crt do Banco Inter"></div>'+
+    ((R.seg.key&&!RCUI.key)?'<div class="mk-seg"><div><b>Chave privada .key</b><div class="nt">Enviada em '+esc(R.seg.key.t)+' por '+esc(R.seg.key.q)+' · conteúdo não exibido</div></div><button class="btn sec" data-cf="rctrocar" data-s="key" style="width:auto;padding:0 12px">Trocar</button></div>':'<div class="mk-seg"><div><b>Chave privada .key</b><div class="nt">Nenhum arquivo enviado</div><small class="nt cf-dica">Só grava. Depois de enviada, não aparece mais.</small></div><input type="file" id="rc-key" data-rc="keyfile" accept=".key" aria-label="Chave privada .key do Banco Inter"></div>')
+   :segRow('acesso','Chave de acesso',R.acesso[R.provedor],'Chave de API da conta Asaas. Só grava.')+segRow('tokenAviso','Token do aviso de pagamento',R.seg.tokenAviso,'De 32 a 255 caracteres. O Asaas manda esse token em cada aviso. Só grava.'))+
    rcCampo('chavePix','Chave Pix recebedora','<input id="rc-chavePix" data-rc="chavePix" value="'+esc(R.chavePix)+'">','Chave que recebe o dinheiro dos Pix.')+'</div></div>';
   var c2='<div class="cx"><div class="cx-cab">'+ic('radio')+'<h3>Aviso automático de pagamento</h3></div><div class="cf-corpo">'+
    '<div class="cf-sw"><div><b>Situação do aviso automático de pagamento</b><small>O provedor avisa o sistema assim que um Pix é pago.</small></div><span class="fs '+(ok?'vd':'gr')+'" id="rc-sit">'+(ok?'Recebendo':'Não está recebendo')+'</span></div>'+
    '<div class="cf-sw"><div><b>Último Pix recebido</b><small>'+esc(av.ultimo.t)+'</small></div><b>'+esc(av.ultimo.v)+'</b></div>'+
+   (inter?'<div class="fe-aviso"><span>Aviso do Inter: se o sistema devolver erro, o Inter tenta 4 vezes (20, 30, 60 e 120 minutos). Depois disso só dá para consultar e reenviar.</span></div><div class="cf-dica2"><b>Para o aviso do Inter funcionar (mTLS)</b><ul><li>Endereço do aviso em https: <span class="mono">https://api.itmk.com.br/avisos/inter</span></li><li>Arquivo <span class="mono">ca.crt</span> do Inter, baixado em Minhas integrações, Certificado Webhook (o sistema usa para conferir o aviso).</li><li>Liberar no firewall os blocos de IP do Inter. A lista é longa e muda: conferir na página Como configurar webhooks do Inter na hora de configurar.</li></ul></div>'
+   :'<div class="fe-aviso"><span>Aviso do Asaas: o sistema precisa responder HTTP 200 em até 10 segundos. Depois de 15 falhas seguidas a fila é pausada e é preciso reativar.</span></div><div class="cf-dica2"><b>Para o aviso do Asaas funcionar</b><ul><li>Endereço do aviso em https: <span class="mono">https://api.itmk.com.br/avisos/asaas</span></li><li>Token do aviso igual ao cadastrado ao lado.</li><li>Se usar firewall, liberar os IPs do Asaas em produção: <span class="mono">52.67.12.206, 18.230.8.159, 54.94.136.112, 54.94.183.101</span>.</li></ul></div>')+
    '<button class="btn" data-cf="rctestar" style="width:auto;padding:0 16px;align-self:flex-start">Testar conexão</button></div></div>';
   var c3='<div class="cx"><div class="cx-cab">'+ic('timer')+'<h3>Link, juros e multa</h3></div><div class="cf-corpo">'+
-   rcCampo('validadeLinkDias','Validade do link após o vencimento (dias)',rcNum('validadeLinkDias',R.validadeLinkDias,'dias'),'Depois desse prazo o Pix expira.')+
+   rcCampo('validadeLinkDias','Validade do link após o vencimento (dias)',rcNum('validadeLinkDias',R.validadeLinkDias,'dias'),(inter?'Padrão de 30 dias. No Inter existe campo próprio para esse prazo, e o sistema o envia na cobrança.':'Padrão de 30 dias. No Asaas o QR Code vale 12 meses, então o sistema remove a cobrança ao fim desse prazo.'))+
    '<div class="cf-sw"><div><b>Juros e multa</b><small>Desligado por padrão. Quando ligado, o Pix passa a cobrar os dois depois do vencimento.</small></div><label class="sw"><input type="checkbox" role="switch" data-rc="jurosMultaLigado"'+(R.jurosMultaLigado?' checked':'')+' aria-label="Juros e multa"><span></span></label></div>'+
    (R.jurosMultaLigado?'<div class="f-grade">'+rcCampo('multaPct','Multa (uma vez)',rcNum('multaPct',R.multaPct,'%'))+rcCampo('jurosPct','Juros (ao mês)',rcNum('jurosPct',R.jurosPct,'%'))+'</div>':'')+'</div></div>';
   var c4='<div class="cx"><div class="cx-cab">'+ic('qr-code')+'<h3>Modo padrão do Pix</h3></div><div class="cf-corpo">'+
@@ -201,7 +220,8 @@ function cardsReceb(){
 }
 function recebChange(t){
   var R=CFG.recebimento,k=t.dataset.rc,v,ant=R[k];
-  if(k==='cert'){var f=t.files&&t.files[0];if(!f)return;R.cert={nome:f.name,t:agora(),q:EU};reg('Recebimento · Certificado','—',f.name);pintar();U.toast('Certificado enviado. Ele não fica visível.');return}
+  if(k==='cert'){var f=t.files&&t.files[0];if(!f)return;if(!/\.crt$/i.test(f.name)){U.toast('Envie o arquivo .crt do certificado.');pintar();return}R.cert={nome:f.name,t:agora(),q:EU,validade:dt(mais1ano())};reg('Recebimento · Certificado .crt','—',f.name+' (válido até '+R.cert.validade+')');pintar();U.toast('Certificado enviado. Vale até '+R.cert.validade+'.');return}
+  if(k==='keyfile'){var f3=t.files&&t.files[0];if(!f3)return;if(!/\.key$/i.test(f3.name)){U.toast('Envie o arquivo .key da chave privada.');pintar();return}R.seg.key={t:agora(),q:EU};delete RCUI.key;reg('Recebimento · Chave privada .key','—','nova (conteúdo não exibido)');pintar();U.toast('Chave enviada. Ela não fica visível.');return}
   if(t.type==='checkbox')v=t.checked;else if(t.type==='radio')v=t.value;else v=t.value;
   if(k==='validadeLinkDias'||k==='multaPct'||k==='jurosPct'){
     var n=+String(v).replace(',','.');var max=k==='validadeLinkDias'?365:100;
@@ -226,8 +246,8 @@ function testarConexao(){
 function gravarSeg(k){
   var R=CFG.recebimento,i=document.getElementById('rc-seg-'+k);if(!i||!i.value.trim()){U.toast('Cole o valor para gravar.');return}
   var meta={t:agora(),q:EU};
-  if(k==='acesso')R.acesso[R.provedor]=meta;else R.certSenha=meta;
-  i.value='';delete RCUI[k];reg('Recebimento · '+(k==='acesso'?'Chave de acesso ('+R.provedor+')':'Senha do certificado'),'—','nova (valor não exibido)');
+  if(k==='acesso')R.acesso[R.provedor]=meta;else R.seg[k]=meta;
+  i.value='';delete RCUI[k];reg('Recebimento · '+(k==='acesso'?(R.provedor==='Banco Inter'?'Client Secret (Inter)':'Chave de acesso (Asaas)'):'Token do aviso de pagamento (Asaas)'),'—','nova (valor não exibido)');
   pintar();U.toast('Gravado. O valor não fica visível em nenhum lugar.');
 }
 function abaDados(){
@@ -320,7 +340,7 @@ function transferir(u){
     onOk:function(m){var d=m.querySelector('#tr-d').value,de=u.nome.split(' ')[0],para=d?d.split(' ')[0]:null,n=0;window.MK_CONV.forEach(function(c){if(c.dono===de){c.dono=para;n++}});reg('Dono das conversas · '+u.nome,n+' conversas',d||'sem dono');pintar();U.toast(n+' conversas transferidas. Elas continuam visíveis a quem tem o módulo.')}});
 }
 function etapaNova(){
-  var mods=CFG.modelos.filter(function(m){return m.texto});
+  var mods=aprovados();
   U.modal({titulo:'Nova etapa da régua',ok:'Criar etapa',html:'<div class="campo"><label for="ne-n">Nome da etapa <i class="obr">*</i></label><input id="ne-n"></div><div class="f-grade" style="margin-top:12px"><div class="campo"><label for="ne-d">Dias</label><input id="ne-d" inputmode="numeric" value="5"></div><div class="campo"><label for="ne-q">Quando</label><select class="sel" id="ne-q"><option value="antes">antes do vencimento</option><option value="depois" selected>depois do vencimento</option></select></div><div class="campo"><label for="ne-a">Ação</label><select class="sel" id="ne-a">'+Object.keys(ACOES).map(function(k){return '<option value="'+k+'">'+ACOES[k]+'</option>'}).join('')+'</select></div><div class="campo"><label for="ne-m">Modelo</label><select class="sel" id="ne-m">'+mods.map(function(m){return '<option value="'+m.id+'">'+esc(m.nome)+'</option>'}).join('')+'</select></div></div><small class="erro" id="ne-e" hidden></small>',
     onOk:function(m){var n=m.querySelector('#ne-n').value.trim(),d=parseInt(m.querySelector('#ne-d').value,10),er=m.querySelector('#ne-e');
       if(!n||isNaN(d)||d<0||d>365){er.textContent='Informe o nome e os dias (de 0 a 365).';er.hidden=false;return false}
@@ -354,7 +374,9 @@ document.addEventListener('click',function(e){
   else if(a==='rmetapa'){var et=CFG.etapas.filter(function(x){return String(x.id)===id})[0];confirmarExcluir('Remover etapa','A etapa <b>'+esc(et.nome)+'</b> deixa de disparar.',function(){CFG.etapas=CFG.etapas.filter(function(x){return x!==et});reg('Régua · etapa removida',et.nome,'—');pintar();U.toast('Etapa removida.')})}
   else if(a==='novaexc')excecaoNova();
   else if(a==='rmexc'){var ex=CFG.excecoes.filter(function(x){return String(x.id)===id})[0];CFG.excecoes=CFG.excecoes.filter(function(x){return x!==ex});reg('Régua · exceção removida',ex.pagador+': '+ex.regra,'—');pintar();U.toast('Exceção removida.')}
-  else if(a==='mdsalvar'){var m=CFG.modelos.filter(function(x){return x.id===id})[0],novo=DRAFT['m.'+id];if(novo===undefined||novo===m.texto)return;if(!novo.trim()){U.toast('O texto do modelo não pode ficar vazio.');return}reg('Modelos · '+m.nome,m.texto.slice(0,60)+(m.texto.length>60?'…':''),novo.slice(0,60)+(novo.length>60?'…':''));m.texto=novo;delete DRAFT['m.'+id];pintar();U.toast('Modelo salvo. Vale para as próximas mensagens.')}
+  else if(a==='mdsalvar'){var m=CFG.modelos.filter(function(x){return x.id===id})[0],novo=DRAFT['m.'+id];if(novo===undefined||novo===m.texto)return;if(!novo.trim()){U.toast('O texto do modelo não pode ficar vazio.');return}reg('Modelos · '+m.nome,m.texto.slice(0,60)+(m.texto.length>60?'…':''),novo.slice(0,60)+(novo.length>60?'…':''));m.texto=novo;delete DRAFT['m.'+id];var volta=m.situacao==='Aprovado'||m.situacao==='Reprovado';if(volta)mudarSit(m,'Rascunho','texto editado');pintar();U.toast(volta?'Modelo salvo e voltou para Rascunho. Precisa de nova aprovação.':'Modelo salvo.')}
+  else if(a==='mdaprovar'){var ma=CFG.modelos.filter(function(x){return x.id===id})[0];mudarSit(ma,'Aprovado');pintar();U.toast('Modelo aprovado. Já pode ser usado na régua e pelo robô.')}
+  else if(a==='mdreprovar'){var mr=CFG.modelos.filter(function(x){return x.id===id})[0],us=etapasDe(id);mudarSit(mr,'Reprovado');pintar();U.toast('Modelo reprovado.'+(us.length?' '+us.length+' etapa(s) da régua precisam de nova aprovação.':''))}
   else if(a==='mddescartar'){DRAFT={};pintar()}
   else if(a==='novarapida'){var r=CFG.modelos.filter(function(x){return x.id==='rapidas'})[0];r.rapidas.push({atalho:'novo',texto:'Escreva aqui a resposta.'});reg('Respostas rápidas · criada','—','/novo');pintar()}
   else if(a==='rmrapida'){var r2=CFG.modelos.filter(function(x){return x.id==='rapidas'})[0],i=+b.dataset.i;reg('Respostas rápidas · removida','/'+r2.rapidas[i].atalho,'—');r2.rapidas.splice(i,1);pintar();U.toast('Resposta removida.')}

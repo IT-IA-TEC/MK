@@ -39,6 +39,10 @@ function iniciar(){
 }
 /* ---------- regras (o que o robô pode fazer agora) ---------- */
 function ligado(pid){iniciar();return !ST.pausa.on&&ST.wa.ok&&PES[pid]&&PES[pid].st==='Atende'}
+function hojeTxt(){return fd(new Date())}
+function envHoje(pid){return LOG.filter(function(l){return l.t&&l.t.indexOf(hojeTxt())===0&&l.res==='Enviado'&&(pid===undefined||l.pid===pid)})}
+function minUltimo(pid){var e=envHoje(pid);if(!e.length)return 9999;var x=e[0].t.split(' ')[1].split(':'),d=new Date();return Math.round((d-new Date(d.getFullYear(),d.getMonth(),d.getDate(),+x[0],+x[1]))/60000)}
+function conferida(pid){var p=pag(pid);try{return p.lojas.every(function(l){var d=MKFechamento.dadosCalculo(pid,l.gs);return d&&d.conferidoPor})}catch(e){return true}}
 function verifica(pid,acao){
   iniciar();var p=pag(pid),r=[],ok=true,pe=PES[pid];
   function c(t,v,n){r.push({t:t,ok:v,n:n||''});if(!v)ok=false}
@@ -47,9 +51,17 @@ function verifica(pid,acao){
   c('Pagador atende',pe.st!=='Não atende',pe.st==='Não atende'?pe.motivo:pe.st==='Em teste'?'Em teste: só sugere, não envia':'');
   c('Ação liberada nas regras',!!REG.acoes[acao.k],'');
   var d=new Date(),hm=d2(d.getHours())+':'+d2(d.getMinutes());
-  c('Dia e horário permitidos',REG.hor.dias.indexOf(d.getDay())>-1&&hm>=REG.hor.ini&&hm<=REG.hor.fim,'Permitido das '+REG.hor.ini+' às '+REG.hor.fim);
-  c('Dentro dos limites de mensagens',true,'Máx. '+REG.lim.pag+' por pagador por dia');
-  c('Competência conferida',true,'Setembro/2026 conferida por Marina Costa');
+  var fer=REG.hor.feriados&&(','+REG.hor.lista.replace(/\s/g,'')+',').indexOf(','+d2(d.getDate())+'/'+d2(d.getMonth()+1)+',')>-1;
+  c('Dia e horário permitidos',REG.hor.dias.indexOf(d.getDay())>-1&&hm>=REG.hor.ini&&hm<=REG.hor.fim&&!fer,fer?'Hoje é feriado da lista':'Permitido das '+REG.hor.ini+' às '+REG.hor.fim);
+  var nh=envHoje(pid).length,nt=envHoje().length,mu=minUltimo(pid);
+  c('Limite por pagador no dia',nh<REG.lim.pag,'Hoje: '+nh+' de '+REG.lim.pag);
+  c('Limite total no dia',nt<REG.lim.dia,'Hoje: '+nt+' de '+REG.lim.dia);
+  c('Intervalo desde a última mensagem',mu>=REG.lim.int,mu>=9999?'Nenhuma mensagem hoje':'Última há '+mu+' min, mínimo '+REG.lim.int);
+  c('Cliente não pediu para parar',!pe.optOut,pe.optOut?'Opt-out registrado':'');
+  var cf=conferida(pid);
+  c('Competência conferida',cf,cf?'Conferida no Fechamento':'Há loja sem conferência no Fechamento');
+  var md=(window.MK_CFG&&MK_CFG.modelos)?MK_CFG.modelos.filter(function(m){return m.situacao==='Aprovado'}).length:null;
+  if(md!==null)c('Há modelo de mensagem aprovado',md>0,md>0?md+' modelos aprovados':'Nenhum modelo aprovado em Configurações');
   if(p.promessa&&REG.pausas.promessa)c('Sem promessa ativa',false,'Promessa para '+p.promessa.data);
   if(p.acordo&&REG.pausas.acordo)c('Sem acordo ativo',false,'Acordo em andamento');
   return {ok:ok&&pe.st!=='Em teste',itens:r,teste:pe.st==='Em teste'};
@@ -136,8 +148,10 @@ function refaz(){var y=window.scrollY;render();window.scrollTo(0,y)}
 function motivoModal(tit,txt,cb){
   U.modal({titulo:tit,ok:'Confirmar',html:'<p class="dica-m">'+txt+'</p><div class="campo"><label for="mt">Motivo <i class="obr">*</i></label><textarea class="cb-area" id="mt" rows="3"></textarea><small class="erro" id="mt-e" hidden>Escreva o motivo.</small></div>',onOk:function(m){var v=m.querySelector('#mt').value.trim();if(!v){m.querySelector('#mt-e').hidden=false;return false}cb(v)}});
 }
+function optOut(pid){iniciar();var e=PES[pid];e.optOut=true;e.st='Não atende';e.motivo='Pediu para parar de receber mensagens (opt-out)';e.desde=fd(new Date());e.quem=EU;log(pid,'Opt-out registrado','Pedido do cliente','Cliente pediu para parar','Registrado');avisar()}
 function definir(pid,st,motivo,quem){
-  iniciar();var e=PES[pid];e.st=st;e.motivo=st==='Atende'?'':(motivo||'');e.desde=fd(new Date());e.quem=quem||EU;log(pid,'Situação do robô alterada','Ação de uma pessoa','Agora: '+st+(motivo?'. Motivo: '+motivo:''),'Registrado');avisar();
+  iniciar();var e=PES[pid];if(e.optOut&&st==='Atende'){U.toast('Quem pediu para parar só volta com decisão do P.O. no cadastro.');}
+  e.st=st;e.motivo=st==='Atende'?'':(motivo||'');if(st==='Atende')e.optOut=false;e.desde=fd(new Date());e.quem=quem||EU;log(pid,'Situação do robô alterada','Ação de uma pessoa','Agora: '+st+(motivo?'. Motivo: '+motivo:''),'Registrado');avisar();
 }
 function escalar(pid,motivo){iniciar();if(!HUM.some(function(h){return h.pid===pid}))HUM.unshift({pid:pid,motivo:motivo,espera:1,resp:'Sem dono'});log(pid,'Passou para uma pessoa','Escalação','',motivo);avisar()}
 function acao(b){
@@ -181,6 +195,6 @@ document.addEventListener('input',function(e){
   if(t.id==='rb-q'){fqP=t.value;var p=t.selectionStart;pintar();var n=document.getElementById('rb-q');if(n){n.focus();n.setSelectionRange(p,p)}}
   if(t.id==='rb-aq'){aq=t.value;var p2=t.selectionStart;pintar();var n2=document.getElementById('rb-aq');if(n2){n2.focus();n2.setSelectionRange(p2,p2)}}
 });
-function api(){iniciar();return {situacao:function(pid){iniciar();return PES[pid]||{st:'Atende',motivo:'',desde:'',quem:''}},definir:definir,pausado:function(){return ST.pausa.on},ligado:ligado,escalar:escalar,log:log,quandoMudar:function(f){ouvintes.push(f)},modelo:modelo}}
+function api(){iniciar();return {situacao:function(pid){iniciar();return PES[pid]||{st:'Atende',motivo:'',desde:'',quem:''}},definir:definir,optOut:optOut,pausado:function(){return ST.pausa.on},ligado:ligado,escalar:escalar,log:log,quandoMudar:function(f){ouvintes.push(f)},modelo:modelo}}
 return {render:render,api:api,nomeCanal:'WhatsGW'};
 })();

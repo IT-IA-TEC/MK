@@ -68,3 +68,15 @@
 .f-sub .btn{font-family:var(--f-corpo);text-transform:none;letter-spacing:0}
 .cf-col{display:flex;flex-direction:column;gap:12px;min-width:0}
 .cf-col>.cx:last-child{flex:1}
+/* recebimento e aprovação de modelos */
+.cf-dica{display:block;margin-top:2px;overflow-wrap:anywhere}
+.cf-val{margin-top:2px;overflow-wrap:anywhere}
+.cf-dica2{border:1px solid var(--borda);border-radius:var(--raio-bloco);padding:10px 12px;font-size:12.5px;color:var(--apoio);overflow-wrap:anywhere}
+.cf-dica2 b{color:var(--texto-2);font-size:13px}
+.cf-dica2 ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.cf-pend{display:block;margin-top:4px;overflow-wrap:anywhere}
+.mk-seg input[type=file]{max-width:100%;min-width:0}
+.md-i{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.md-i span:first-child{min-width:0;overflow-wrap:anywhere}
+.md-sit{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding-bottom:10px;border-bottom:1px solid var(--borda)}
+.md-sit>.nt{flex:1 1 220px;min-width:0;overflow-wrap:anywhere}

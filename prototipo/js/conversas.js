@@ -247,5 +247,5 @@ document.addEventListener('keydown',function(e){
   if(e.target.id==='ch-txt'&&e.key==='Escape')qrFechar();
   if(e.key==='Enter'&&e.target.classList&&e.target.classList.contains('cv-item')){abrirConversa(CONV.filter(function(c){return String(c.id)===e.target.dataset.c})[0],true)}
 });
-return {render:render};
+return {render:render,abrirPag:function(pid){var c=CONV.filter(function(x){return x.pag===pid&&!x.arq})[0];if(c){sel=c;aba='todas';busca=''}}};
 })();

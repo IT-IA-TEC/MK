@@ -93,7 +93,7 @@ document.addEventListener('click',function(e){
   if(e.target.closest('#novo')){novo();return}
   if(e.target.closest('#limpar')){MKFiltro.limpar();fLoja='';fFin='';fRobo='';render();return}
   var z=e.target.closest('[data-zap]');
-  if(z){var p=DADOS.filter(function(x){return String(x.id)===z.dataset.zap})[0];aviso('Abriria a conversa de '+p.nome+' na tela Conversas. Ainda sem função.');return}
+  if(z){var p=DADOS.filter(function(x){return String(x.id)===z.dataset.zap})[0];if(window.MKConversas&&MKConversas.abrirPag)MKConversas.abrirPag(p.id);if(window.MKApp)MKApp.ir('conversas');return}
   var l=e.target.closest('.pag-lin');if(l)MKFicha.abrir(DADOS.filter(function(x){return String(x.id)===l.dataset.id})[0]);
 });
 document.addEventListener('keydown',function(e){

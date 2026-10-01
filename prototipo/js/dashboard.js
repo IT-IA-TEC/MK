@@ -140,13 +140,15 @@ function gaveta(id){
   var g=document.createElement('aside');g.className='gaveta';g.id='gaveta';g.setAttribute('role','dialog');g.setAttribute('aria-modal','true');g.setAttribute('aria-label',titulo);
   g.innerHTML='<div class="gaveta-cab"><div><h3>'+titulo+'</h3><p>'+sub+'</p></div><button class="fechar" id="fechar" aria-label="Fechar">'+ic('x')+'</button></div>'+
    '<div class="gaveta-corpo">'+(linhas.length?linhas.map(function(x){return '<div class="g-lin"><div style="min-width:0"><div class="pg">'+esc(x.p)+'</div><div class="nt">'+esc(x.l.join(', '))+'</div></div>'+'<div class="din">'+R(x.v)+'</div>'+'<div class="nt" style="grid-column:1 / -1">'+status(x)+'</div></div>'}).join(''):'<div class="nada">Nada neste período.</div>')+'</div>'+
-   '<div class="gaveta-pe">Mostrando '+linhas.length+' de '+tot+'. Lista de exemplo.</div>';
+   '<div class="gaveta-pe" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><span>Mostrando '+linhas.length+' de '+tot+'. Lista de exemplo.</span><button class="btn sec" id="g-origem" style="width:auto;padding:0 14px">Abrir a tela de origem</button></div>';
   document.body.appendChild(v);document.body.appendChild(g);
   if(window.lucide)lucide.createIcons();
   requestAnimationFrame(function(){v.classList.add('aberto');g.classList.add('aberto')});
   function fechar(){v.classList.remove('aberto');g.classList.remove('aberto');document.removeEventListener('keydown',tecla);setTimeout(function(){v.remove();g.remove();if(ant&&ant.focus)ant.focus()},240)}
   function tecla(e){if(e.key==='Escape')fechar()}
   document.addEventListener('keydown',tecla);v.addEventListener('click',fechar);g.querySelector('#fechar').addEventListener('click',fechar);g.querySelector('#fechar').focus();
+  var dest={cobrado:'fechamento',recebido:'recebimentos',avencer:'fechamento',vencido:'inadimplencia',pont:'recebimentos',pixhoje:'recebimentos'}[id];
+  g.querySelector('#g-origem').addEventListener('click',function(){fechar();if(window.MKApp)MKApp.ir(dest)});
 }
 function aviso(msg){
   var t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.className='toast';t.setAttribute('role','status');document.body.appendChild(t)}

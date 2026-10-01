@@ -32,5 +32,8 @@ $('#form-login').addEventListener('submit',function(e){
   menu();mostrar();
 });
 window.MKApp={ir:function(id){ativo=id;menu();mostrar()}};
+document.addEventListener('keydown',function(e){
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('[role="button"][tabindex]')&&!e.target.matches('.cv-item,.pag-lin,tr.mk-lin,.ev-lin,button,a,input,select,textarea')){e.preventDefault();e.target.click()}
+});
 icones();
 })();
