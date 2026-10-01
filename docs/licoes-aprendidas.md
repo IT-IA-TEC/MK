@@ -142,6 +142,16 @@ Fonte: leitura de toda a conversa. Cada erro tem: o que aconteceu, por que passo
   4. Deixar no repositório o arquivo exatamente como foi enviado.
   5. Registrar a regra no CLAUDE.md. (aplicado)
 
+## 15. Mandei um arquivo com decisões do dono ainda em aberto
+- **O que houve:** a especificação para o BL foi enviada com duas decisões "pendentes" marcadas no texto. O dono já a usaria.
+- **Por que passou:** achei que marcar como pendente era suficiente.
+- **5 soluções:**
+  1. Resposta ambígua do dono vale como dúvida aberta: perguntar de novo, mais simples.
+  2. Antes de enviar, listar as decisões do arquivo e a resposta clara de cada uma.
+  3. Pendência no arquivo só quando o dono mandou enviar assim.
+  4. Se enviei antes da hora, mandar versão nova com número novo e dizer que a anterior deve ser descartada.
+  5. Regra gravada no CLAUDE.md. (aplicado)
+
 ## O ritual fixo (nunca mudar)
 1. Chega arquivo ou regra nova → conferir ponto por ponto → responder certo / só em parte / falta.
 2. Listar todas as dúvidas → perguntar todas → esperar.

@@ -47,7 +47,7 @@
 
 ## Meu jeito de trabalhar (obrigatório, nunca mudar)
 Detalhes e motivos em `docs/licoes-aprendidas.md`.
-1. **Dúvida primeiro, arquivo depois.** Listar todas as dúvidas, perguntar, esperar. Só com zero dúvidas gerar e enviar. Sugestão minha nunca vale como decisão do dono.
+1. **Dúvida primeiro, arquivo depois.** Listar todas as dúvidas, perguntar, esperar. Só com zero dúvidas gerar e enviar. Isso vale também quando a dúvida pode ser "marcada como pendente" dentro do arquivo: marcar pendência no arquivo NÃO substitui a resposta. Antes de enviar, reler as respostas do dono e conferir se cada dúvida foi respondida de forma clara; resposta ambígua é dúvida aberta e se pergunta de novo, em palavras mais simples. Sugestão minha nunca vale como decisão do dono.
 2. **Mesmo ritual sempre.** Em todo arquivo de lote, dizer em qual aba colar (Frontend, Backend, Database ou Integrações) e se vai no Criar ou no Editar em lote. Arquivo ou regra nova → conferir ponto por ponto (certo / só em parte / falta) → montar → validar → enviar os arquivos com a ordem de colar → esperar a confirmação. Nunca trocar esse caminho.
 3. **Arquivo enviado nunca é trocado.** O dono executa assim que recebe. Se achar erro depois de enviar, criar um arquivo NOVO (número seguinte) que corrige, e dizer qual já foi enviado e qual é a correção. Conferir tudo antes de enviar.
 4. **Só dizer "conferido" o que de fato conferi,** e dizer o que não deu para conferir. Avisar qualquer mudança nas minhas ferramentas.
