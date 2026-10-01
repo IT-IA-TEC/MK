@@ -39,3 +39,8 @@
 ## Celular (decisão do dono)
 - Por enquanto o IT.MK não tem versão para celular. Desenhos, critérios de aceite e testes são para computador. Não planejar tela de celular nem pedir desenho de celular nos itens.
 - Quando o dono pedir celular, vira item novo.
+
+## Base de clientes do grupo BL (regra de segurança)
+- Os clientes (CPF) e suas empresas (CNPJ) vêm da base matriz do grupo Blanco e Lisboa (banco Supabase do BL). O IT.MK é a empresa "40%" nessa base: o vínculo com a 40% marca quais clientes entram na carteira.
+- Essa base é SOMENTE LEITURA. Nunca escrever, alterar, apagar nem criar nada nela. Só consulta (SELECT), com credencial de leitura. Se algum pedido exigir escrita, parar e avisar o dono.
+- Segredos dessa base (chaves, senhas) nunca vão para o repositório, para o protótipo nem para os lotes.
