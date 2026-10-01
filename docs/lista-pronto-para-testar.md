@@ -161,3 +161,6 @@ Atualizado em 02/10/2026. Vale para o desenho publicado (versão 27): https://cl
 | Coluna Base com seletor (Fechamento do mês) | as bases que a Kwai entrega ainda estão "a confirmar" |
 | Regras padrão e base padrão (Configurações) | um critério ainda fala em "dias até bloquear", regra antiga que mudou; precisa de ajuste no item antes |
 | Foco e navegação por teclado (Qualidade das telas) | o teste da tecla Tab ainda não foi feito |
+
+## Atualização de 02/10/2026
+Teste de teclado feito: Tab percorre os campos sem travar nem cair em elemento invisível, Esc fecha gavetas, janelas e menus, e Enter abre a linha (Pagadores, lojas em Marketplaces e Conversas). Achei e corrigi um defeito: Enter na linha de Pagadores abria a ficha e fechava na hora. O item **Foco e navegação por teclado** pode ir para Pronto para testar (108 itens).

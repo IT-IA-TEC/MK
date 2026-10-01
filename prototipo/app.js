@@ -32,6 +32,10 @@ $('#form-login').addEventListener('submit',function(e){
   menu();mostrar();
 });
 window.MKApp={ir:function(id){ativo=id;menu();mostrar()}};
+/* Enter numa linha abre a gaveta e leva o foco ao botão Fechar; sem isto o navegador repete o Enter nesse botão e fecha a gaveta na hora */
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&e.target.matches&&e.target.matches('.cv-item,.pag-lin,tr.mk-lin,.ev-lin'))e.preventDefault();
+},true);
 document.addEventListener('keydown',function(e){
   if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('[role="button"][tabindex]')&&!e.target.matches('.cv-item,.pag-lin,tr.mk-lin,.ev-lin,button,a,input,select,textarea')){e.preventDefault();e.target.click()}
 });
