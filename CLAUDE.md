@@ -25,3 +25,7 @@
 ## Base de método para planos e estrutura
 - Todo plano, estrutura, backlog ou roteiro pedido pelo dono segue `docs/base-po.md` (resumo dos 4 materiais de Product Owner enviados pelo dono) e é sempre voltado ao IT.MK.
 - Use o modelo da seção 10 desse arquivo: visão e meta, partes interessadas, valor, roadmap com datas, histórias e épicos, critérios de aceite, prioridade, plano de versões, riscos e o que não foi verificado, acompanhamento.
+
+## Base de conhecimento dos agentes
+- Mapa em `docs/kb-mapa.md` (repositório IT-HUB-IA/Agent-s-Conhecimento, 89 mil arquivos) e manuais prontos em `docs/kb/`.
+- Antes de montar plano de qualquer frente (Frontend, Backend, Database, Integrações), leia o manual da frente em `docs/kb/` e busque no repositório o que faltar. O que a base não cobre (ex.: Supabase, WhatsGW) deve ser dito como "não coberto pela base".
