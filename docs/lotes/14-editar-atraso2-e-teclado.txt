@@ -1,8 +1,12 @@
 # Atraso 2 passa para o dia 5 (decisão de 02/10/2026, editável em Configurações) e o teste de teclado do Frontend foi feito.
 
 editar: BL-336
-  tirar aceite: As etapas partem das seis do protótipo: Lembrete no dia -2, Vencimento no dia 0, Atraso 1 no dia 3, Atraso 2 no dia 10, Aviso de bloqueio 3 dias antes do último dia do mês do vencimento e Pedir bloqueio nesse último dia
+  trocar aceites: sim
+  aceite: A tabela etapa_regua guarda dia relativo ao vencimento, ação, modelo, ativa e condição, com check do tipo de ação
   aceite: As etapas partem das seis do protótipo: Lembrete no dia -2, Vencimento no dia 0, Atraso 1 no dia 3, Atraso 2 no dia 5, Aviso de bloqueio 3 dias antes do último dia do mês do vencimento e Pedir bloqueio nesse último dia
+  aceite: As etapas de bloqueio são guardadas como regra de calendário (relativa ao último dia do mês do vencimento) e não como número fixo de dias
+  aceite: Dois dias iguais na mesma régua são recusados, e etapa aponta só para modelo aprovado
+  aceite: A regra de pausa (promessa, acordo, contestação) fica no código e não nos dados, e exceções por pagador (Não cobrar, Régua mais firme, Régua mais leve) ficam em tabela própria
 
 editar: Foco e navegação por teclado
   no épico: Qualidade das telas
