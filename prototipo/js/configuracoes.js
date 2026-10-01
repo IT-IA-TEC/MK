@@ -30,8 +30,8 @@ function iniciar(){
       {id:2,nome:'Vencimento',dia:0,acao:'rev',modelo:'lembrete',ativa:true},
       {id:3,nome:'Atraso 1',dia:3,acao:'rev',modelo:'atraso',ativa:true},
       {id:4,nome:'Atraso 2',dia:10,acao:'rev',modelo:'atraso',ativa:true},
-      {id:5,nome:'Aviso de bloqueio',dia:20,acao:'auto',modelo:'aviso',ativa:true},
-      {id:6,nome:'Pedir bloqueio',dia:25,acao:'equipe',modelo:'solic_bloq',ativa:true}
+      {id:5,nome:'Aviso de bloqueio',dia:7,acao:'auto',modelo:'aviso',ativa:true},
+      {id:6,nome:'Pedir bloqueio',dia:10,acao:'equipe',modelo:'solic_bloq',ativa:true}
     ],
     pausas:{promessa:true,acordo:true},
     excecoes:[{id:1,pagador:'ALBERTO NUNES DE CARVALHO',regra:'Não cobrar'},{id:2,pagador:'ALEXANDRE TEIXEIRA GOMES',regra:'Régua mais firme'},{id:3,pagador:'ADRIANO APARECIDO SANTOS PEREIRA',regra:'Régua mais leve'}],
@@ -108,7 +108,7 @@ var ACOES={equipe:'Só avisar a equipe',rev:'Enviar mensagem com revisão',auto:
 function quando(d){return d<0?'antes':d===0?'no dia':'depois'}
 function abaRegua(){
   var et=CFG.etapas.slice().sort(function(a,b){return a.dia-b.dia}),mods=aprovados();
-  return '<div class="fe-barra"><div class="fe-info">Sequência automática por dias em relação ao vencimento. Promessa ativa e acordo em dia pausam a régua.</div><button class="btn" data-cf="novaetapa" style="width:auto;padding:0 14px">Nova etapa</button></div>'+
+  return '<div class="fe-barra"><div class="fe-info">Sequência automática por dias em relação ao vencimento. O aviso de bloqueio sai 3 dias antes do último dia do mês do vencimento, e o pedido de bloqueio é nesse último dia (os dias da tabela são para mês de 30 dias). Promessa ativa e acordo em dia pausam a régua.</div><button class="btn" data-cf="novaetapa" style="width:auto;padding:0 14px">Nova etapa</button></div>'+
    '<div class="tab-cartao"><table class="tab-fe tab-cf"><colgroup><col style="width:13%"><col style="width:27%"><col style="width:24%"><col style="width:20%"><col style="width:6%"><col style="width:10%"></colgroup><thead><tr><th>Etapa</th><th>Quando (em relação ao vencimento)</th><th>Ação</th><th>Modelo de mensagem</th><th class="c">Ativa</th><th></th></tr></thead><tbody>'+
    et.map(function(e){return '<tr><td data-rot="Etapa"><div class="lj-n">'+esc(e.nome)+'</div></td><td data-rot="Quando"><div class="cf-quando"><input class="sel" data-et="'+e.id+'" data-ef="dias" inputmode="numeric" value="'+Math.abs(e.dia)+'" '+(e.dia===0?'disabled':'')+' aria-label="Dias da etapa '+esc(e.nome)+'"><select class="sel" data-et="'+e.id+'" data-ef="quando" aria-label="Quando, etapa '+esc(e.nome)+'">'+[['antes','dias antes'],['no dia','no dia'],['depois','dias depois']].map(function(o){return '<option value="'+o[0]+'"'+(quando(e.dia)===o[0]?' selected':'')+'>'+o[1]+'</option>'}).join('')+'</select></div></td>'+
     '<td data-rot="Ação"><select class="sel" data-et="'+e.id+'" data-ef="acao" aria-label="Ação, etapa '+esc(e.nome)+'">'+Object.keys(ACOES).map(function(k){return '<option value="'+k+'"'+(e.acao===k?' selected':'')+'>'+ACOES[k]+'</option>'}).join('')+'</select></td>'+
@@ -152,7 +152,7 @@ function abaModelos(){
 }
 function abaBloqueio(){
   var b=CFG.bloqueio,l=[];if(b.nome)l.push('• NOME DA LOJA');if(b.gs)l.push('  GS 00000000000000');if(b.codigo)l.push('  Código 000');
-  return '<div class="cf-grade2"><div class="cx"><div class="cx-cab">'+ic('lock')+'<h3>Grupo e prazo</h3></div><div class="cf-corpo">'+campos('bloqueio',['bloqueio.grupo','bloqueio.prazo'])+'</div></div>'+
+  return '<div class="cf-grade2"><div class="cx"><div class="cx-cab">'+ic('lock')+'<h3>Grupo e prazo</h3></div><div class="cf-corpo">'+campos('bloqueio',['bloqueio.grupo'])+'<p class="cf-dica" style="margin-top:10px">Prazo de bloqueio: a loja é bloqueada se o pagamento não chegar até o último dia do mês do vencimento (30 ou 31, ou 28 ou 29 em fevereiro).</p></div></div>'+
    '<div class="cx"><div class="cx-cab">'+ic('file-text')+'<h3>Formato da solicitação</h3></div><div class="cf-corpo">'+campos('bloqueio',['bloqueio.nome','bloqueio.gs','bloqueio.codigo','bloqueio.vcard'])+'<div class="f-sub">Como a mensagem chega ao grupo</div><pre class="pv-txt md-pv" id="bl-pv">'+esc(blPrev())+'</pre></div></div>'+
    '<div class="cx"><div class="cx-cab">'+ic('user-check')+'<h3>Quem confirma</h3></div><div class="cf-corpo">'+campos('bloqueio',['bloqueio.confirmam'])+'</div></div></div>'+barraSalvar();
 }

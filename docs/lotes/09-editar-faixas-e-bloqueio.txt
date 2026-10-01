@@ -1,0 +1,23 @@
+# Faixas de atraso novas (1-7, 8-15, 16-30, 31-60, 61-90, 91+) e bloqueio no último dia do mês do vencimento (decisões de 02/10/2026).
+
+editar: Competência e relógio injetado
+  tirar aceite: Um teste com data fixa prova que a cobrança com vencimento em 20/10/2026 está em atraso de 1 dia em 21/10/2026 e na faixa até 30 dias
+  aceite: Um teste com data fixa prova que a cobrança com vencimento em 20/10/2026 está em atraso de 1 dia em 21/10/2026 e na faixa de 1 a 7 dias
+
+editar: Faixas de atraso e carteira em atraso
+  tirar aceite: A faixa é objeto de valor (até 30 dias, 31 a 60, 61 a 90 e acima de 90) e o teste cobre os limites 30, 31, 60, 61, 90 e 91 dias
+  aceite: A faixa é objeto de valor (1 a 7, 8 a 15, 16 a 30, 31 a 60, 61 a 90 e acima de 90 dias) e o teste cobre os limites 7, 8, 15, 16, 30, 31, 60, 61, 90 e 91 dias
+
+editar: Pedir bloqueio e desbloqueio ao grupo
+  tirar aceite: A loja entra em A pedir quando passa do prazo de Configurações (hoje 15 dias de atraso), está ativa e a régua não está pausada
+  aceite: A loja entra em A pedir quando passa do último dia do mês do vencimento (30 ou 31, ou 28 ou 29 em fevereiro), está ativa e a régua não está pausada
+  aceite: Um teste com data fixa prova o limite em mês de 30 dias, de 31 dias e em fevereiro de ano comum e bissexto
+
+editar: Relatórios de cobrança
+  tirar aceite: O envelhecimento soma quantidade e valor por faixa (até 30, 31 a 60, 61 a 90 e acima de 90), e o total das faixas é igual ao valor vencido
+  aceite: O envelhecimento soma quantidade e valor por faixa (1 a 7, 8 a 15, 16 a 30, 31 a 60, 61 a 90 e acima de 90), e o total das faixas é igual ao valor vencido
+
+editar: BL-336
+  tirar aceite: As etapas partem das seis do protótipo: Lembrete no dia -2, Vencimento no dia 0, Atraso 1 no dia 3, Atraso 2 no dia 10, Aviso de bloqueio no dia 20 e Pedir bloqueio no dia 25
+  aceite: As etapas partem das seis do protótipo: Lembrete no dia -2, Vencimento no dia 0, Atraso 1 no dia 3, Atraso 2 no dia 10, Aviso de bloqueio 3 dias antes do último dia do mês do vencimento e Pedir bloqueio nesse último dia
+  aceite: As etapas de bloqueio são guardadas como regra de calendário (relativa ao último dia do mês do vencimento) e não como número fixo de dias

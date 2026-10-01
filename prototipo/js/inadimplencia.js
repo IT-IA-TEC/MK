@@ -54,7 +54,7 @@ function casa(t,p,extra){
   if(n&&p.lojas.some(function(l){return l.gs.indexOf(n)>-1}))return true;
   return p.lojas.some(function(l){return so(l.n).indexOf(s)>-1})||(extra&&so(extra).indexOf(s)>-1);
 }
-function faixaDe(d){return d<=30?'1':d<=60?'2':d<=90?'3':'4'}
+function faixaDe(d){return d<=7?'1':d<=15?'2':d<=30?'3':d<=60?'4':d<=90?'5':'6'}
 function bloqRows(){
   var rows=[],api=RC();
   PAGS.forEach(function(p){
@@ -67,7 +67,7 @@ function bloqRows(){
         else if(quit&&!(p.fin==='acordo'))sit='desbloqueio a pedir';
         else sit='confirmado';
       }else if(b&&b.sit==='enviado ao grupo'&&b.tipo==='bloqueio'){sit='enviado ao grupo';desde='—';motivo=b.motivo}
-      else if(em&&em.dias>15&&l.st==='ativa'&&!reguaPausada(p)){sit='a pedir';desde='—';motivo='Passou do prazo da régua ('+em.dias+' dias de atraso)'}
+      else if(em&&em.dias>10&&l.st==='ativa'&&!reguaPausada(p)){sit='a pedir';desde='—';motivo='Passou do último dia do mês do vencimento ('+em.dias+' dias de atraso)'}
       if(sit)rows.push({p:p,l:l,sit:sit,desde:desde,motivo:motivo,tipo:b&&b.tipo});
     });
   });
@@ -117,14 +117,14 @@ function topo(){
 }
 function abaAtraso(){
   var todos=atrasos(),lista=todos.filter(function(a){return casa(q,a.p)});
-  var cnt={todas:lista.length,'1':0,'2':0,'3':0,'4':0};lista.forEach(function(a){cnt[faixaDe(a.dias)]++});
+  var cnt={todas:lista.length,'1':0,'2':0,'3':0,'4':0,'5':0,'6':0};lista.forEach(function(a){cnt[faixaDe(a.dias)]++});
   var l=lista.filter(function(a){
     if(faixa!=='todas'&&faixaDe(a.dias)!==faixa)return false;
     if(ext.promessa&&!a.p.promessa)return false;if(ext.acordo&&!acordoAtivo(a.p))return false;
     if(ext.bloq&&!a.p.lojas.some(function(x){return x.st==='bloqueada'}))return false;
     if(ext.semcontato&&contato(a.p)<ext.n)return false;return true;
   });
-  var F1=[['todas','Todas'],['1','1 a 30 dias'],['2','31 a 60 dias'],['3','61 a 90 dias'],['4','Mais de 90 dias']];
+  var F1=[['todas','Todas'],['1','1 a 7 dias'],['2','8 a 15 dias'],['3','16 a 30 dias'],['4','31 a 60 dias'],['5','61 a 90 dias'],['6','Mais de 90 dias']];
   var X=[['promessa','Com promessa ativa'],['acordo','Com acordo'],['bloq','Bloqueado'],['semcontato','Sem contato há']];
   return '<div class="ia-filtros"><div class="fe-filtros">'+F1.map(function(x){return '<button class="chip-f" data-faixa="'+x[0]+'" aria-pressed="'+(faixa===x[0])+'">'+x[1]+' <b>'+cnt[x[0]]+'</b></button>'}).join('')+'</div>'+
    '<div class="fe-filtros ia-ext">'+X.map(function(x){return '<button class="chip-f" data-ext="'+x[0]+'" aria-pressed="'+ext[x[0]]+'">'+x[1]+(x[0]==='semcontato'?' '+ext.n+' dias':'')+'</button>'}).join('')+'<label class="ia-n"><span class="sr">Dias sem contato</span><input class="sel" id="ia-n" type="number" min="1" max="365" value="'+ext.n+'" title="Dias sem contato"></label></div></div>'+
@@ -195,9 +195,9 @@ function relDia(d){
   return {ds:ds,cobrado:cats[0][2],rec:rec,comp:comp,blq:cats[5][1],ac:cats[4][1],cats:cats};
 }
 function faixas(){
-  var a=atrasos(),F1=[['1 a 30 dias',0],['31 a 60 dias',0],['61 a 90 dias',0],['Mais de 90 dias',0]],q1=[0,0,0,0],v1=[0,0,0,0];
+  var a=atrasos(),F1=[['1 a 7 dias',0],['8 a 15 dias',0],['16 a 30 dias',0],['31 a 60 dias',0],['61 a 90 dias',0],['Mais de 90 dias',0]],q1=[0,0,0,0,0,0],v1=[0,0,0,0,0,0];
   a.forEach(function(x){var i=+faixaDe(x.dias)-1;q1[i]++;v1[i]+=x.valor});
-  BAIXAS.forEach(function(b){q1[3]++;v1[3]+=b.valor});
+  BAIXAS.forEach(function(b){q1[5]++;v1[5]+=b.valor});
   return F1.map(function(f,i){return [f[0],q1[i],v1[i]]});
 }
 function abaRel(){
