@@ -1,0 +1,16 @@
+# Decisões do dono (02/10/2026) após a varredura do BL: vínculo direto cliente com a 40%, loja_canal generalizada e alíquota configurável de quatro jeitos. Aba: qualquer uma (Editar em lote).
+
+editar: Marcar o vínculo da 40% nos clientes no sistema do BL
+  no épico: Pendências fora do sistema
+  aceite: O vínculo é criado direto entre o cliente (CPF) e a 40%, novo, e não é derivado pela empresa; o vínculo da empresa com a companhia que já existe não muda
+editar: Criar na ficha do BL os campos que o IT.MK precisa
+  no épico: Pendências fora do sistema
+  aceite: O vínculo cliente com a 40% guarda data de início, data de fim, motivo de saída, detalhe e quem registrou
+  aceite: A tabela de lojas que já existe (loja_canal, vazia) é generalizada por migração segura: codigo_gs vira codigo_loja, canal vira plataforma, e entram cpf_dono (um só por loja), data_inicio e situacao, com chave única por plataforma e código
+  aceite: A transferência de dono da loja grava histórico e não sobrescreve
+editar: BL: Configurar percentual da 40%, alíquota e base de cálculo
+  no épico: Cálculo da cobrança no BL
+  aceite: A alíquota do imposto é configurável por loja, em lote (várias lojas de uma vez), para todas as lojas (padrão geral) e por regime tributário da empresa (tabela de regimes, cada um com a sua alíquota)
+  aceite: Quando mais de um valer, vence o mais específico: loja, depois regime, depois padrão geral
+  aceite: Se nenhum estiver definido, a loja fica a calcular com alerta e nunca assume alíquota zero
+  aceite: Cada mudança de alíquota guarda quem, quando, valor antigo e novo, em tabela só de inserção, e vale daqui para frente
