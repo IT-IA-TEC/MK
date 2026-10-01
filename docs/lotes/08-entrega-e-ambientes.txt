@@ -1,0 +1,61 @@
+lote: Entrega e ambientes
+depois de: Base de clientes do grupo BL
+
+Entrega e ambientes [Backend] {v1.4}
+meta: o time instala o app no Windows, o servidor roda na VPS e cada versão nova chega sem parar o trabalho
+- Preparar a VPS para rodar o servidor
+  depende: Decidir onde o servidor roda
+  historia: Como dono do IT.MK, quero o servidor rodando na minha VPS, para o robô e os avisos do Pix funcionarem o dia todo.
+  aceite: O servidor sobe e reinicia sozinho se a VPS reiniciar
+  aceite: O endereço é HTTPS com certificado válido e a porta do banco nunca fica aberta para a internet
+  aceite: Segredo fica fora do repositório e do log, e só o servidor lê
+  aceite: Existe cópia de segurança da VPS e um teste de restauração
+  prioridade: Deve 2
+  valor: 9 sem o servidor no ar nada funciona
+  pontos: 5
+- Separar teste e produção do servidor
+  depende: Preparar a VPS para rodar o servidor
+  historia: Como time técnico, quero um ambiente de teste separado da produção, para testar sem mexer em dinheiro real.
+  aceite: Teste e produção usam bancos, chaves e endereços diferentes
+  aceite: O ambiente de teste só usa dados fictícios e contas de teste dos provedores
+  aceite: Está escrito o que muda entre os dois ambientes
+  prioridade: Deve 2
+  valor: 9 teste em produção mexe em dinheiro de verdade
+  pontos: 3
+- Publicar o servidor de forma automática
+  depende: Separar teste e produção do servidor
+  historia: Como time técnico, quero publicar uma versão nova com um comando, para não errar na mão.
+  aceite: Cada versão passa nos testes automáticos antes de publicar
+  aceite: Publicar não derruba o servidor e dá para voltar à versão anterior
+  aceite: Nenhuma publicação acontece na sexta-feira
+  prioridade: Deve 3
+  valor: 7 publicação manual gera erro
+  pontos: 5
+
+Aplicativo no Windows [Frontend] {v1.4}
+meta: o time instala o IT.MK no Windows e recebe as versões novas
+- Gerar o instalador do app para Windows
+  depende: Publicar o servidor de forma automática
+  historia: Como analista de cobrança, quero instalar o IT.MK no meu computador com Windows, para trabalhar sem abrir o navegador.
+  aceite: Existe um instalador do Windows que instala e remove o app
+  aceite: O app abre com a identidade visual do protótipo aprovado
+  aceite: O app nunca guarda chave do banco nem segredo de provedor
+  prioridade: Deve 3
+  valor: 8 sem instalador o time não usa o sistema
+  pontos: 5
+- Atualizar o app sozinho
+  depende: Gerar o instalador do app para Windows
+  historia: Como analista de cobrança, quero que o app avise e atualize quando sair versão nova, para todo mundo usar a mesma.
+  aceite: O app avisa quando há versão nova e mostra o que mudou
+  aceite: A atualização não perde o que a pessoa estava fazendo
+  aceite: Se a atualização falhar, o app continua na versão antiga
+  prioridade: Deveria 3
+  valor: 6 versões diferentes geram cobrança diferente
+  pontos: 5
+
+Pendências da entrega
+- Entregar o acesso da VPS ao time técnico
+  tipo: Tarefa
+  responsavel: William
+  prazo: 08/10/2026
+  aceite: O time técnico consegue entrar na VPS para configurar o servidor

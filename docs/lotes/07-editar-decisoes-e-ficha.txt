@@ -1,0 +1,60 @@
+# Decisões do dono de 02/10/2026 e ficha 100% no BL (pessoas ligadas e etiquetas do pagador ficam no BL).
+
+editar: BL-297
+  titulo: Ler pessoas ligadas da ficha do BL
+  trocar aceites: sim
+  historia: Como analista de cobrança, quero ver os contatos ligados ao pagador como estão na ficha do BL, para saber com quem falar sem cadastrar duas vezes.
+  aceite: As pessoas ligadas (nome, papel de responsável, financeiro ou sócio, e telefone) são lidas direto da ficha do BL e nunca são gravadas no IT.MK
+  aceite: O responsável aparece uma só vez por pagador, conferido na leitura
+  aceite: Se a ficha do BL não responde, a tela mostra aviso e o resto continua funcionando
+
+editar: BL-298
+  titulo: Criar etiquetas da conversa
+  trocar aceites: sim
+  historia: Como analista de cobrança, quero etiquetas coloridas nas conversas, para separar rápido quem merece mais atenção.
+  aceite: A tabela etiqueta guarda nome único e cor, e parte de VIP, Negociação, Reclamação e Novo cliente
+  aceite: A ligação entre etiqueta e conversa é uma tabela própria, com chave única do par
+  aceite: As etiquetas do pagador (cliente) são lidas da ficha do BL e não são gravadas no IT.MK
+
+editar: Linha do tempo e pessoas ligadas
+  tirar aceite: Pessoas ligadas guardam nome, papel (responsável, financeiro, sócio) e telefone, e o responsável aparece uma só vez por pagador
+  aceite: Pessoas ligadas vêm da ficha do BL (leitura direta), com o responsável aparecendo uma só vez por pagador
+
+editar: Etiquetas e não lidas
+  tirar aceite: A etiqueta tem nome único e cor e parte de VIP, Negociação, Reclamação e Novo cliente
+  aceite: A etiqueta da conversa tem nome único e cor e parte de VIP, Negociação, Reclamação e Novo cliente, e a etiqueta do pagador vem da ficha do BL
+
+editar: BL-164
+  trocar aceites: sim
+  historia: Como analista de cobrança, quero ver as pessoas ligadas ao pagador e as regras dele, para saber com quem falar e como cobrar.
+  aceite: As pessoas ligadas vêm da ficha do BL e a tela não permite cadastrar nem editar pessoa no IT.MK
+  aceite: As regras de cobrança do pagador (modo de cobrança e robô) são editadas no IT.MK
+  aceite: Sem barra de rolagem horizontal e sem espaço vazio em nenhuma largura de computador
+
+editar: Decidir tolerância de centavos e arredondamento
+  aceite: Decisão do dono (02/10/2026): a diferença aceita ao conferir um pagamento é de R$ 0,02 por padrão, ajustável em Configurações de R$ 0,01 até R$ 1,00, e nenhuma diferença acima de R$ 1,00 é aceita sozinha
+  aceite: Decisão do dono: o arredondamento é para o centavo mais próximo, com meio centavo subindo, e é uma só regra para o projeto inteiro
+
+editar: Decidir faixas de atraso e prazos
+  tirar aceite: Está registrado, para cada prazo, se é fixo ou configurável: vencimento (dia 20 do mês seguinte), prazo do Pix após o vencimento (30 dias), prazo para entrar em A pedir bloqueio (15 dias), prazo de baixa sugerida (365 dias) e máximo de parcelas (12)
+  tirar aceite: Está registrado como conferir o prazo de 15 dias de Configurações com a régua, que hoje traz Aviso de bloqueio no dia 20 e Pedir bloqueio no dia 25
+  tirar aceite: Está registrado se as faixas (até 30, 31 a 60, 61 a 90 e acima de 90 dias, do protótipo) são fixas no código ou configuráveis
+  aceite: Decisão do dono (02/10/2026): as faixas de atraso são 1 a 7, 8 a 15, 16 a 30, 31 a 60, 61 a 90 e mais de 90 dias, iguais em todas as telas
+  aceite: Decisão do dono: o vencimento é sempre dia 20 do mês seguinte à competência (competência de maio vence em 20/06)
+  aceite: Decisão do dono: a loja é bloqueada se não pagar até o último dia do mês do vencimento (30 ou 31, ou 28 ou 29 em fevereiro), e esse prazo substitui o de 15 dias e o dia 25 do protótipo
+
+editar: Decidir titular da conta que recebe o Pix
+  aceite: Decisão do dono (02/10/2026): o titular fica registrado como "Agente Titular conta" e não há mais decisão aberta sobre ele
+
+editar: Decidir contas de desenvolvedor e dona dos aplicativos
+  aceite: Decisão do dono (02/10/2026): a conta dona do aplicativo do Mercado Livre é da empresa IT.MK
+  aceite: Decisão do dono: o cadastro de parceiro da Shopee já existe
+
+editar: Decidir quem trata divergência
+  aceite: Decisão do dono (02/10/2026): toda divergência vai para uma tela onde uma pessoa avalia e decide, e nunca é resolvida sozinha
+
+editar: Decidir canal do WhatsApp entre QR e Oficial
+  aceite: Decisão do dono (02/10/2026): não é preciso parecer jurídico para ligar o robô de cobrança nem a etapa jurídica da esteira
+
+editar: Decidir onde o servidor roda
+  aceite: Decisão do dono (02/10/2026): o servidor roda numa VPS que o dono já tem, e o time técnico ajuda a configurar
