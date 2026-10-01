@@ -3,7 +3,7 @@ depois de: Database, Backend, Integrações
 
 # Pagador é sempre uma pessoa com CPF; loja é plataforma + código; CNPJ só informa.
 
-editar: Criar tabela de pagador com modo de cobrança
+editar: BL-293
   trocar aceites: sim
   historia: Como analista de cobrança, quero o pagador (sempre uma pessoa) cadastrado com CPF, WhatsApp e modo de cobrança, para achar quem paga e saber como cobrar.
   aceite: A tabela pagador guarda nome, CPF só com 11 números (único e obrigatório), WhatsApp só com números e DDD (mínimo 10 dígitos) e ativo
@@ -12,7 +12,7 @@ editar: Criar tabela de pagador com modo de cobrança
   aceite: A busca por nome sem acento, por CPF, por telefone e por código de loja usa índice e devolve o pagador certo em teste com dados de exemplo
   aceite: A situação financeira (em dia, a vencer, em atraso, em acordo) vem de consulta sobre cobranças, nunca é gravada no pagador
 
-editar: Criar tabela de loja
+editar: BL-294
   trocar aceites: sim
   historia: Como analista de cobrança, quero as lojas ligadas ao pagador e identificadas por plataforma e código, para ver todas as lojas de quem eu cobro.
   aceite: A tabela loja guarda pagador, nome, plataforma, código da loja na plataforma (texto; na Shein é o GS), situação (ativa, bloqueada, inativa), data de início e CNPJ informativo (opcional, sem máscara, aceita letras e números)
@@ -35,6 +35,6 @@ editar: Consultar carteira com filtro único
   aceite: Uma só consulta busca por nome sem acento, CPF, telefone (só números), código ou nome da loja, e devolve o mesmo resultado em Pagadores e Lojas, Inadimplência, Recebimentos e Conversas
   aceite: Nenhuma busca nem filtro usa o CNPJ
 
-editar: Cadastro de novo pagador
+editar: BL-155
   aceite: O formulário pede CPF do pagador (11 números, obrigatório), código da loja na plataforma e plataforma, e o CNPJ da loja é opcional e vem rotulado como informativo
   aceite: CPF repetido mostra aviso com o pagador que já existe
