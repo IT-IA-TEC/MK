@@ -44,7 +44,7 @@ Fontes: (1) Product Owner's Handbook (Atacan Demiralp, guia de Scrum), (2) Produ
 ## 6. Backlog
 - Lista ordenada e sempre viva. Todo item tem número (ID), história, prioridade, estimativa e "Pronto".
 - O PO responde por conteúdo, disponibilidade e ordem. Itens do topo são mais claros e detalhados. Itens não validados ficam embaixo.
-- **Item bem escrito tem 3 partes**: (1) história, (2) critérios de aceite (caixas que o dev marca), (3) imagem ou desenho (celular e computador). Mais o que for útil. Siga o guia de estilo existente.
+- **Item bem escrito tem 3 partes**: (1) história, (2) critérios de aceite (caixas que o dev marca), (3) imagem ou desenho (computador; celular fora do escopo por enquanto). Mais o que for útil. Siga o guia de estilo existente.
 - **Critérios de aceite**: claros, sem ambiguidade, testáveis. Use INVEST (independente, negociável, valioso, estimável, pequeno, testável).
 - **Prioridade**: alta/média/baixa ou MoSCoW (deve, deveria, poderia, não terá). Os "deve" formam o mínimo viável. Cinco níveis: 1 só para emergência (sistema fora do ar); 2 é o normal mais urgente; 5 é ideia ainda não detalhada.
 - **Ordem por valor**: retorno direto, necessidade da parte mais importante, dependências, grande impacto, risco e incerteza. Valor igual: maior valor/custo sobe. Pareto: 80% do valor vem de 20% do produto.

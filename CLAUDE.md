@@ -35,3 +35,7 @@
 - No banco: `numeric` com duas casas. Em Java: `BigDecimal` com duas casas, ou centavos em número inteiro. O time técnico escolhe, mas tem de ser exato.
 - Existe uma só regra de arredondamento para o projeto inteiro, escrita no critério de aceite de todo item que calcula valor (Fechamento, Pix, juros e multa, rateio entre lojas, acordos e parcelas).
 - Pix de valor fixo não aceita pagamento parcial. Parcelamento usa um Pix por parcela.
+
+## Celular (decisão do dono)
+- Por enquanto o IT.MK não tem versão para celular. Desenhos, critérios de aceite e testes são para computador. Não planejar tela de celular nem pedir desenho de celular nos itens.
+- Quando o dono pedir celular, vira item novo.
