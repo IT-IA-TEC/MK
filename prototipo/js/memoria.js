@@ -11,7 +11,7 @@ var BASES={faturamento_total:'Faturamento total',produtos:'Valor dos produtos (s
 function calculo(pid,gs){
   var p=pag(pid),l=p.lojas.filter(function(x){return !gs||x.gs===gs})[0]||p.lojas[0];
   if(window.MKFechamento&&MKFechamento.dadosCalculo){try{var d=MKFechamento.dadosCalculo(pid,l.gs);if(d)return d}catch(e){}}
-  var i=p.lojas.indexOf(l),fat=Math.round((9000+(p.id*2310)+i*1700)*100)/100,aliq=[6,7.3,8.2][(p.id+i)%3],imp=Math.round(fat*aliq)/100,pc=40,v40=Math.round((fat-imp)*pc)/100;
+  var i=p.lojas.indexOf(l),fat=Math.round((9000+(p.id*2310)+i*1700)*100)/100,aliq=[6,7.3,8.2][(p.id+i)%3],imp=Math.round(fat*aliq)/100,pc=40,v40=Math.round(imp*pc)/100;
   var h=new Date();
   return {competencia:'setembro/2026',loja:l.n,gs:l.gs,plataforma:l.plat,base:{id:'faturamento_total',nome:BASES.faturamento_total},fonte:l.plat==='Shein'||l.plat==='Kwai'?'Lançado à mão a partir do painel da plataforma':'API da plataforma',periodo:'01/09/2026 a 30/09/2026',faturado:fat,aliquota:aliq,origemAliquota:'Regime tributário do cadastro do pagador',imposto:imp,pct40:pc,valor40:v40,vencimento:'20/10/2026',conferidoPor:'Marina Costa',conferidoEm:'01/10/2026 09:40',
    versoes:[{v:2,quando:'01/10/2026 09:40',quem:'Marina Costa',motivo:'Conferência final do faturamento'},{v:1,quando:'30/09/2026 18:05',quem:'Sistema',motivo:'Cálculo inicial com os dados da plataforma'}]};
@@ -20,7 +20,7 @@ function todas(pid){return pag(pid).lojas.map(function(l){return calculo(pid,l.g
 function extratoTexto(pid){
   var p=pag(pid),c=todas(pid),n=p.nome.split(' ')[0];n=n.charAt(0)+n.slice(1).toLowerCase();
   var tot=c.reduce(function(a,x){return a+x.valor40},0);
-  return 'Extrato da cobrança · '+c[0].competencia+'\n'+c.map(function(x){return x.loja+': faturado '+R(x.faturado)+' − imposto '+R(x.imposto)+' × '+pct(x.pct40)+' = '+R(x.valor40)}).join('\n')+'\nTotal: '+R(tot)+' · vence em '+c[0].vencimento+'.\nQualquer dúvida, responda esta mensagem, '+n+'.';
+  return 'Extrato da cobrança · '+c[0].competencia+'\n'+c.map(function(x){return x.loja+': faturado '+R(x.faturado)+' · imposto '+R(x.imposto)+' × '+pct(x.pct40)+' = '+R(x.valor40)}).join('\n')+'\nTotal: '+R(tot)+' · vence em '+c[0].vencimento+'.\nQualquer dúvida, responda esta mensagem, '+n+'.';
 }
 function kv(a,b,cl){return '<div class="mm-kv'+(cl?' '+cl:'')+'"><span>'+a+'</span><b>'+b+'</b></div>'}
 function bloco(c){
@@ -29,7 +29,7 @@ function bloco(c){
    kv('Competência',esc(c.competencia))+kv('Base usada',esc(c.base.nome))+kv('Fonte do dado',esc(c.fonte))+kv('Período da fonte',esc(c.periodo))+
    kv('Faturado na base',R(c.faturado))+kv('Alíquota',pct(c.aliquota))+kv('Origem da alíquota',esc(c.origemAliquota))+kv('Imposto',R(c.imposto))+
    kv('Percentual da 40%',pct(c.pct40))+kv('Valor da 40%',R(c.valor40),'mm-destaque')+kv('Vencimento',esc(c.vencimento))+kv('Conferido por',esc(c.conferidoPor)+' em '+esc(c.conferidoEm))+'</div>'+
-   '<div class="mm-conta"><span class="nt">Conta</span><code>('+R(c.faturado)+' − '+R(c.imposto)+') × '+pct(c.pct40)+' = '+R(c.valor40)+'</code></div>'+
+   '<div class="mm-conta"><span class="nt">Conta</span><code>imposto '+R(c.imposto)+' × '+pct(c.pct40)+' = '+R(c.valor40)+'</code></div>'+
    '<details class="mm-vs"><summary>Versões do cálculo ('+c.versoes.length+')</summary>'+c.versoes.map(function(v){return '<div class="f-lin"><div style="min-width:0"><div class="pg">Versão '+v.v+(v===c.versoes[0]?' (atual)':'')+'</div><div class="nt">'+esc(v.motivo)+'</div></div><div class="nt mono">'+esc(v.quando)+' · '+esc(v.quem)+'</div></div>'}).join('')+'</details></section>';
 }
 function abrir(pid,gs){

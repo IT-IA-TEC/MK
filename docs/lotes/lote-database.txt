@@ -1,0 +1,875 @@
+versão: v0.1
+  entrega: 15/10/2026
+  meta: o analista entra no sistema e acha qualquer pagador, suas lojas e a ficha completa
+versão: v1.0
+  entrega: 05/11/2026
+  meta: o analista vê a situação de cada loja nas quatro plataformas, preenche a análise e compara com a anterior
+versão: v1.1
+  entrega: 26/11/2026
+  meta: o analista fecha o mês, gera os Pix e confere o dinheiro que entrou
+versão: v1.2
+  entrega: 17/12/2026
+  meta: atraso, acordo, contestação e conversa são tratados dentro do sistema
+versão: v1.3
+  entrega: 14/01/2027
+  meta: o robô cobra sozinho, com limites, aprovação de uma pessoa e auditoria
+versão: v1.4
+  entrega: 04/02/2027
+  meta: o dono vê tudo no Dashboard e todas as telas passam na conferência de qualidade
+
+pronto: A mudança de estrutura segue expansão e contração, sem parar o sistema
+pronto: Tem teste de integração contra um banco de teste real
+pronto: Toda tabela nova tem regra de acesso por linha ligada e testada
+pronto: Dinheiro é numeric com duas casas, nunca float
+pronto: Segredo nunca é lido de volta
+pronto: Toda mudança de estrutura é um arquivo de migração versionado, testado em cópia dos dados, com plano de volta e conferência de soma e contagem antes e depois
+pronto: Tabela de histórico só aceita inserir, e existe teste que prova que editar e apagar falham
+pronto: Os verificadores de segurança e de desempenho do Supabase rodaram e não há erro de segurança aberto
+pronto: Sem bugs conhecidos e sem entrega na sexta-feira
+
+Decisões do banco [Database] {v0.1}
+meta: o dono e o time técnico deixam por escrito, com data e responsável, as escolhas do banco que travam as tabelas, antes de 15/10/2026
+- Decidir plano e orçamento do Supabase
+  historia: Como dono do IT.MK, quero fechar o plano do Supabase e quanto posso gastar por mês, para o banco não parar nem estourar o orçamento.
+  aceite: Está escrito que a produção usa o plano Pro, aprovado em 01/10/2026, e nunca o plano gratuito, que pausa o projeto após 1 semana sem uso
+  aceite: Estão escritos o tamanho da computação, o limite de gasto aceito e os valores conferidos na página oficial do Supabase na data da decisão
+  aceite: Está escrito se o PITR (voltar o banco a um ponto no tempo) será contratado e com retenção de 7, 14 ou 28 dias
+  aceite: A decisão tem nome do responsável e data, e o alerta de uso de disco e de saída de dados está combinado antes de estourar a cota
+  prioridade: Deve 2
+  valor: 9 sem o plano pago não há cópia diária nem produção estável
+  pontos: 2
+- Decidir ambientes de teste e produção
+  historia: Como time técnico, quero ambientes de teste e de produção separados, para testar mudança sem risco para o dinheiro real.
+  aceite: Está escrito que teste e produção são dois projetos separados do Supabase, ou um projeto com ramo persistente de teste, com chaves e senhas diferentes em cada um
+  aceite: O teste só recebe dados fictícios de um arquivo de exemplo (seed), nunca CPF, CNPJ, telefone ou e-mail de pagador real
+  aceite: Está escrito quem pode mudar a produção, e que mudança em produção não sai na sexta-feira
+  prioridade: Deve 2
+  valor: 9 evita vazar dado de pagador e errar direto em produção
+  pontos: 1
+- Decidir quem fala com o banco e o fim da Data API
+  historia: Como dono do IT.MK, quero que só o servidor Spring fale com o banco, para nenhuma chave do banco ficar no computador do analista.
+  aceite: Está registrado o caminho login do Supabase, servidor Spring no meio e banco, e que o app JavaFX nunca guarda chave nem senha do banco (decisão de 01/10/2026)
+  aceite: Está registrado que a Data API do Supabase fica desligada nos dois ambientes
+  aceite: Está registrada a saída das chaves legadas anon e service_role até 31/12/2026, usando só as chaves sb_publishable e sb_secret
+  aceite: Está registrado que a chave sb_secret fica só no servidor, uma por componente (cobrança, robô e webhook), para revogar uma sem derrubar as outras
+  prioridade: Deve 2
+  valor: 10 chave vazada deixaria ler e mudar o banco inteiro
+  pontos: 2
+- Decidir onde o webhook de Pix entra
+  historia: Como time técnico, quero decidir onde chega o aviso de pagamento do Pix, para a baixa automática não depender de um endereço indefinido.
+  aceite: Está registrado se o aviso entra pelo servidor Spring ou por Edge Function do Supabase, com endereço exclusivo por provedor e por ambiente
+  aceite: Está registrado que o Inter exige certificado de cliente no aviso e que o servidor na nuvem tem IP fixo e aceita esse certificado (decisão de 01/10/2026)
+  aceite: Está registrado que o aviso é gravado inteiro antes de processar e que a resposta HTTP 200 sai logo depois de gravar
+  prioridade: Deve 2
+  valor: 8 sem isso o Pix pago não é baixado sozinho
+  pontos: 2
+- Decidir guarda e anonimização da auditoria
+  historia: Como dono do IT.MK, quero um parecer jurídico sobre quanto tempo guardar a auditoria e como tratar pedido de apagar dado pessoal, para provar o que o robô fez sem descumprir a lei.
+  aceite: Existe parecer jurídico anexado com o prazo de guarda e a regra de anonimização, ou a decisão registra que a auditoria segue sem prazo até o parecer chegar
+  aceite: Está registrado como o dado pessoal fica fora da trilha, guardando só o identificador do pagador e não o dado pessoal inteiro
+  aceite: Enquanto não há parecer, nenhuma rotina apaga, edita ou anonimiza linha de auditoria
+  prioridade: Deve 2
+  valor: 8 auditoria que nunca apaga pode colidir com pedido de apagar dado pessoal
+  pontos: 2
+- Decidir tolerância de centavos e arredondamento
+  historia: Como responsável pelo financeiro, quero uma só regra de arredondamento e de tolerância de centavos, para o mesmo valor sair igual em todas as telas.
+  aceite: Está escrita uma regra única de arredondamento (para baixo em 2 casas, como o Banco Central manda nos campos do Pix, ou meio para cima, como o numeric do Postgres) e onde ela vale: Fechamento, Pix, juros e multa, rateio entre lojas, acordos e parcelas
+  aceite: Está escrito para onde vai a diferença de centavos: última parcela, ou última loja com saldo
+  aceite: Está escrita a tolerância em centavos para dar a baixa automática como valor igual (o protótipo usa R$ 0,02)
+  aceite: Existe um caso de teste com centavos (R$ 100,00 em 3 parcelas) que fecha no total
+  prioridade: Deve 2
+  valor: 9 sem regra única o saldo da mesma cobrança difere entre telas
+  pontos: 2
+- Decidir lista de status da cobrança
+  historia: Como analista de cobrança, quero uma lista fechada de status da cobrança, para a mesma palavra valer em todas as telas e no robô.
+  aceite: Está registrada a lista de status (partindo de Em aberto, Parcial e Quitada do protótipo, mais Cancelada e Substituída) e se Parcial e Vencida são status ou são calculadas pelo saldo e pelo vencimento
+  aceite: Está registrada a tabela de transições permitidas, por exemplo de Em aberto para Quitada só com saldo zerado
+  aceite: Está registrado o que muda na cobrança quando abre contestação ou acordo (a régua pausa; o status muda ou não)
+  prioridade: Deve 2
+  valor: 8 todas as telas e o robô leem esse status
+  pontos: 2
+- Decidir backup extra fora do Supabase
+  historia: Como dono do IT.MK, quero uma cópia do banco guardada fora do Supabase, para não perder o histórico se o projeto tiver problema.
+  aceite: Está registrado onde a cópia semanal fica, quem tem acesso e se ela é criptografada
+  aceite: Está registrado que o backup do Supabase não inclui os arquivos do Storage e quem guarda a cópia dos comprovantes
+  aceite: Está registrado quanto de dado o negócio aceita perder e em quanto tempo o sistema precisa voltar
+  prioridade: Deveria 3
+  valor: 7 o backup do Supabase sozinho não cobre comprovantes
+  pontos: 1
+- Decidir quando particionar a auditoria
+  historia: Como time técnico, quero um critério de tamanho para particionar a auditoria, para só mexer nisso quando houver volume real.
+  aceite: Está registrado que a auditoria não é particionada no começo
+  aceite: Está registrado o critério de tamanho que dispara a decisão, medido no painel com dados reais
+  aceite: Está registrado que partição antiga só pode ser arquivada, nunca descartada, mantendo o selo de integridade
+  prioridade: Poderia 4
+  valor: 4 hoje não há volume que justifique
+  pontos: 1
+
+Base do banco [Database] {v0.1}
+meta: o banco nasce com ambientes separados, mudança só por arquivo versionado, contas com poder mínimo e as mesmas regras de tipo e de acesso em todas as tabelas
+- Criar projetos de teste e produção
+  depende: Decidir ambientes de teste e produção
+  historia: Como time técnico, quero os projetos de teste e de produção criados no Supabase, para começar a criar tabelas sem risco.
+  aceite: Existem dois ambientes separados (teste e produção) com chaves e senhas diferentes, e a produção está no plano Pro
+  aceite: O endereço de conexão de cada ambiente fica em variável de ambiente do servidor e nunca no código
+  aceite: A conexão do servidor ao banco usa sslmode=require no mínimo, com pool pequeno e fixo, menor que o limite de conexões do plano
+  aceite: A Data API está desligada nos dois ambientes e o servidor usa só a chave sb_secret, sem chave legada
+  prioridade: Deve 2
+  valor: 10 todas as outras tabelas dependem deste item
+  pontos: 3
+- Versionar migrações com expansão e contração
+  depende: Criar projetos de teste e produção
+  historia: Como time técnico, quero que toda mudança de tabela seja um arquivo de migração numerado no git, para trocar a estrutura sem parar o sistema.
+  aceite: Existe a pasta supabase/migrations no git, e nenhuma tabela é criada ou mudada pelo painel em produção
+  aceite: Mudança de estrutura segue expansão e contração: coluna nova aceitando nulo, gravar nos dois, migrar a leitura e só então remover a antiga
+  aceite: Migração já aplicada em produção nunca é editada, e a correção vira migração nova
+  aceite: Migração com dado financeiro tem plano de volta e conferência de soma e contagem de linhas antes e depois, e não entra em produção na sexta-feira
+  prioridade: Deve 2
+  valor: 9 mudar tabela na mão em produção quebra o histórico e o dinheiro
+  pontos: 3
+- Criar contas do banco com privilégio mínimo
+  depende: Criar projetos de teste e produção
+  historia: Como time técnico, quero uma conta do banco para cada serviço, para um erro ou vazamento num serviço não abrir o banco inteiro.
+  aceite: Existem cinco contas: app (itmk_app), robô, conector de marketplace (itmk_integracao), migração e relatório, e nenhuma é superusuário nem tem BYPASSRLS
+  aceite: A conta do app não muda estrutura, não lê o Vault e não é dona da tabela de auditoria
+  aceite: A conta de relatório só lê visões e resumos, e a conta de migração não é usada no dia a dia
+  aceite: Os privilégios padrão de anon e authenticated estão revogados em tabelas e funções do esquema public
+  prioridade: Deve 2
+  valor: 9 conta com poder demais deixa apagar auditoria ou ler segredo
+  pontos: 5
+- Ligar regra de acesso por linha em toda tabela
+  depende: Criar contas do banco com privilégio mínimo
+  historia: Como time técnico, quero regra de acesso por linha ligada em toda tabela nova, para ninguém ler o banco por um caminho esquecido.
+  aceite: Toda tabela nova nasce com row level security ligado e com acesso de anon e authenticated revogado
+  aceite: Tabelas de pagamento, auditoria e conexão não têm nenhuma concessão para anon
+  aceite: Nenhuma política usa using (true) fora da exceção documentada da auditoria
+  aceite: Um teste automático tenta ler cada tabela como anon e como authenticated e falha em todas
+  prioridade: Deve 2
+  valor: 9 tabela esquecida sem regra fica aberta para quem tem a chave pública
+  pontos: 3
+- Definir tipos de dinheiro e competência
+  depende: Versionar migrações com expansão e contração
+  historia: Como responsável pelo financeiro, quero todo valor em R$ guardado de forma exata, para a soma das cobranças sempre fechar.
+  aceite: Todo valor em R$ é numeric(14,2), com check de valor maior ou igual a zero onde fizer sentido, e nenhum campo de dinheiro usa float ou double
+  aceite: Percentuais (percentual da 40%, multa, juros ao mês) usam numeric(9,6)
+  aceite: A competência é uma coluna date que guarda o primeiro dia do mês
+  aceite: Valor em R$ dentro de JSON viaja como texto, e valor, status e data que o negócio consulta nunca ficam em JSON
+  prioridade: Deve 2
+  valor: 10 erro de centavo se repete em toda cobrança
+  pontos: 2
+- Definir fuso e datas
+  depende: Versionar migrações com expansão e contração
+  historia: Como time técnico, quero as datas guardadas do mesmo jeito em todas as tabelas, para vencimento e atraso não mudarem de dia por causa do fuso.
+  aceite: Instante de evento usa timestamptz e data de negócio (vencimento, competência) usa date
+  aceite: Todo registro de evento guarda a hora do evento e a hora do registro, que podem ser diferentes
+  aceite: O fuso usado para virar o dia do vencimento está registrado, e a hora vem do servidor, nunca da tela
+  prioridade: Deve 3
+  valor: 7 atraso contado errado gera cobrança errada
+  pontos: 2
+- Seguir convenções de nome do glossário
+  depende: Versionar migrações com expansão e contração
+  historia: Como time técnico, quero tabelas e colunas com os termos do glossário do IT.MK, para o banco e o código usarem a mesma palavra.
+  aceite: Existe a lista de termos (pagador, loja, plataforma, competência, faturado, cobrança, Pix, recebimento, comprovante, divergência, promessa, acordo, parcela, contestação, memória de cálculo, régua, robô, conversa, mensagem) e cada termo tem um só nome de tabela
+  aceite: Nenhuma tabela ou coluna usa sinônimo de um termo da lista
+  aceite: Estados e listas fixas ficam em tabela de domínio ou em check, nunca em texto livre
+  prioridade: Deve 3
+  valor: 6 nome igual evita erro entre o banco e o código
+  pontos: 2
+- Definir chaves e identificadores públicos
+  depende: Seguir convenções de nome do glossário
+  historia: Como time técnico, quero chaves e identificadores definidos de um jeito só, para ligar as tabelas sem ambiguidade e sem expor número sequencial.
+  aceite: Toda tabela tem chave primária e chave estrangeira declarada, com o mesmo tipo nas duas pontas
+  aceite: Tabela que aparece fora do banco tem id_publico aleatório além da chave interna, e nenhuma tela ou API expõe número sequencial
+  aceite: Chave estrangeira de cobrança, pagamento, acordo, contestação e auditoria usa on delete restrict, nunca cascade
+  aceite: Chaves estrangeiras têm índice criado, e dado financeiro nunca é apagado (usa estado Cancelada ou Arquivada)
+  prioridade: Deve 2
+  valor: 8 apagar um pagador não pode levar o histórico junto
+  pontos: 3
+- Guardar versão do registro para edição concorrente
+  depende: Definir chaves e identificadores públicos
+  historia: Como analista de cobrança, quero que duas pessoas não sobrescrevam o mesmo registro, para não perder o que a outra mudou.
+  aceite: Tabelas editáveis têm as colunas criado_em, criado_por, atualizado_em e versao
+  aceite: A gravação só vale se a versão lida ainda é a atual, e com versão antiga volta conflito com 0 linhas afetadas
+  aceite: Um teste com duas gravações ao mesmo tempo no mesmo acordo mostra que só uma vale
+  prioridade: Deve 3
+  valor: 7 dois analistas editando o mesmo acordo é situação comum
+  pontos: 3
+
+Cadastro no banco [Database] {v0.1}
+meta: o banco guarda pagadores, lojas, pessoas, etiquetas, plataformas e usuários, e o analista acha qualquer pagador, suas lojas e a ficha completa
+- Criar tabela de pagador com modo de cobrança
+  depende: Definir chaves e identificadores públicos
+  historia: Como analista de cobrança, quero o pagador cadastrado com seu WhatsApp e seu modo de cobrança, para achar quem paga e saber como cobrar.
+  aceite: A tabela pagador guarda nome, WhatsApp só com números e DDD (mínimo 10 dígitos) e ativo, e a situação financeira (em dia, a vencer, em atraso, em acordo) vem de consulta sobre cobrança e acordo, não de coluna copiada
+  aceite: O documento do pagador, quando informado, aceita letras e números (CNPJ alfanumérico), é guardado sem máscara e é único
+  aceite: O modo de cobrança aceita só padrão do sistema, um Pix por pagador ou um Pix por loja, e nasce como padrão do sistema
+  aceite: A busca por nome sem acento, por telefone e por GS de loja usa índice e devolve o pagador certo em teste com dados de exemplo
+  prioridade: Deve 2
+  valor: 10 sem pagador nenhuma outra tela existe
+  pontos: 3
+- Criar tabela de loja
+  depende: Criar tabela de pagador com modo de cobrança
+  historia: Como analista de cobrança, quero as lojas ligadas ao pagador, para ver todas as lojas de quem eu cobro.
+  aceite: A tabela loja guarda pagador, nome, GS (só números, mínimo 8 dígitos), plataforma, situação (ativa, bloqueada, inativa) e data de início
+  aceite: Há chave única por GS e plataforma, e a chave estrangeira do pagador usa on delete restrict
+  aceite: Um pagador tem uma ou mais lojas e uma loja tem um só pagador
+  aceite: A lista de pagadores com lojas filtra por situação da loja e por plataforma usando índice
+  prioridade: Deve 2
+  valor: 10 cobrança, conexão e análise são por loja
+  pontos: 3
+- Criar usuários e permissões
+  depende: Definir chaves e identificadores públicos
+  historia: Como dono do IT.MK, quero que cada pessoa entre com o seu login e fique registrada em tudo o que fizer, para saber quem fez cada ação.
+  aceite: A tabela usuario liga ao login do Supabase (auth.users) e guarda nome, e-mail, atende (sim ou não) e Aprova a fila do robô, e todo usuário novo nasce com Aprova a fila do robô ligado
+  aceite: Permissão é só de gravação nos bastidores, e nenhuma coluna de perfil ou nível muda o que a tela mostra, porque a visão é única
+  aceite: Toda linha de auditoria aponta para um usuário, para o robô ou para o sistema, e usuário nunca é apagado, só fica inativo
+  aceite: Nenhuma política do banco usa user_metadata, que o próprio usuário pode editar
+  prioridade: Deve 2
+  valor: 8 sem saber quem agiu a auditoria perde o valor
+  pontos: 3
+- Criar tabela de plataformas e capacidades
+  depende: Definir chaves e identificadores públicos
+  historia: Como analista de marketplaces, quero as plataformas cadastradas com o que cada uma entrega, para o sistema tratar as diferenças sem regra espalhada.
+  aceite: A tabela plataforma tem Shein, Mercado Livre, Shopee e Kwai, e aceita nova plataforma sem mudar a estrutura
+  aceite: Cada plataforma declara por dado suas capacidades (entrega pedidos, entrega notas, conexão por API), e a Kwai nasce sem notas
+  aceite: A ordem dos conectores está guardada: Shopee, Mercado Livre, Shein e Kwai, e a Kwai só entra depois de ter a documentação
+  aceite: Loja só aceita plataforma que existe na tabela, por chave estrangeira
+  prioridade: Deve 3
+  valor: 7 a capacidade evita regra espalhada por plataforma
+  pontos: 2
+- Criar tabela de pessoas ligadas
+  depende: Criar tabela de pagador com modo de cobrança
+  historia: Como analista de cobrança, quero os contatos ligados ao pagador, para saber com quem falar quando o responsável não atende.
+  aceite: A tabela guarda nome, papel (responsável, financeiro, sócio) e telefone, ligada ao pagador por chave estrangeira com on delete restrict
+  aceite: O responsável aparece uma só vez por pagador
+  prioridade: Deveria 3
+  valor: 5 ajuda a achar quem decide quando o responsável some
+  pontos: 2
+- Criar etiquetas do pagador e da conversa
+  depende: Criar tabela de pagador com modo de cobrança
+  historia: Como analista de cobrança, quero etiquetas coloridas, para separar rápido quem merece mais atenção.
+  aceite: A tabela etiqueta guarda nome único e cor, e parte de VIP, Negociação, Reclamação e Novo cliente
+  aceite: A ligação entre etiqueta e pagador ou conversa é uma tabela própria, com chave única do par
+  prioridade: Deveria 3
+  valor: 4 organiza a fila de conversas sem mudar a cobrança
+  pontos: 2
+
+Auditoria e histórico no banco [Database] {v0.1}
+meta: toda mudança importante fica gravada com quem e quando, numa tabela que ninguém edita nem apaga, com um selo que mostra se alguém mexeu
+- Criar tabela de auditoria só de inserção
+  depende: Criar contas do banco com privilégio mínimo
+  historia: Como dono do IT.MK, quero uma trilha que prove o que o sistema e o robô fizeram, para me defender numa contestação.
+  aceite: A tabela auditoria guarda hora do evento, hora do registro, ator (usuário, robô, sistema ou webhook), ação, tabela, registro, estado de origem e de destino, resultado, motivo e antes e depois em jsonb
+  aceite: Segredo, token, chave, string de conexão e dado pessoal sensível nunca entram nas colunas nem no jsonb, só hash ou os últimos 4 caracteres
+  aceite: O robô e o app só têm permissão de inserir, e a tabela é criada pela conta de migração, sem dono entre as contas de uso
+  aceite: Se a gravação da auditoria de uma ação obrigatória falha, a ação é cancelada (falha fechada) e o erro vai para o log do servidor
+  prioridade: Deve 2
+  valor: 10 é a prova do que o robô fez
+  pontos: 5
+- Bloquear editar e apagar na auditoria
+  depende: Criar tabela de auditoria só de inserção
+  historia: Como dono do IT.MK, quero que a auditoria nunca possa ser editada nem apagada, para a prova valer em qualquer disputa.
+  aceite: Um gatilho before update or delete e outro before truncate recusam a operação com mensagem clara
+  aceite: A permissão de update, delete e truncate está revogada de todas as contas de uso, e row level security está ligado com force
+  aceite: Existe teste automático em que update, delete e truncate na auditoria falham, e ele roda a cada entrega
+  prioridade: Deve 2
+  valor: 10 só o gatilho junto com a permissão retirada garante o bloqueio
+  pontos: 3
+- Encadear selo de integridade na auditoria
+  depende: Criar tabela de auditoria só de inserção
+  historia: Como dono do IT.MK, quero um selo em cada registro ligado ao anterior, para descobrir se alguém alterou a trilha.
+  aceite: Cada linha guarda o hash SHA-256 da linha anterior e o seu próprio hash, calculados no banco na hora de inserir
+  aceite: Uma rotina diária confere a corrente inteira e gera alerta quando encontra uma quebra
+  aceite: Existe teste que altera uma linha pela conta de migração e a rotina aponta a linha quebrada
+  aceite: Dois registros inseridos ao mesmo tempo não quebram a corrente, porque a ordem é garantida por trava
+  prioridade: Deveria 2
+  valor: 8 mostra adulteração mesmo se alguém contornar o bloqueio
+  pontos: 5
+- Guardar histórico de configuração
+  depende: Criar tabela de auditoria só de inserção
+  historia: Como responsável pelo financeiro, quero saber quem mudou cada configuração e quando, para explicar por que o comportamento mudou.
+  aceite: Toda mudança em Configurações grava data e hora, usuário, onde mudou, valor de antes e valor de depois
+  aceite: Valor de segredo nunca aparece no antes ou no depois, só o registro de que foi trocado
+  aceite: A lista do histórico vai da mais nova para a mais antiga, com paginação por chave de busca e não por deslocamento grande
+  prioridade: Deve 3
+  valor: 7 mudar limite ou régua sem rastro causa disputa
+  pontos: 3
+- Registrar política de guarda da auditoria
+  depende: Decidir guarda e anonimização da auditoria
+  historia: Como dono do IT.MK, quero o prazo de guarda da auditoria guardado como configuração, para cumprir o parecer jurídico quando ele chegar.
+  aceite: Existe uma configuração com o prazo de guarda, vazia até o parecer, e vazia significa guardar para sempre
+  aceite: Nenhuma rotina de limpeza toca a auditoria enquanto o prazo estiver vazio
+  aceite: Com o parecer, o pedido de apagar dado pessoal atua na tabela de pagador, a auditoria fica só com o identificador e o selo continua válido, com teste
+  prioridade: Deveria 3
+  valor: 6 evita conflito entre auditoria que nunca apaga e pedido de apagar dado pessoal
+  pontos: 3
+
+Conexões e segredos no banco [Database] {v1.0}
+meta: o analista de marketplaces vê a situação da conexão de cada loja nas quatro plataformas, e nenhum segredo volta para a tela
+- Criar conexão por loja e plataforma
+  depende: Criar tabela de loja
+  historia: Como analista de marketplaces, quero ver a conexão de cada loja com cada plataforma, para saber onde falta autorizar.
+  aceite: A tabela conexao_marketplace tem chave única por loja e plataforma e guarda situação (Sem conexão, Aguardando autorização, Conectada, Com erro, Vencida), quem autorizou, data da autorização e último teste
+  aceite: A situação Vencida só nasce quando a data de validade é conhecida, e a Kwai não calcula Vencida até a regra ser confirmada
+  aceite: Dados próprios de cada plataforma (tipo de loja da Shein, CPF ou CNPJ da Shopee, país do Mercado Livre) ficam em colunas ou em jsonb, nunca valor em R$
+  aceite: Cada mudança de situação grava evento de auditoria com usuário e motivo
+  prioridade: Deve 2
+  valor: 9 é a base de todo o painel de lojas
+  pontos: 5
+- Guardar segredos no Vault só de gravação
+  depende: Criar conexão por loja e plataforma
+  historia: Como dono do IT.MK, quero que as chaves das lojas nunca apareçam depois de salvas, para evitar vazamento.
+  aceite: Todo segredo de conexão (token, client secret, refresh token) é guardado com vault.create_secret, e a tabela de conexão guarda só o segredo_id, a data da gravação e os últimos 4 caracteres
+  aceite: Só uma função do papel itmk_integracao lê vault.decrypted_secrets, com security definer e search_path vazio, e o execute está revogado de todos os outros papéis
+  aceite: Cada leitura do segredo gera linha de auditoria com quem, para quê e quando, sem o valor
+  aceite: Um teste prova que a conta do app, a conta de relatório e anon não leem o segredo, e que log e resposta de erro não contêm o valor
+  prioridade: Deve 2
+  valor: 10 segredo exposto dá acesso às lojas do cliente
+  pontos: 8
+- Guardar credenciais do Inter e do Asaas
+  depende: Guardar segredos no Vault só de gravação
+  historia: Como responsável pelo financeiro, quero guardar as credenciais do Pix com segurança, para o sistema gerar cobrança sem expor a chave.
+  aceite: O Inter guarda Client ID, Client Secret, certificado (.crt) e chave privada (.key) no Vault, e o Asaas guarda a chave de API e o token do aviso, de 32 a 255 caracteres, gerado pelo sistema
+  aceite: As credenciais são separadas por provedor e por ambiente (quatro combinações), e trocar de teste para produção limpa o que era do outro ambiente
+  aceite: O banco guarda a data de vencimento do certificado do Inter, e uma consulta lista os que vencem em 90 dias e em 30 dias
+  aceite: Chave de teste do Asaas é recusada em produção e chave de produção é recusada em teste, pelo prefixo
+  prioridade: Deve 2
+  valor: 9 sem credencial guardada não há Pix
+  pontos: 5
+- Guardar validade da conexão por plataforma
+  depende: Criar conexão por loja e plataforma
+  historia: Como analista de marketplaces, quero saber quando cada conexão vence, para renovar antes de a loja ficar sem dado.
+  aceite: A Shopee guarda a validade lida da API (expire_time) e aceita 7, 30, 90, 180 ou 365 dias ou data livre até 365 dias; o Mercado Livre guarda 6 meses a partir da autorização; a Shein não tem validade fixa; a Kwai fica como a confirmar
+  aceite: O banco guarda a data da última chamada com sucesso, porque o Mercado Livre cai após 4 meses sem chamada
+  aceite: Existe consulta das conexões que vencem dentro do prazo de aviso (sugestão: 30 dias, e 7 na Shopee), com índice na data de validade
+  prioridade: Deve 3
+  valor: 7 conexão vencida deixa a análise sem dado
+  pontos: 3
+- Guardar aplicativo por plataforma
+  depende: Criar tabela de plataformas e capacidades
+  historia: Como analista de marketplaces, quero o aplicativo de cada plataforma cadastrado, para saber se a integração está aprovada.
+  aceite: A tabela aplicativo guarda, por plataforma, identificador, situação (Aprovado, Em revisão), tipo, endereço de retorno de teste e de produção, lista de IPs e data da última troca
+  aceite: Cada plataforma tem um só aplicativo ativo, e a Shopee guarda os dois endereços de retorno
+  aceite: O segredo do aplicativo (Partner Key, chave secreta) vai para o Vault só de gravação, e a tela só mostra a data da última troca
+  prioridade: Deve 3
+  valor: 7 sem aplicativo aprovado a plataforma não conecta
+  pontos: 3
+- Trocar e revogar segredo com registro
+  depende: Guardar segredos no Vault só de gravação
+  historia: Como dono do IT.MK, quero trocar ou revogar um segredo com registro de quem fez, para reagir rápido a um vazamento.
+  aceite: Trocar um segredo grava o novo no Vault e registra na auditoria quem trocou e quando, sem o valor
+  aceite: Token renovado (Shopee a cada 4 horas, Mercado Livre a cada 6 horas) é gravado antes de o anterior ser descartado, e falha ao gravar gera alerta e pede nova autorização
+  aceite: Revogar marca o segredo como revogado com data e usuário, e segredo revogado nunca é lido
+  prioridade: Deve 3
+  valor: 8 token novo perdido obriga o vendedor a autorizar de novo
+  pontos: 5
+
+Análise de loja no banco [Database] {v1.0}
+meta: o analista de marketplaces vê a situação de cada loja nas quatro plataformas, preenche a análise e compara com a anterior
+- Criar análise de loja como foto imutável
+  depende: Criar tabela de loja
+  historia: Como analista de marketplaces, quero que cada análise fique guardada como foto com data e autor, para comparar com a anterior sem perder nada.
+  aceite: A tabela analise_loja guarda loja, data, autor e número da análise, e nenhuma análise salva é editada, porque corrigir é fazer outra
+  aceite: Update e delete são bloqueados por gatilho e por permissão, como na auditoria
+  aceite: A consulta da análise anterior da mesma loja devolve a última por data, com índice por loja e data
+  aceite: Salvar a análise e seus campos acontece numa só transação, tudo ou nada
+  prioridade: Deve 2
+  valor: 9 sem foto guardada não há comparação com a análise anterior
+  pontos: 5
+- Guardar campos da análise com origem
+  depende: Criar análise de loja como foto imutável
+  historia: Como analista de marketplaces, quero saber de onde veio cada campo da análise, para confiar no que leio.
+  aceite: A tabela analise_campo guarda a chave do campo (por exemplo fat.total ou cad.login), o valor e a origem, e origem só aceita Manual, API, Calculado ou Cadastro
+  aceite: Campo com origem API ou Calculado não aceita gravação manual e guarda a data da última leitura
+  aceite: Campo que a plataforma não entrega (por exemplo desempenho e violações da Shein) nasce Manual
+  aceite: Concorrência e preço de terceiros nunca recebem origem API
+  prioridade: Deve 3
+  valor: 8 o selo de origem evita editar à mão o que vem da API
+  pontos: 8
+- Guardar violações, devoluções e campanhas
+  depende: Criar análise de loja como foto imutável
+  historia: Como analista de marketplaces, quero as listas de violações, devoluções e campanhas de cada análise, para entender o que pesa na saúde da loja.
+  aceite: Violações, devoluções e campanhas são linhas filhas da análise, com chave estrangeira restrict
+  aceite: Violação guarda data, motivo, penalidade, pontos, situação e prazo, e devolução guarda data, pedido, produto, motivo e situação
+  aceite: Valor em R$ dessas linhas, quando existir, é numeric(14,2)
+  prioridade: Deveria 3
+  valor: 6 detalha o que explica a nota da loja
+  pontos: 5
+- Calcular indicadores e faixa de saúde única
+  depende: Guardar campos da análise com origem
+  historia: Como analista de marketplaces, quero indicadores comparáveis e uma faixa de saúde igual nas quatro plataformas, para comparar lojas de plataformas diferentes.
+  aceite: Indicadores numéricos (faturado, pedidos, devoluções, violações) ficam em colunas numeric, para comparar uma análise com a anterior por consulta
+  aceite: A faixa de saúde usa uma só lista, partindo de Excelente, Boa e Regular do protótipo com a lista final em decisão registrada, calculada pelo sistema e com a versão da regra guardada
+  aceite: A faixa nunca vem do marketplace, e o cálculo tem teste com casos fixos de entrada e saída
+  prioridade: Deveria 3
+  valor: 7 uma faixa só permite comparar lojas
+  pontos: 5
+- Criar selo da análise e consultas do painel
+  depende: Criar análise de loja como foto imutável
+  historia: Como analista de marketplaces, quero ver numa lista a situação de cada loja, para saber onde falta análise.
+  aceite: O selo da análise (Sem análise, Em dia, Desatualizada) é calculado por consulta a partir da data da última análise, e o prazo para Desatualizada é configuração com decisão registrada
+  aceite: A consulta do painel devolve loja, plataforma, situação da conexão, selo e faixa de saúde numa só chamada
+  aceite: O filtro por plataforma, situação e selo usa índice, e o plano foi conferido com EXPLAIN
+  prioridade: Deve 3
+  valor: 8 é a lista de trabalho diária do analista de marketplaces
+  pontos: 5
+
+Faturamento e bases no banco [Database] {v1.1}
+meta: o analista fecha o mês com o faturado de cada loja guardado por base de cálculo, com histórico de cada troca de base
+- Criar competências do fechamento
+  depende: Definir tipos de dinheiro e competência
+  historia: Como analista de cobrança, quero cada mês de fechamento guardado com seu estado, para saber o que está aberto e o que está fechado.
+  aceite: A tabela competencia guarda o primeiro dia do mês (date), vencimento, estado (aberta ou fechada), data e quem fechou, com chave única pela data
+  aceite: Competência fechada não aceita mudança de faturado, imposto ou valor (update falha), e ajuste depois do fechamento está fora do plano
+  aceite: Fechar a competência grava evento de auditoria com usuário e hora na mesma transação
+  prioridade: Deve 2
+  valor: 9 fechado precisa ficar congelado para o valor não mudar sem aviso
+  pontos: 3
+- Criar bases de cálculo do faturado
+  depende: Criar tabela de plataformas e capacidades
+  historia: Como analista de cobrança, quero escolher de onde vem o número do faturado, para cobrar sobre a base certa de cada loja.
+  aceite: A tabela base_calculo tem cinco bases: Faturamento total, Valor dos produtos sem frete, Pedidos concluídos, Notas fiscais emitidas e Valor manual
+  aceite: Cada plataforma só aceita as bases que sua capacidade permite (a Kwai não aceita Notas fiscais emitidas), e loja sem conexão ativa só aceita Valor manual, por regra no banco e não por condição espalhada no código
+  aceite: A base padrão do sistema vem de Configurações e cai em Faturamento total quando a loja não suporta a escolhida
+  prioridade: Deve 3
+  valor: 8 base errada gera cobrança errada
+  pontos: 3
+- Guardar faturado por loja e base
+  depende: Criar competências do fechamento
+  historia: Como analista de cobrança, quero o faturado e o imposto de cada loja por base, para conferir o valor antes de fechar.
+  aceite: A tabela faturado_loja guarda competência, loja, base escolhida, valor de cada base, imposto, alíquota, valor da 40% e origem (API, planilha ou manual), em numeric(14,2) ou numeric(9,6)
+  aceite: Há chave única por competência, loja e origem, e importar o mesmo lote duas vezes não duplica (on conflict do nothing, com relatório de divergência)
+  aceite: Faturado vazio (a calcular), zero (sem movimento) e valor são três estados distintos, garantidos por check
+  aceite: O arredondamento do imposto e do valor da 40% segue a regra única de arredondamento registrada
+  prioridade: Deve 2
+  valor: 9 é a entrada do cálculo da cobrança
+  pontos: 8
+- Guardar alteração de base com histórico
+  depende: Guardar faturado por loja e base
+  historia: Como analista de cobrança, quero trocar a base de uma loja com registro de quem trocou e por quê, para explicar a mudança do valor.
+  aceite: A alteração grava alcance (só esta loja, lojas selecionadas ou todas as lojas) e duração (somente no mês vigente ou para sempre)
+  aceite: Cada alteração guarda data e hora, usuário, competência, base de antes, base de depois e motivo, em tabela só de inserção
+  aceite: Duração para sempre grava a base própria da loja, e somente no mês vigente vale só para aquela competência
+  aceite: Ao trocar a base o imposto é recalculado proporcional ao faturado novo pela regra única de arredondamento, e competência fechada não aceita a troca
+  prioridade: Deve 3
+  valor: 7 troca de base sem rastro muda o valor sem explicação
+  pontos: 5
+- Guardar pedidos e notas
+  depende: Criar competências do fechamento
+  historia: Como analista de cobrança, quero os pedidos e as notas que formam o faturado, para conferir de onde veio o número.
+  aceite: As tabelas pedido e nota guardam loja, data, valor numeric(14,2) e identificador externo, com chave única por plataforma e identificador
+  aceite: A importação guarda arquivo (nome gerado pelo servidor e hash), linhas lidas, aceitas e rejeitadas e o motivo de cada rejeição
+  aceite: Dado pessoal do comprador que a plataforma mascara não é guardado
+  aceite: A soma e a contagem do lote importado conferem com o total do arquivo antes de a competência fechar
+  prioridade: Deveria 3
+  valor: 7 permite provar o faturado numa contestação
+  pontos: 8
+
+Cobrança e Pix no banco [Database] {v1.1}
+meta: o analista gera a cobrança de cada pagador com Pix e consegue explicar cada valor pela memória de cálculo guardada
+- Criar cobrança e itens por loja
+  depende: Criar tabela de loja
+  historia: Como analista de cobrança, quero a cobrança do pagador com um item por loja, para enviar um total que bate com o cálculo.
+  aceite: A tabela cobranca guarda pagador, competência, tipo, vencimento, status (lista decidida) e valor total numeric(14,2), com chave única por pagador, competência, tipo e versão
+  aceite: A tabela cobranca_item guarda uma linha por loja com valor numeric(14,2), e o total da cobrança é igual à soma dos itens, garantido por check ou gatilho
+  aceite: Chaves estrangeiras de pagador, loja e competência usam on delete restrict, e o saldo é o total menos os pagamentos, calculado por consulta
+  aceite: Mudança de status só pelas transições permitidas, com update condicional (where status igual ao esperado) conferindo as linhas afetadas
+  prioridade: Deve 2
+  valor: 10 é o centro de todo o dinheiro do IT.MK
+  pontos: 8
+- Versionar cálculo e guardar memória de cálculo
+  depende: Criar cobrança e itens por loja
+  historia: Como analista de cobrança, quero que cada valor tenha sua memória de cálculo guardada, para explicar o valor ao pagador.
+  aceite: A tabela regra_calculo tem versão, início de vigência, percentual numeric(9,6), prazo, juros, multa, arredondamento e autor, e regra velha nunca é editada
+  aceite: A cobrança guarda a regra usada, as entradas (base, faturado, imposto, alíquota) e o resultado, e recalcular cria nova versão ligada à anterior com motivo, ficando a antiga como Substituída
+  aceite: A memória de cálculo guarda competência, loja, base usada, fonte e período do dado, quem conferiu e quando, e as versões do cálculo com quem fez e o motivo
+  aceite: Existe teste de regressão com casos fixos de entrada e saída para a versão da regra, e o arredondamento segue a regra única registrada
+  prioridade: Deve 2
+  valor: 10 sem a memória o valor cobrado não se explica numa contestação
+  pontos: 8
+- Criar Pix com estados
+  depende: Criar cobrança e itens por loja
+  historia: Como analista de cobrança, quero acompanhar cada Pix do gerado ao pago, para saber o que falta receber.
+  aceite: A tabela pix guarda cobrança, parcela, provedor, identificador no provedor, copia e cola, link, vencimento, prazo final, valor e estado
+  aceite: O estado só aceita Pix gerado, Enviado, Pago, Expirado ou Cancelado, com transições permitidas, e Pix pago não volta
+  aceite: O identificador nosso da cobrança no provedor (txid de 26 a 35 letras e números no Inter, externalReference no Asaas) é gerado e guardado antes da chamada, é único e nunca é reaproveitado, nem de cobrança cancelada
+  aceite: Pix de valor fixo não aceita pagamento parcial, e o valor do Pix é o total da cobrança ou da loja, nunca editável pelo pagador
+  prioridade: Deve 2
+  valor: 10 sem Pix guardado não há como receber nem conferir
+  pontos: 8
+- Gerar um Pix por pagador ou por loja e por parcela
+  depende: Criar Pix com estados
+  historia: Como analista de cobrança, quero um Pix por pagador, ou por loja, e um por parcela, para cada pagamento ligar certo na cobrança.
+  aceite: No modo um Pix por pagador existe um Pix por cobrança, no modo um Pix por loja existe um Pix por loja, e no parcelamento existe um Pix por parcela (e por loja quando o modo for por loja)
+  aceite: Cada Pix de parcela tem vencimento e identificador próprios, e a soma das parcelas é igual ao total, com a diferença de centavos na última parcela pela regra única de arredondamento
+  aceite: O modo vale o do pagador e, se for padrão do sistema, o de Configurações
+  prioridade: Deve 3
+  valor: 8 parcelamento e Pix por loja mudam quantos Pix existem
+  pontos: 5
+- Controlar validade após o vencimento
+  depende: Criar Pix com estados
+  historia: Como responsável pelo financeiro, quero que o Pix deixe de valer 30 dias depois do vencimento, para não receber Pix fora do prazo sem querer.
+  aceite: O prazo final é o vencimento mais 30 dias (decisão de 01/10/2026), guardado em cada Pix, e o número de dias vem de Configurações
+  aceite: No Inter o prazo vai no campo validadeAposVencimento, e no Asaas uma rotina diária remove a cobrança em aberto cujo prazo acabou, porque o QR do Asaas vale 12 meses
+  aceite: A remoção grava evento de auditoria e o Pix passa para Expirado, e Pix que chega depois do prazo vai para divergência com o motivo de prazo
+  prioridade: Deve 3
+  valor: 8 sem a remoção o Asaas aceita Pix por até 12 meses
+  pontos: 5
+- Agendar envio da cobrança
+  depende: Criar Pix com estados
+  historia: Como analista de cobrança, quero agendar o envio da cobrança do mês, para as mensagens saírem no dia e na hora certos.
+  aceite: A tabela de agenda guarda competência, data e hora do envio e estado (agendado, enviado, cancelado)
+  aceite: Cobrança já enviada não é reenviada, pela chave de idempotência (cobrança, data e canal), mesmo se o robô reiniciar
+  aceite: A fila de envio é uma tabela com estado, tentativas e próxima tentativa, e chamada externa nunca fica dentro de transação aberta
+  prioridade: Deveria 3
+  valor: 7 evita cobrar duas vezes quando o sistema reinicia
+  pontos: 5
+
+Recebimentos no banco [Database] {v1.1}
+meta: o analista confere o dinheiro que entrou sem pagamento duplicado, e cada divergência vai para uma pessoa decidir
+- Criar pagamento com identificador único
+  depende: Criar cobrança e itens por loja
+  historia: Como analista de cobrança, quero que o mesmo pagamento Pix nunca seja lançado duas vezes, para não errar o saldo.
+  aceite: A tabela pagamento guarda cobrança (pode ficar sem ligação), valor numeric(14,2), moeda BRL, meio, data do pagamento, recebido em e o identificador da transação do provedor, que tem restrição unique
+  aceite: Inserir o mesmo identificador de novo não cria linha (on conflict do nothing), e um teste com 20 envios iguais ao mesmo tempo grava um só pagamento
+  aceite: A baixa grava pagamento, muda o status da cobrança e grava a auditoria numa única transação, com update condicional e trava na cobrança
+  aceite: A baixa automática só acontece se cobrança, valor dentro da tolerância, prazo, pagador e identificador novo baterem, senão cria divergência, e o rateio entre lojas segue a regra única de arredondamento com a sobra na última loja com saldo
+  prioridade: Deve 2
+  valor: 10 pagamento duplicado erra o saldo e o dinheiro do cliente
+  pontos: 8
+- Guardar aviso bruto do provedor
+  depende: Criar contas do banco com privilégio mínimo
+  historia: Como time técnico, quero guardar o aviso do provedor inteiro antes de processar, para investigar e reprocessar sem perder nada.
+  aceite: A tabela webhook_evento_recebido guarda provedor, id do evento (unique junto com o provedor), hora, assinatura conferida, corpo cru, hash do corpo, estado (recebido, processado, erro) e tentativas
+  aceite: No Asaas a unicidade é pelo id do evento e no Inter pelo endToEndId, e aviso repetido não processa de novo
+  aceite: O aviso pode trazer lista com vários Pix e campos novos, sem derrubar a gravação
+  aceite: Evento com erro vai para fila de erros com alerta, e o corpo completo do aviso nunca vai para o log comum
+  prioridade: Deve 2
+  valor: 9 sem o aviso guardado o Pix perdido não se recupera
+  pontos: 5
+- Criar divergência com quatro motivos
+  depende: Criar pagamento com identificador único
+  historia: Como analista de cobrança, quero que todo Pix que não bate vá para uma lista com o motivo, para uma pessoa decidir.
+  aceite: A tabela divergencia guarda pagamento, cobrança esperada, valor esperado, valor recebido, quem pagou, hora, provedor, identificador e motivo
+  aceite: O motivo só aceita Valor diferente, Quem pagou é diferente do pagador, Pix fora do prazo ou expirado e Pagamento duplicado, por check
+  aceite: Divergência nasce aberta, e nenhuma rotina devolve ou resolve sozinha
+  prioridade: Deve 2
+  valor: 9 nada se resolve sozinho com o dinheiro do cliente
+  pontos: 5
+- Registrar decisão da divergência e crédito
+  depende: Criar divergência com quatro motivos
+  historia: Como analista de cobrança, quero registrar o que decidi em cada divergência, para ter prova de quem escolheu e quando.
+  aceite: A decisão aceita aceitar, devolver, ligar a outra cobrança ou guardar como crédito, com nome de quem decidiu, hora e motivo, em linha só de inserção
+  aceite: Devolução só nasce por decisão de uma pessoa, dentro de 90 dias do Pix, e só fecha ao receber o aviso final do provedor
+  aceite: O crédito do pagador é uma tabela de lançamentos numeric(14,2) com entrada, saída e motivo, e o saldo é a soma, sem coluna de saldo editável
+  aceite: Dois analistas decidindo a mesma divergência ao mesmo tempo: só uma decisão vale, pela versão do registro
+  prioridade: Deve 3
+  valor: 9 nunca devolver sozinho é regra aprovada pelo dono
+  pontos: 8
+- Guardar comprovante com hash
+  depende: Criar pagamento com identificador único
+  historia: Como analista de cobrança, quero guardar o comprovante de quem paga por fora do link, para conferir e ligar ao pagamento.
+  aceite: A tabela comprovante guarda pagador, arquivo (nome gerado pelo servidor e hash), valor, quem pagou, estado (a conferir, conferido) e quem conferiu
+  aceite: O arquivo fica em bucket privado do Storage, e no banco ficam só o caminho e o hash, nunca o arquivo
+  aceite: O comprovante em PDF vale só para quem paga por fora do link, e tipo e tamanho do arquivo são validados
+  prioridade: Deveria 3
+  valor: 6 primeiro mês roda em paralelo com conferência manual
+  pontos: 3
+- Guardar pagamento sem cobrança ligada
+  depende: Criar pagamento com identificador único
+  historia: Como analista de cobrança, quero ver os pagamentos que ainda não têm cobrança ligada, para ligar cada um à cobrança certa.
+  aceite: Pagamento sem cobrança fica com estado pendente e aparece na consulta paginada Sem cobrança ligada
+  aceite: Desfazer a baixa nunca apaga o pagamento, ele volta para Sem cobrança ligada e grava auditoria
+  aceite: A consulta por período e faixa de valor usa índice e devolve a primeira página com plano conferido por EXPLAIN
+  prioridade: Deve 3
+  valor: 7 dinheiro sem ligação precisa de dono
+  pontos: 3
+
+Configurações no banco [Database] {v1.1}
+meta: o responsável pelo financeiro muda provedor, juros, modo e régua pela tela e cada mudança fica guardada
+- Guardar provedor de Pix, ambiente e chave Pix
+  depende: Guardar credenciais do Inter e do Asaas
+  historia: Como responsável pelo financeiro, quero escolher o provedor de Pix e o ambiente, para gerar cobrança no lugar certo.
+  aceite: A configuração guarda provedor (Asaas ou Banco Inter), ambiente (teste ou produção), chave Pix recebedora e validade do link em dias (30), com o Asaas como provedor de partida e o Inter pedido em paralelo
+  aceite: A configuração vale por provedor e por ambiente (quatro combinações), e a tela não mostra campos do outro provedor
+  aceite: O titular da conta que recebe é decisão aberta do dono e fica registrado como em aberto até ser definido
+  aceite: Cada mudança grava no histórico de configuração com usuário e hora
+  prioridade: Deve 3
+  valor: 8 sem provedor configurado não há Pix
+  pontos: 5
+- Guardar juros e multa desligados por padrão
+  depende: Guardar provedor de Pix, ambiente e chave Pix
+  historia: Como responsável pelo financeiro, quero juros e multa desligados por padrão, para nunca cobrar a mais sem o dono decidir.
+  aceite: A configuração nasce com juros e multa desligados, e multa em % e juros em % ao mês, em numeric(9,6), ficam vazios até o dono definir
+  aceite: Com juros e multa desligados nenhum campo de juros ou multa vai ao provedor, e a conta do Asaas não pode ter juros e multa padrão ligados
+  aceite: Ligar exige usuário e motivo no histórico, e ligado a multa vale uma vez e os juros valem ao mês
+  aceite: Cobrança com juros e multa ligados guarda o valor original e os componentes separados, pela regra única de arredondamento
+  prioridade: Deve 3
+  valor: 7 cobrar juros sem querer gera reclamação e risco legal
+  pontos: 3
+- Guardar modo padrão, base padrão e regras do fechamento
+  depende: Versionar cálculo e guardar memória de cálculo
+  historia: Como responsável pelo financeiro, quero o modo padrão de cobrança, a base padrão e as regras do fechamento guardados, para o mês fechar do mesmo jeito sempre.
+  aceite: A configuração guarda o modo padrão de cobrança (um Pix por pagador) e a base padrão (Faturamento total)
+  aceite: As regras do fechamento (percentual da 40% hoje 40, dia do vencimento hoje 20, tolerância hoje R$ 0,02, máximo de parcelas hoje 12) ficam na tabela regra_calculo versionada, e mudar cria versão nova
+  aceite: Mudar o padrão não muda cobrança já gerada nem competência fechada
+  prioridade: Deve 3
+  valor: 7 regra mudada sem versão deixa a cobrança antiga sem explicação
+  pontos: 3
+- Guardar modelos de mensagem com aprovação
+  depende: Guardar histórico de configuração
+  historia: Como analista de cobrança, quero modelos de mensagem aprovados pela equipe, para o robô só falar com o pagador o que foi aprovado.
+  aceite: A tabela modelo_mensagem guarda nome, texto, variáveis permitidas (nome, competência, total, vencimento, Pix e outras), versão e estado de aprovação
+  aceite: Mensagem do robô só usa modelo aprovado, e cada envio guarda a versão do modelo usada
+  aceite: Texto aprovado nunca é editado, e mudar cria versão nova que precisa de nova aprovação, com quem aprovou e quando
+  aceite: Variável fora da lista permitida é recusada na gravação
+  prioridade: Deve 3
+  valor: 8 evita texto livre perigoso saindo para o pagador
+  pontos: 5
+- Guardar régua como dados validados
+  depende: Guardar modelos de mensagem com aprovação
+  historia: Como analista de cobrança, quero a régua de cobrança guardada como dados validados, para mudar dias e ações sem mexer no código.
+  aceite: A tabela etapa_regua guarda dia relativo ao vencimento, ação, modelo, ativa e condição, com check do tipo de ação
+  aceite: As etapas partem das seis do protótipo: Lembrete no dia -2, Vencimento no dia 0, Atraso 1 no dia 3, Atraso 2 no dia 10, Aviso de bloqueio no dia 20 e Pedir bloqueio no dia 25
+  aceite: Dois dias iguais na mesma régua são recusados, e etapa aponta só para modelo aprovado
+  aceite: A regra de pausa (promessa, acordo, contestação) fica no código e não nos dados, e exceções por pagador (Não cobrar, Régua mais firme, Régua mais leve) ficam em tabela própria
+  prioridade: Deveria 3
+  valor: 7 a régua muda com frequência e não pode exigir entrega nova
+  pontos: 5
+
+Inadimplência e contestações no banco [Database] {v1.2}
+meta: atraso, acordo, bloqueio e contestação são tratados dentro do sistema, com tudo guardado e a régua pausando sozinha
+- Criar acordo e parcelas
+  depende: Criar cobrança e itens por loja
+  historia: Como analista de cobrança, quero fechar acordo em parcelas, para o pagador quitar o atraso sem eu perder o controle.
+  aceite: A tabela acordo guarda pagador, cobranças incluídas, valor total numeric(14,2), entrada, número de parcelas (até o máximo configurado) e estado (ativo, quebrado, quitado)
+  aceite: A tabela acordo_parcela guarda número, valor e vencimento, e a soma das parcelas é igual ao valor total (gatilho), com a diferença de centavos na última parcela pela regra única de arredondamento
+  aceite: Um índice único parcial garante um só acordo ativo por pagador
+  aceite: Aprovar acordo roda no servidor numa transação com trava na cobrança, e quebrar o acordo grava evento e reativa as cobranças
+  prioridade: Deve 2
+  valor: 9 acordo com soma errada ou duplicado gera cobrança errada
+  pontos: 8
+- Criar contestação com situações, motivos e prazo
+  depende: Criar cobrança e itens por loja
+  historia: Como analista de cobrança, quero registrar a contestação do pagador com motivo e prazo, para a cobrança parar enquanto uma pessoa decide.
+  aceite: A tabela contestacao guarda cobrança, motivo (Valor errado, Loja encerrada, Pagamento já feito, Não reconhece a loja, Faturamento diferente, Outro), valor contestado, prazo, situação e quem abriu
+  aceite: A situação só aceita Aberta, Em análise, Aguardando cliente, Procedente, Improcedente e Ajustada, com transições permitidas
+  aceite: Contestação Aberta, Em análise ou Aguardando cliente pausa o robô para a cobrança (falha fechada), e abrir grava evento na cobrança na mesma transação
+  aceite: Resolução procedente ou ajustada cria lançamento de ajuste, nunca edita o valor antigo
+  prioridade: Deve 2
+  valor: 9 cobrar quem contestou gera disputa e reclamação
+  pontos: 8
+- Guardar histórico e memória de cálculo da contestação
+  depende: Criar contestação com situações, motivos e prazo
+  historia: Como analista de cobrança, quero o histórico da contestação com a memória de cálculo anexada, para decidir com a prova na mão.
+  aceite: A tabela contestacao_evento é só de inserção e guarda tipo, autor, texto, anexos (hash) e hora
+  aceite: Ao abrir a contestação, a memória de cálculo da cobrança é anexada na versão vigente naquele dia
+  aceite: Só uma pessoa decide, a decisão guarda o nome, e o robô nunca decide
+  prioridade: Deve 3
+  valor: 8 a memória anexada é a prova do valor cobrado
+  pontos: 3
+- Criar promessa e retorno
+  depende: Criar cobrança e itens por loja
+  historia: Como analista de cobrança, quero registrar a data que o pagador prometeu pagar, para a régua parar e eu cobrar o retorno.
+  aceite: A tabela promessa guarda pagador, data prometida, prazo de retorno, resultado (reagendado, não atendeu, recusou, número errado) e quem registrou
+  aceite: Promessa ativa pausa a régua e só existe uma ativa por pagador, por índice único parcial
+  aceite: Cada resultado registrado entra na linha do tempo do pagador com usuário e hora
+  prioridade: Deve 3
+  valor: 7 evita cobrar quem prometeu pagar
+  pontos: 3
+- Criar bloqueio e desbloqueio de loja
+  depende: Criar tabela de loja
+  historia: Como analista de cobrança, quero registrar o pedido de bloqueio e de desbloqueio de loja, para saber em que passo cada um está.
+  aceite: A tabela bloqueio_loja guarda loja, tipo (bloqueio ou desbloqueio), situação (a pedir, enviado ao grupo, confirmado, desbloqueio a pedir), data, motivo e quem pediu
+  aceite: Cada passo grava na história do bloqueio com usuário e hora, e a situação da loja (ativa, bloqueada, inativa) muda só por transição permitida
+  aceite: Loja com promessa, acordo ativo ou contestação ativa não entra na lista a pedir
+  prioridade: Deve 3
+  valor: 7 bloquear loja errada afeta o negócio do cliente
+  pontos: 5
+- Registrar pedidos de saída e baixas
+  depende: Criar cobrança e itens por loja
+  historia: Como analista de cobrança, quero registrar pedidos de saída de loja e baixas de cobrança antiga, para limpar a lista sem perder o histórico.
+  aceite: A tabela pedido_saida guarda pagador, lojas, data do pedido, data efetiva e situação (pendente, concluída, cancelada), com histórico
+  aceite: A baixa de cobrança antiga guarda motivo (Passivo antigo sem chance de cobrança, Pagamento não registrado, Cobrança lançada por engano), quem fez e quando, e nunca apaga a cobrança
+  aceite: A baixa é lançamento novo que aponta para a cobrança, e o saldo continua calculado por consulta
+  prioridade: Deveria 3
+  valor: 6 mantém a lista de atraso limpa sem apagar o passado
+  pontos: 5
+
+Conversas e robô no banco [Database] {v1.3}
+meta: o robô cobra sozinho dentro de limites, com aprovação de uma pessoa e auditoria completa guardada no banco
+- Registrar execuções do robô
+  depende: Encadear selo de integridade na auditoria
+  historia: Como dono do IT.MK, quero ver tudo o que o robô fez e também o que decidiu não fazer, para confiar nele e me defender.
+  aceite: A tabela robo_execucao guarda início, fim, versão do robô, versão da regra e resultado, e robo_acao guarda cobrança, pagador, ação, regra aplicada, canal, chave de idempotência e resultado
+  aceite: As duas tabelas são só de inserção, com selo encadeado, e a conta do robô só tem permissão de inserir
+  aceite: A ação de ignorar (por exemplo contestação aberta, acordo ativo, fora do horário) também é registrada com o motivo
+  aceite: A chave de idempotência (cobrança, data, canal) é unique, e uma rodada roda por vez por trava consultiva (pg_try_advisory_xact_lock)
+  prioridade: Deve 2
+  valor: 10 é a prova do que o robô fez e deixou de fazer
+  pontos: 8
+- Criar conversa e mensagem
+  depende: Criar tabela de pagador com modo de cobrança
+  historia: Como analista de cobrança, quero as conversas com o pagador guardadas, para atender e provar o que foi dito.
+  aceite: A tabela conversa liga ao pagador (ou a um grupo interno), e a tabela mensagem guarda sentido (pagador ou equipe), tipo (texto, imagem, PDF, áudio), hora e identificadores do WhatsApp (waid) e interno
+  aceite: Mensagem repetida (mesmo waid) não duplica, por chave única
+  aceite: As não lidas por conversa vêm de consulta ou de contador atualizado na mesma transação, nunca de dois lugares sem dono
+  aceite: Nota interna fica marcada e nunca é enviada ao pagador, e mídia guarda caminho e hash, não o arquivo
+  prioridade: Deve 3
+  valor: 9 é a base do atendimento e da prova de cobrança
+  pontos: 8
+- Criar fila de aprovação e modo sombra
+  depende: Guardar situação do robô por pagador
+  historia: Como analista de cobrança, quero aprovar ou editar o que o robô propõe, para ele não agir sozinho no que é delicado.
+  aceite: A tabela de fila guarda tipo (parcelamento, prazo novo, bloqueio, desbloqueio, resposta a contestação, mensagem fora do padrão), pagador, pedido, proposta, hora e estado
+  aceite: Qualquer usuário com Aprova a fila do robô ligado aprova, e a aprovação guarda quem e quando e vale para uma só execução
+  aceite: O modo sombra (só sugere, não envia) é configuração, e cada sugestão guarda se foi aprovada sem edição, editada ou recusada, para medir a taxa de aprovação
+  prioridade: Deve 2
+  valor: 9 uma pessoa decide o que o robô não faz sozinho
+  pontos: 8
+- Guardar situação do robô por pagador
+  depende: Criar tabela de pagador com modo de cobrança
+  historia: Como analista de cobrança, quero marcar se o robô atende cada pagador, para ele não falar com quem está em negociação.
+  aceite: A situação do pagador aceita só Atende, Não atende ou Em teste, com motivo, desde quando e quem alterou, e a mudança grava auditoria
+  aceite: Não atende exige motivo escrito
+  aceite: A lista de pagadores filtra por situação do robô com índice
+  prioridade: Deve 3
+  valor: 7 controla quem o robô pode cobrar
+  pontos: 3
+- Registrar atribuição e escalação
+  depende: Criar conversa e mensagem
+  historia: Como analista de cobrança, quero saber quem cuida de cada conversa e por que o robô passou para uma pessoa, para ninguém ficar sem resposta.
+  aceite: A conversa tem um só responsável por vez, pessoa ou robô, e cada troca grava linha com quem, quando e motivo
+  aceite: Escalar para pessoa exige motivo (por exemplo Pediu parcelamento, Contestou o valor) e a conversa aparece no atendimento humano com o tempo de espera
+  aceite: Assumir a conversa pausa o robô só nela, e o botão Robô ON/OFF das Conversas não muda de comportamento
+  prioridade: Deve 3
+  valor: 8 evita conversa parada sem dono
+  pontos: 5
+- Guardar limites, horários e feriados do robô
+  depende: Guardar histórico de configuração
+  historia: Como dono do IT.MK, quero limites de envio guardados no banco, para o robô não cobrar demais nem fora de hora, já que a WhatsGW não controla isso.
+  aceite: Guarda limite por dia no total (40), por pagador por dia (1) e intervalo mínimo (180 minutos), com valores iniciais baixos e cada subida registrada com quem e por quê
+  aceite: Guarda horário (09:00 às 17:30), dias da semana (segunda a sexta) e lista de feriados com a chave de não enviar em feriados
+  aceite: Cada envio guarda o contador que o liberou, para conferir o limite de verdade
+  prioridade: Deve 3
+  valor: 8 sem limite o número pode ser banido
+  pontos: 5
+- Registrar opt-out e opt-in do pagador
+  depende: Criar conversa e mensagem
+  historia: Como analista de cobrança, quero que o pedido de parar do pagador seja respeitado na hora, para não insistir com quem não quer.
+  aceite: A tabela opt_out guarda pagador, telefone, palavra de parada, mensagem de origem, hora e quem tratou, e o pedido de parar marca o pagador como Não atende na mesma transação
+  aceite: Telefone na lista de não contatar nunca recebe envio, pela verificação da fila de saída
+  aceite: Fica guardado quando e como o pagador deu o número (registro do opt-in)
+  prioridade: Deve 3
+  valor: 8 a WhatsGW não tem opt-out, então o IT.MK precisa construir
+  pontos: 5
+- Guardar estado da conexão do WhatsApp
+  depende: Guardar limites, horários e feriados do robô
+  historia: Como analista de cobrança, quero saber se o número do robô está conectado, para nada sair com o número caído.
+  aceite: A tabela guarda o número exclusivo do robô, o estado (conectado, desconectado, restrito) e conectado desde, e cada mudança grava linha com hora e origem (evento phonestate ou account_health)
+  aceite: Estado desconectado ou restrito pausa o robô, e a volta depende de confirmação de uma pessoa e, se restrito, do fim da restrição
+  aceite: O modo do canal (QR hoje, Oficial depois) fica em coluna, para planejar o modo Oficial
+  prioridade: Deve 3
+  valor: 8 envio com número caído se perde ou piora o risco de banimento
+  pontos: 3
+- Limite semanal por pagador
+  depende: Guardar limites, horários e feriados do robô
+  prioridade: Poderia 5
+  valor: 3 reduz o risco de excesso de mensagem ao mesmo pagador
+  pontos: 3
+
+Consultas e desempenho [Database] {v1.4}
+meta: o dono vê tudo no Dashboard com consultas rápidas e conferidas
+- Criar visões do Dashboard
+  depende: Criar pagamento com identificador único
+  historia: Como dono do IT.MK, quero ver cobrado e recebido, rankings e contagens numa só tela, para acompanhar a empresa sem pedir relatório.
+  aceite: As visões guardam valor em R$ e contagens de aberto, vencido, recebido, em acordo, bloqueado e em contestação, cada indicador com fórmula escrita e o total que serve de base
+  aceite: A série cobrado x recebido por mês e os rankings saem de visão ou tabela-resumo atualizada por rotina, e mês fechado vem de tabela fechada, não de recálculo
+  aceite: A conta de relatório só lê as visões, e valores por loja e atraso por pagador mostram a mediana junto da média
+  aceite: Cada número do Dashboard bate com a tela de origem em conferência com dados de exemplo (por exemplo recebido do mês igual à soma dos pagamentos do mês)
+  prioridade: Deve 3
+  valor: 9 é a visão única do dono
+  pontos: 8
+- Criar fila do dia, pendências e alertas de dado
+  depende: Criar visões do Dashboard
+  historia: Como analista de cobrança, quero uma fila do dia com pendências e alertas, para saber por onde começar.
+  aceite: A fila do dia lista cobranças vencidas e a vencer ordenadas por vencimento, com índice parcial nos status em aberto
+  aceite: As pendências somam comprovantes a conferir, divergências abertas, pedidos de saída pendentes, aprovações do robô e bloqueios a pedir, sem repetir a mesma informação
+  aceite: Os alertas de dado listam faturado sem imposto, alíquota fora do padrão, valor com diferença maior que 35% do mês anterior, loja bloqueada, loja em saída e pagador sem responsável
+  prioridade: Deve 3
+  valor: 8 é a lista de trabalho do dia
+  pontos: 5
+- Criar índices pelos filtros reais
+  depende: Criar visões do Dashboard
+  historia: Como time técnico, quero índices só para as consultas que existem, para as telas abrirem rápido sem deixar a gravação lenta.
+  aceite: Cada filtro das telas (status mais vencimento, pagador, loja, competência, plataforma, situação do robô) tem índice composto, com igualdade primeiro e faixa depois
+  aceite: Chaves estrangeiras e colunas usadas em política têm índice, e índice em tabela já grande é criado com concurrently, fora de transação
+  aceite: Nenhum índice é criado por precaução, e cada um cita a consulta que o justifica
+  aceite: O plano de cada consulta pesada foi conferido com EXPLAIN e anexado ao item, e o verificador de desempenho do Supabase não aponta chave estrangeira sem índice
+  prioridade: Deveria 3
+  valor: 7 tela lenta no fechamento do mês atrapalha o dia a dia
+  pontos: 5
+- Realtime na fila de cobrança
+  depende: Criar fila do dia, pendências e alertas de dado
+  prioridade: Poderia 5
+  valor: 3 atualizar a fila sem recarregar é conforto, pode ser feito por consulta periódica
+  pontos: 5
+
+Cópia de segurança e segurança do banco [Database] {v1.4}
+meta: o dono confia que o banco volta de um problema e que ninguém acessa o que não deve
+- Ativar backup diário e restauração testada
+  depende: Criar projetos de teste e produção
+  historia: Como dono do IT.MK, quero cópia diária do banco e uma restauração já testada, para não perder pagamento nem auditoria.
+  aceite: O backup diário do plano Pro está ativo na produção e a retenção de 7 dias está anotada
+  aceite: Há ensaio de restauração em ambiente separado a cada trimestre no mínimo, com conferência de totais (soma de valores e contagem de linhas) e tempo gasto registrado
+  aceite: Depois de restaurar são reconferidos senhas de papéis, segredos do Vault e chaves, e a corrente de hash da auditoria continua íntegra
+  aceite: Se o PITR foi contratado, o ensaio restaura a um ponto no tempo e registra o resultado, senão a decisão de não contratar está registrada
+  prioridade: Deve 2
+  valor: 10 perder um dia de pagamentos é grave e backup não testado não vale
+  pontos: 5
+- Resolver avisos de segurança do Supabase
+  depende: Ligar regra de acesso por linha em toda tabela
+  historia: Como time técnico, quero rodar os verificadores do Supabase antes de cada entrega, para não entregar tabela exposta.
+  aceite: Os verificadores de segurança e de desempenho rodam antes de cada entrega, e o resultado é anexado ao item
+  aceite: Não há erro de segurança aberto: tabela sem regra de acesso por linha, política com using (true) fora da exceção, coluna sensível exposta ou referência a user_metadata
+  aceite: Aviso de desempenho (chave estrangeira sem índice) é corrigido ou justificado por escrito
+  prioridade: Deve 3
+  valor: 8 pega erro de exposição antes de o dono ver
+  pontos: 3
+- Testar regra de acesso do banco
+  depende: Ligar regra de acesso por linha em toda tabela
+  historia: Como time técnico, quero testes automáticos de acesso e de concorrência, para provar que cada conta só faz o que pode.
+  aceite: Um conjunto de testes conecta como anon, authenticated, app, robô, conector e relatório, e confere o que cada um pode e não pode fazer (negar por padrão)
+  aceite: O teste falha a entrega se uma tabela nova ficar sem regra de acesso por linha ou com concessão para anon
+  aceite: Um teste de concorrência com várias chamadas iguais de baixa, acordo e contestação prova que só uma vale
+  prioridade: Deve 3
+  valor: 9 prova o que o banco garante mesmo com bug no código
+  pontos: 5
+- Fazer cópia extra semanal fora do Supabase
+  depende: Decidir backup extra fora do Supabase
+  historia: Como dono do IT.MK, quero uma cópia semanal guardada fora do Supabase, para ter outro caminho de volta.
+  aceite: Um pg_dump semanal grava cópia criptografada fora do Supabase, no local definido na decisão
+  aceite: A cópia tem acesso restrito e monitorado, e a falta da cópia da semana gera alerta
+  aceite: A cópia é restaurada em ambiente de teste ao menos uma vez com conferência de totais, e dado pessoal e segredo são mascarados no teste
+  aceite: Está escrito o plano para a chave do Vault numa troca de projeto, porque o projeto novo não decifra os segredos antigos sem a chave raiz
+  prioridade: Deveria 3
+  valor: 7 segunda saída se o projeto tiver problema
+  pontos: 3
+- Copiar comprovantes do Storage
+  depende: Guardar comprovante com hash
+  historia: Como responsável pelo financeiro, quero cópia própria dos comprovantes, para não perder a prova de pagamento.
+  aceite: O backup do banco não cobre o Storage, e os comprovantes têm cópia própria na frequência decidida
+  aceite: O bucket é privado e o acesso é por link temporário
+  aceite: A cópia é conferida contando arquivos e comparando o hash com a tabela comprovante
+  prioridade: Deveria 3
+  valor: 6 arquivo apagado depois do backup não volta
+  pontos: 3
+- Girar chaves e segredos
+  depende: Trocar e revogar segredo com registro
+  historia: Como time técnico, quero uma rotina de troca de senhas e chaves pronta antes de precisar, para reagir rápido a um vazamento.
+  aceite: Existe rotina escrita para girar a senha de cada conta do banco e a chave sb_secret de cada componente, com a data da última troca registrada
+  aceite: A troca usa janela dupla (aceita a antiga e a nova por um tempo) e revoga a antiga depois, e o vazamento tem passo a passo de revogar, girar, apagar e registrar
+  aceite: A detecção de segredo no código roda antes de cada commit
+  prioridade: Deveria 3
+  valor: 7 sem rotina pronta a resposta a vazamento demora
+  pontos: 5
