@@ -29,7 +29,7 @@ function iniciar(){
       {id:1,nome:'Lembrete',dia:-2,acao:'rev',modelo:'lembrete',ativa:true},
       {id:2,nome:'Vencimento',dia:0,acao:'rev',modelo:'lembrete',ativa:true},
       {id:3,nome:'Atraso 1',dia:3,acao:'rev',modelo:'atraso',ativa:true},
-      {id:4,nome:'Atraso 2',dia:10,acao:'rev',modelo:'atraso',ativa:true},
+      {id:4,nome:'Atraso 2',dia:5,acao:'rev',modelo:'atraso',ativa:true},
       {id:5,nome:'Aviso de bloqueio',dia:7,acao:'auto',modelo:'aviso',ativa:true},
       {id:6,nome:'Pedir bloqueio',dia:10,acao:'equipe',modelo:'solic_bloq',ativa:true}
     ],
