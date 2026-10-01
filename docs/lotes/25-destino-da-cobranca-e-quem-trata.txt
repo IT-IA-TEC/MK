@@ -1,0 +1,60 @@
+lote: Destino da cobrança e quem trata
+depois de: Cálculo da cobrança no BL
+
+Destino da cobrança e quem trata [Backend] {v1.1}
+meta: cada loja fala com uma pessoa só, e o usuário escolhe para quem vai a cobrança quando as lojas de um pagador falam com pessoas diferentes
+- Definir o destino da cobrança do pagador
+  historia: Como analista de cobrança, quero que o servidor saiba para quem mandar a cobrança de cada pagador, para a mensagem nunca ir para a pessoa errada.
+  aceite: Cada loja tem uma só pessoa que trata de tudo (quem trata), lida da ficha do BL, e uma pessoa pode tratar várias lojas
+  aceite: Quando todas as lojas do pagador têm a mesma pessoa, a cobrança vai para ela sem pedir escolha
+  aceite: Quando as lojas têm pessoas diferentes, vale a configuração do pagador ou, se não houver, a padrão: cada loja ao seu responsável (exige um Pix por loja), uma pessoa escolhida, todos os responsáveis, ou não enviar até escolher
+  aceite: Com a opção não enviar até escolher, o servidor não envia nada daquele pagador e devolve um alerta visível na ficha e na fila
+  aceite: Cada escolha grava quem escolheu, quando, a opção antiga e a nova, em tabela só de inserção
+  prioridade: Deve 2
+  valor: 9 mensagem para a pessoa errada gera reclamação e cobrança perdida
+  pontos: 5
+- Guardar o destino da cobrança [Database]
+  depende: Definir o destino da cobrança do pagador
+  historia: Como analista de cobrança, quero o destino da cobrança guardado por pagador e como padrão, para valer em todo envio.
+  aceite: A configuração padrão guarda uma das quatro opções (cada loja ao seu responsável, uma pessoa escolhida, todos os responsáveis, não enviar até escolher), com padrão não enviar até escolher
+  aceite: O destino do pagador guarda a opção e, quando for uma pessoa, o CPF dela, e vale no lugar do padrão
+  aceite: O histórico das mudanças é só de inserção e não permite editar nem apagar
+  aceite: Toda tabela nova tem regra de acesso por linha ligada e testada
+  prioridade: Deve 2
+  valor: 8 sem isso a escolha se perde
+  pontos: 3
+- Escolher para quem vai a cobrança [Frontend]
+  depende: Guardar o destino da cobrança
+  historia: Como analista de cobrança, quero escolher para quem vai a cobrança de um pagador cujas lojas falam com pessoas diferentes, para não depender de outra tela.
+  aceite: Na ficha do pagador, o bloco Para quem vai a cobrança só aparece quando as lojas têm pessoas diferentes e mostra as opções: padrão de Configurações, cada loja ao seu responsável, todos os responsáveis e só uma pessoa específica
+  aceite: Cada loja da ficha mostra Quem trata
+  aceite: Com a opção não enviar até escolher, a ficha mostra o aviso A cobrança não sai até você escolher
+  aceite: Em Configurações, Regras padrão, existe a opção padrão para todos os pagadores e a linha só de leitura Congelar competência após o vencimento, que vem do BL
+  aceite: Sem barra de rolagem horizontal e sem espaço vazio em nenhuma largura de computador
+  prioridade: Deve 3
+  valor: 8 evita cobrança travada sem o analista saber
+  pontos: 3
+- BL: Quem trata da loja e responsável terceiro
+  tipo: Tarefa
+  responsavel: William
+  prazo: 02/10/2026
+  aceite: Parte do BL: cada loja tem uma só pessoa que trata de tudo, e por padrão é o cliente CPF dono da loja
+  aceite: Existe o cadastro de responsável terceiro (nome, WhatsApp, e-mail e CPF), visível só dentro da ficha da loja, e para o IT.MK ele aparece como quem trata
+  aceite: O terceiro nunca vira pagador, e uma pessoa pode tratar várias lojas
+  aceite: A visão de loja devolve quem_trata_nome, quem_trata_whatsapp, quem_trata_email e quem_trata_cpf
+  aceite: Mudar o telefone ou o e-mail de quem trata gera o evento de loja alterada
+- BL: Um só pagador por loja e transferência de dono
+  tipo: Tarefa
+  responsavel: William
+  prazo: 02/10/2026
+  aceite: Parte do BL: a loja tem exatamente um CPF dono, e o dono nunca é deduzido pela empresa (CNPJ), que pode ter vários clientes
+  aceite: Trocar o dono grava um registro novo com data efetiva e histórico, sem sobrescrever o anterior
+  aceite: As cobranças antigas continuam com o dono da época
+- BL: Congelar competência após o vencimento
+  tipo: Tarefa
+  responsavel: William
+  prazo: 02/10/2026
+  aceite: Parte do BL: o Java do BL tem a opção de congelar a competência após o vencimento, ligada por padrão, e quantos dias depois do vencimento ela passa a valer (padrão 0)
+  aceite: Competência congelada recusa recálculo, e a correção entra como ajuste na competência seguinte
+  aceite: Cada mudança da opção guarda quem, quando, o valor antigo e o novo
+  aceite: A opção e os dias aparecem para o IT.MK na visão da regra de cálculo, só para leitura
