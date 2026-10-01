@@ -1,0 +1,77 @@
+# Foco só na Shein por enquanto (decisão de 02/10/2026). Os conectores de Shopee, Mercado Livre e Kwai ficam em espera: "Não terá agora". Para voltar, é só trocar a prioridade. Aba: Integrações (Editar em lote, qualquer aba serve).
+
+editar: BL: Cadastrar conta ISV e aplicativo ERP na Shopee
+  no épico: Conector da Shopee
+  prioridade: Não terá agora 4
+
+editar: BL: Declarar IPs e endereços de retorno da Shopee
+  no épico: Conector da Shopee
+  prioridade: Não terá agora 4
+
+editar: BL: Autorizar vendedor na Shopee por link
+  no épico: Conector da Shopee
+  prioridade: Não terá agora 4
+
+editar: BL: Guardar validade e renovar token da Shopee
+  no épico: Conector da Shopee
+  prioridade: Não terá agora 4
+
+editar: BL: Assinar chamadas da Shopee
+  no épico: Conector da Shopee
+  prioridade: Não terá agora 4
+
+editar: BL: Ler pedidos, itens e regras por categoria na Shopee
+  no épico: Conector da Shopee
+  prioridade: Não terá agora 4
+
+editar: BL: Ler violações, punições e devoluções na Shopee
+  no épico: Conector da Shopee
+  prioridade: Não terá agora 4
+
+editar: BL: Ler desempenho e financeiro na Shopee
+  no épico: Conector da Shopee
+  prioridade: Não terá agora 4
+
+editar: BL: Receber avisos Push da Shopee
+  no épico: Conector da Shopee
+  prioridade: Não terá agora 4
+
+editar: BL: Criar o aplicativo único do Mercado Livre
+  no épico: Conector do Mercado Livre
+  prioridade: Não terá agora 4
+
+editar: BL: Autorizar vendedor no Mercado Livre com conta administradora
+  no épico: Conector do Mercado Livre
+  prioridade: Não terá agora 4
+
+editar: BL: Renovar token do Mercado Livre e gravar o novo refresh
+  no épico: Conector do Mercado Livre
+  prioridade: Não terá agora 4
+
+editar: BL: Pedir permissões e liberar IPs no Mercado Livre
+  no épico: Conector do Mercado Livre
+  prioridade: Não terá agora 4
+
+editar: BL: Receber notificações do Mercado Livre
+  no épico: Conector do Mercado Livre
+  prioridade: Não terá agora 4
+
+editar: BL: Ler reputação, anúncios, reclamações e devoluções no Mercado Livre
+  no épico: Conector do Mercado Livre
+  prioridade: Não terá agora 4
+
+editar: BL: Ler faturamento e tarifas no Mercado Livre
+  no épico: Conector do Mercado Livre
+  prioridade: Não terá agora 4
+
+editar: BL: Registrar a documentação da Kwai recebida
+  no épico: Conector da Kwai
+  prioridade: Não terá agora 4
+
+editar: BL: Fazer teste de aprendizado da API da Kwai
+  no épico: Conector da Kwai
+  prioridade: Não terá agora 4
+
+editar: BL: Manter a ficha da Kwai manual até confirmar
+  no épico: Conector da Kwai
+  prioridade: Não terá agora 4
