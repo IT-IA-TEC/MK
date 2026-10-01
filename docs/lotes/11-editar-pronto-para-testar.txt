@@ -1,0 +1,430 @@
+# Marca como Pronto para testar os itens do Frontend que o desenho já cumpre (lista em docs/lista-pronto-para-testar.md).
+# Ficam de fora 7 itens: Foco e navegação por teclado, Exportar PDF, Cadastro da conexão, Aba Aplicativos, Abas de catálogo e violações, Faixa de saúde única e Coluna Base com seletor.
+# Não é Aceito. Aceitar só depois de testar no sistema final.
+
+editar: Identidade visual e padrões de cor
+  no épico: Base visual e navegação
+  situação: Pronto para testar
+
+editar: Menu lateral com nove módulos
+  no épico: Base visual e navegação
+  situação: Pronto para testar
+
+editar: Tela de login
+  no épico: Base visual e navegação
+  situação: Pronto para testar
+
+editar: Cartões, abas e botões padrão
+  no épico: Base visual e navegação
+  situação: Pronto para testar
+
+editar: Tabelas com colunas proporcionais
+  no épico: Base visual e navegação
+  situação: Pronto para testar
+
+editar: Janelas, gavetas e avisos
+  no épico: Base visual e navegação
+  situação: Pronto para testar
+
+editar: Filtro único de busca
+  no épico: Base visual e navegação
+  situação: Pronto para testar
+
+editar: Tela da lista da carteira
+  no épico: Carteira de clientes
+  situação: Pronto para testar
+
+editar: Ícone da plataforma e selo da análise em cada loja
+  no épico: Carteira de clientes
+  situação: Pronto para testar
+
+editar: BL-155
+  situação: Pronto para testar
+
+editar: Filtros por situação da loja e financeira
+  no épico: Carteira de clientes
+  situação: Pronto para testar
+
+editar: Filtro por situação do robô
+  no épico: Carteira de clientes
+  situação: Pronto para testar
+
+editar: Selo Robô não atende na tabela
+  no épico: Carteira de clientes
+  situação: Pronto para testar
+
+editar: Resumo financeiro da ficha
+  no épico: Ficha do pagador
+  situação: Pronto para testar
+
+editar: Acompanhamento e promessa
+  no épico: Ficha do pagador
+  situação: Pronto para testar
+
+editar: Acordo e parcelas
+  no épico: Ficha do pagador
+  situação: Pronto para testar
+
+editar: Comprovantes
+  no épico: Ficha do pagador
+  situação: Pronto para testar
+
+editar: Linha do tempo
+  no épico: Ficha do pagador
+  situação: Pronto para testar
+
+editar: Pessoas ligadas e regras
+  no épico: Ficha do pagador
+  situação: Pronto para testar
+
+editar: Bloco Lojas de marketplace
+  no épico: Ficha do pagador
+  situação: Pronto para testar
+
+editar: Bloco Histórico de análises
+  no épico: Ficha do pagador
+  situação: Pronto para testar
+
+editar: Modo de cobrança por pagador
+  no épico: Ficha do pagador
+  situação: Pronto para testar
+
+editar: Bloco Robô
+  no épico: Ficha do pagador
+  situação: Pronto para testar
+
+editar: Aba Conexões com subabas por plataforma
+  no épico: Conexões e aplicativos dos marketplaces
+  situação: Pronto para testar
+
+editar: Segredos só de gravação
+  no épico: Conexões e aplicativos dos marketplaces
+  situação: Pronto para testar
+
+editar: Convite ao cliente
+  no épico: Conexões e aplicativos dos marketplaces
+  situação: Pronto para testar
+
+editar: Aba Lojas com filtro único
+  no épico: Ficha da loja
+  situação: Pronto para testar
+
+editar: Ficha da loja em três modos
+  no épico: Ficha da loja
+  situação: Pronto para testar
+
+editar: Modo Preencher com abas por assunto
+  no épico: Ficha da loja
+  situação: Pronto para testar
+
+editar: Campos manuais com selo de origem
+  no épico: Ficha da loja
+  situação: Pronto para testar
+
+editar: Aba de devoluções por tipo de loja da Shein
+  no épico: Ficha da loja
+  situação: Pronto para testar
+
+editar: Abas de produtos, preços e marketing
+  no épico: Ficha da loja
+  situação: Pronto para testar
+
+editar: Abas de diagnóstico e desempenho
+  no épico: Ficha da loja
+  situação: Pronto para testar
+
+editar: Aba Financeiro da loja
+  no épico: Ficha da loja
+  situação: Pronto para testar
+
+editar: Salvar análise
+  no épico: Ficha da loja
+  situação: Pronto para testar
+
+editar: Selo da análise
+  no épico: Ficha da loja
+  situação: Pronto para testar
+
+editar: Modo Relatório de uma página
+  no épico: Relatório da análise
+  situação: Pronto para testar
+
+editar: Comparação com a análise anterior
+  no épico: Relatório da análise
+  situação: Pronto para testar
+
+editar: Modo Comparar duas análises
+  no épico: Relatório da análise
+  situação: Pronto para testar
+
+editar: Visão do cliente na aba Análise
+  no épico: Relatório da análise
+  situação: Pronto para testar
+
+editar: Comparação entre as plataformas
+  no épico: Relatório da análise
+  situação: Pronto para testar
+
+editar: Painel geral da carteira
+  no épico: Relatório da análise
+  situação: Pronto para testar
+
+editar: Aba Faturamento com totais por base
+  no épico: Faturamento por base
+  situação: Pronto para testar
+
+editar: Quadro da base de cada loja
+  no épico: Faturamento por base
+  situação: Pronto para testar
+
+editar: Lista de pedidos e notas
+  no épico: Faturamento por base
+  situação: Pronto para testar
+
+editar: Botão Usar no Fechamento
+  no épico: Faturamento por base
+  situação: Pronto para testar
+
+editar: Etapa de faturamento por loja
+  no épico: Fechamento do mês
+  situação: Pronto para testar
+
+editar: Alterar base com alcance e duração
+  no épico: Fechamento do mês
+  situação: Pronto para testar
+
+editar: Histórico de mudança de base
+  no épico: Fechamento do mês
+  situação: Pronto para testar
+
+editar: Etapa de conferência
+  no épico: Fechamento do mês
+  situação: Pronto para testar
+
+editar: Etapa de envio com prévia
+  no épico: Fechamento do mês
+  situação: Pronto para testar
+
+editar: Agendamento do envio automático
+  no épico: Fechamento do mês
+  situação: Pronto para testar
+
+editar: Situação do Pix por pagador
+  no épico: Fechamento do mês
+  situação: Pronto para testar
+
+editar: Memória de cálculo da cobrança
+  no épico: Memória de cálculo
+  situação: Pronto para testar
+
+editar: Versões do cálculo
+  no épico: Memória de cálculo
+  situação: Pronto para testar
+
+editar: Extrato da cobrança
+  no épico: Memória de cálculo
+  situação: Pronto para testar
+
+editar: Aba Pix automático
+  no épico: Recebimentos
+  situação: Pronto para testar
+
+editar: Aba Divergentes
+  no épico: Recebimentos
+  situação: Pronto para testar
+
+editar: Resolver divergência
+  no épico: Recebimentos
+  situação: Pronto para testar
+
+editar: Aba A conferir
+  no épico: Recebimentos
+  situação: Pronto para testar
+
+editar: Aba Sem cobrança ligada
+  no épico: Recebimentos
+  situação: Pronto para testar
+
+editar: Aba Conferidos
+  no épico: Recebimentos
+  situação: Pronto para testar
+
+editar: Aba Lançar pagamento
+  no épico: Recebimentos
+  situação: Pronto para testar
+
+editar: Dados de recebimento com Asaas ou Banco Inter
+  no épico: Configurações
+  situação: Pronto para testar
+
+editar: Testar conexão do Pix
+  no épico: Configurações
+  situação: Pronto para testar
+
+editar: Validade do link, juros e multa
+  no épico: Configurações
+  situação: Pronto para testar
+
+editar: Régua de cobrança
+  no épico: Configurações
+  situação: Pronto para testar
+
+editar: Modelos de mensagem
+  no épico: Configurações
+  situação: Pronto para testar
+
+editar: Regras padrão e base padrão
+  no épico: Configurações
+  situação: Pronto para testar
+
+editar: Usuários e permissões
+  no épico: Configurações
+  situação: Pronto para testar
+
+editar: Dados da empresa
+  no épico: Configurações
+  situação: Pronto para testar
+
+editar: Etiquetas e bloqueio de lojas
+  no épico: Configurações
+  situação: Pronto para testar
+
+editar: Histórico de alterações
+  no épico: Configurações
+  situação: Pronto para testar
+
+editar: Aba Em atraso
+  no épico: Inadimplência e acordos
+  situação: Pronto para testar
+
+editar: Aba Acordos
+  no épico: Inadimplência e acordos
+  situação: Pronto para testar
+
+editar: Aba Bloqueios
+  no épico: Inadimplência e acordos
+  situação: Pronto para testar
+
+editar: Aba Pedidos de saída
+  no épico: Inadimplência e acordos
+  situação: Pronto para testar
+
+editar: Aba Baixas
+  no épico: Inadimplência e acordos
+  situação: Pronto para testar
+
+editar: Aba Relatórios
+  no épico: Inadimplência e acordos
+  situação: Pronto para testar
+
+editar: Aba Contestações
+  no épico: Contestações
+  situação: Pronto para testar
+
+editar: Nova contestação
+  no épico: Contestações
+  situação: Pronto para testar
+
+editar: Detalhe da contestação
+  no épico: Contestações
+  situação: Pronto para testar
+
+editar: Tela de três colunas
+  no épico: Conversas
+  situação: Pronto para testar
+
+editar: Lista com abas e etiquetas
+  no épico: Conversas
+  situação: Pronto para testar
+
+editar: Conversa com texto, áudio e imagem
+  no épico: Conversas
+  situação: Pronto para testar
+
+editar: Botão Robô ON/OFF
+  no épico: Conversas
+  situação: Pronto para testar
+
+editar: Selo Robô nas mensagens
+  no épico: Conversas
+  situação: Pronto para testar
+
+editar: Assumir conversa e devolver ao robô
+  no épico: Conversas
+  situação: Pronto para testar
+
+editar: Ficha ao lado, Contestar e Memória de cálculo
+  no épico: Conversas
+  situação: Pronto para testar
+
+editar: Painel do robô
+  no épico: Robô de cobrança
+  situação: Pronto para testar
+
+editar: Indicador do WhatsApp conectado
+  no épico: Robô de cobrança
+  situação: Pronto para testar
+
+editar: Pausar robô geral
+  no épico: Robô de cobrança
+  situação: Pronto para testar
+
+editar: Fila de aprovação
+  no épico: Robô de cobrança
+  situação: Pronto para testar
+
+editar: Atendimento humano
+  no épico: Robô de cobrança
+  situação: Pronto para testar
+
+editar: Pagadores do robô com ações em lote
+  no épico: Robô de cobrança
+  situação: Pronto para testar
+
+editar: Regras e limites
+  no épico: Robô de cobrança
+  situação: Pronto para testar
+
+editar: Modo teste com simulador
+  no épico: Robô de cobrança
+  situação: Pronto para testar
+
+editar: Modo sombra
+  no épico: Robô de cobrança
+  situação: Pronto para testar
+
+editar: Auditoria
+  no épico: Robô de cobrança
+  situação: Pronto para testar
+
+editar: Números do período
+  no épico: Dashboard
+  situação: Pronto para testar
+
+editar: Andamento do mês
+  no épico: Dashboard
+  situação: Pronto para testar
+
+editar: Fila do dia
+  no épico: Dashboard
+  situação: Pronto para testar
+
+editar: Pendências de decisão
+  no épico: Dashboard
+  situação: Pronto para testar
+
+editar: Alertas de dado
+  no épico: Dashboard
+  situação: Pronto para testar
+
+editar: Rankings e gráfico
+  no épico: Dashboard
+  situação: Pronto para testar
+
+editar: Conferência de largura de tela de computador
+  no épico: Qualidade das telas
+  situação: Pronto para testar
+
+editar: Texto justificado e quebra de linha
+  no épico: Qualidade das telas
+  situação: Pronto para testar
