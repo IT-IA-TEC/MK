@@ -1,0 +1,40 @@
+lote: Ajuste CPF e loja
+depois de: Database, Backend, Integrações
+
+# Pagador é sempre uma pessoa com CPF; loja é plataforma + código; CNPJ só informa.
+
+editar: Criar tabela de pagador com modo de cobrança
+  trocar aceites: sim
+  historia: Como analista de cobrança, quero o pagador (sempre uma pessoa) cadastrado com CPF, WhatsApp e modo de cobrança, para achar quem paga e saber como cobrar.
+  aceite: A tabela pagador guarda nome, CPF só com 11 números (único e obrigatório), WhatsApp só com números e DDD (mínimo 10 dígitos) e ativo
+  aceite: Pagador é sempre uma pessoa: não existe pagador só com CNPJ, e o CNPJ nunca identifica, busca nem filtra pagador
+  aceite: O modo de cobrança aceita só padrão do sistema, um Pix por pagador ou um Pix por loja, e nasce como padrão do sistema
+  aceite: A busca por nome sem acento, por CPF, por telefone e por código de loja usa índice e devolve o pagador certo em teste com dados de exemplo
+  aceite: A situação financeira (em dia, a vencer, em atraso, em acordo) vem de consulta sobre cobranças, nunca é gravada no pagador
+
+editar: Criar tabela de loja
+  trocar aceites: sim
+  historia: Como analista de cobrança, quero as lojas ligadas ao pagador e identificadas por plataforma e código, para ver todas as lojas de quem eu cobro.
+  aceite: A tabela loja guarda pagador, nome, plataforma, código da loja na plataforma (texto; na Shein é o GS), situação (ativa, bloqueada, inativa), data de início e CNPJ informativo (opcional, sem máscara, aceita letras e números)
+  aceite: Há chave única por plataforma e código, e a chave estrangeira do pagador usa on delete restrict
+  aceite: Um pagador tem uma ou mais lojas e uma loja tem um só pagador
+  aceite: O CNPJ da loja é só informação: não entra em chave única, busca, filtro, cobrança, conversa nem robô
+  aceite: A lista de pagadores com lojas filtra por situação da loja e por plataforma usando índice
+
+editar: Cadastrar pagador com lojas
+  trocar aceites: sim
+  historia: Como analista de cobrança, quero cadastrar o pagador com CPF, WhatsApp e uma ou mais lojas numa só ação, para ele já aparecer completo na carteira.
+  aceite: O servidor grava pagador e lojas numa só transação, tudo ou nada, e exige nome com mais de 2 letras, CPF válido com 11 números, WhatsApp com DDD (mínimo 10 dígitos), nome da loja, plataforma, código da loja e data de início
+  aceite: Plataforma só aceita Shein, Mercado Livre, Shopee ou Kwai, e o mesmo código na mesma plataforma devolve erro de duplicado
+  aceite: CPF repetido devolve erro de duplicado e aponta o pagador que já existe
+  aceite: O CNPJ da loja, quando informado, é guardado sem máscara só como informação e nunca é exigido
+  aceite: O pagador novo nasce sem cobrança, portanto em dia, com modo de cobrança padrão do sistema e robô como Atende, e a ação grava evento com o usuário
+
+editar: Consultar carteira com filtro único
+  tirar aceite: Uma só consulta busca por nome sem acento, telefone (só números), GS ou nome da loja, e devolve o mesmo resultado em Pagadores e Lojas, Inadimplência, Recebimentos e Conversas
+  aceite: Uma só consulta busca por nome sem acento, CPF, telefone (só números), código ou nome da loja, e devolve o mesmo resultado em Pagadores e Lojas, Inadimplência, Recebimentos e Conversas
+  aceite: Nenhuma busca nem filtro usa o CNPJ
+
+editar: Cadastro de novo pagador
+  aceite: O formulário pede CPF do pagador (11 números, obrigatório), código da loja na plataforma e plataforma, e o CNPJ da loja é opcional e vem rotulado como informativo
+  aceite: CPF repetido mostra aviso com o pagador que já existe

@@ -1,0 +1,46 @@
+lote: Base de clientes do grupo BL
+depois de: Ajuste CPF e loja
+
+# Regra: a base do BL é SOMENTE LEITURA (só SELECT, credencial de leitura). Nenhum segredo vai para o texto.
+
+Base de clientes do grupo BL [Integrações] {v0.1}
+meta: os clientes da 40% chegam do sistema do BL sem nunca escrever nele
+- Ler clientes da 40% na base do BL
+  historia: Como analista de cobrança, quero que os clientes ligados à empresa 40% venham do sistema do BL, para não digitar de novo quem já está cadastrado.
+  aceite: A conexão com a base do BL usa credencial só de leitura, e um teste prova que escrever, alterar ou apagar nessa base é recusado
+  aceite: Só entram clientes (CPF) ligados, pelo vínculo, à companhia 40%, passando por empresa e cliente da empresa
+  aceite: Vêm nome, CPF, WhatsApp, e das empresas o CNPJ e o regime tributário, e o CNPJ fica só como informação
+  aceite: A chave de acesso fica fora do repositório, do protótipo e do log, e nunca é lida de volta
+  prioridade: Deve 2
+  valor: 9 sem isso a carteira nasce vazia
+  pontos: 5
+- Sincronizar a carteira com o BL
+  depende: Ler clientes da 40% na base do BL
+  historia: Como analista de cobrança, quero a carteira sempre em dia com o BL, para cobrar quem entrou e parar de cobrar quem saiu.
+  aceite: A sincronização roda sozinha em horário fixo e a pedido, é repetível e não duplica pagador
+  aceite: Cliente novo vinculado à 40% entra como pagador; cliente que perdeu o vínculo fica inativo e nada é apagado
+  aceite: Mudança de nome, WhatsApp ou regime tributário no BL chega ao IT.MK sem apagar o que o analista cadastrou aqui (lojas, modo de cobrança, robô)
+  aceite: Falha de leitura vai para a fila de erros das integrações e a última sincronização boa continua valendo
+  prioridade: Deve 2
+  valor: 9 carteira velha gera cobrança errada
+  pontos: 8
+- Painel da sincronização com o BL [Frontend]
+  depende: Sincronizar a carteira com o BL
+  historia: Como analista de cobrança, quero ver quando a carteira veio do BL pela última vez e o que mudou, para confiar nos dados.
+  aceite: Mostra data da última sincronização, quantos entraram, quantos saíram e quantos deram erro
+  aceite: Tem o botão Sincronizar agora
+  prioridade: Deveria 3
+  valor: 6 dá confiança nos dados
+  pontos: 3
+
+Pendências fora do sistema
+- Marcar o vínculo da 40% nos clientes no sistema do BL
+  tipo: Tarefa
+  responsavel: William
+  prazo: 10/10/2026
+  aceite: Os clientes da carteira aparecem vinculados à 40% no sistema do BL
+- Criar a credencial de leitura da base do BL
+  tipo: Tarefa
+  responsavel: William
+  prazo: 10/10/2026
+  aceite: Existe usuário só de leitura entregue ao time por canal seguro

@@ -3,7 +3,7 @@
 Uso: python3 lint_lote.py ARQUIVO [ARQUIVO_ANTERIOR ...]
 Os arquivos anteriores só dão os títulos e épicos que já existem (para depende: e nomes repetidos)."""
 import re, sys
-CAMPOS={'como','quero','para','historia','aceite','prioridade','nivel','valor','pontos','tipo','origem','depende','meta','versão','entrega','pronto'}
+CAMPOS={'como','quero','para','historia','aceite','prioridade','nivel','valor','pontos','tipo','origem','depende','meta','versão','entrega','pronto','responsavel','prazo'}
 LIM={'como':300,'quero':500,'para':500,'aceite':500,'meta':1000,'pronto':300}
 PONTOS={1,2,3,5,8,13,20}
 def le(path):
@@ -72,7 +72,7 @@ def main():
                 if c=='nivel' and v not in list('12345'): errs.append(f'{n}: nível inválido')
                 if c=='valor' and not re.match(r'^(10|[1-9])(\s+\S.*)?$',v): errs.append(f'{n}: valor inválido: {v}')
                 if c=='pontos' and (not v.isdigit() or int(v) not in PONTOS): errs.append(f'{n}: pontos inválido: {v}')
-                if c=='tipo' and v not in ('Item','Bug','Melhoria'): errs.append(f'{n}: tipo inválido')
+                if c=='tipo' and v not in ('Item','Bug','Melhoria','Tarefa'): errs.append(f'{n}: tipo inválido')
                 if c=='tipo' and v=='Bug' : pass
             else:
                 errs.append(f'{n}: campo {c} fora de lugar')
@@ -101,6 +101,9 @@ def main():
                 if d.startswith('#') or re.match(r'^BL-\d+$',d): continue
                 if d not in todos: errs.append(f"{it['n']}: depende aponta para item que não existe: {d}")
                 if d==t: errs.append(f"{it['n']}: item depende de si mesmo")
+        if c.get('tipo')=='Tarefa':
+            if 'responsavel' not in c or 'prazo' not in c: errs.append(f"{it['n']}: Tarefa precisa de responsavel e prazo: {t}")
+            continue
         if not ({'historia'}<=set(c) or {'como','quero','para'}<=set(c)) and c.get('prioridade','').split(' ')[-1]!='5':
             errs.append(f"{it['n']}: item sem história: {t}")
         if not it['aceites'] and c.get('prioridade','').split(' ')[-1]!='5': errs.append(f"{it['n']}: item sem critério de aceite: {t}")
