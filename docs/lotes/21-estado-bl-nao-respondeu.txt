@@ -1,7 +1,7 @@
 lote: Estado do BL sem resposta
 depois de: Portas entre o BL e o IT.MK
 
-Portas e leituras entre o BL e o IT.MK [Frontend] {v1.0}
+Estado do BL nas telas [Frontend] {v1.0}
 - Aviso quando o BL não responde
   historia: Como analista de cobrança, quero um aviso claro quando o BL não responde, para saber que estou vendo a última leitura boa e que pedidos ao BL estão parados.
   aceite: Nas telas Pagadores e Lojas, Marketplaces e Fechamento do mês aparece um aviso no topo com a data e a hora da última leitura boa
