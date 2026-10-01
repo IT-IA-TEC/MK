@@ -1,40 +1,45 @@
 lote: Ajuste CPF e loja
 depois de: Database, Backend, Integrações
 
-# Pagador é sempre uma pessoa com CPF; loja é plataforma + código; CNPJ só informa.
+# Regras novas: pagador é sempre uma pessoa com CPF. A ficha do cliente e as lojas ficam 100% no banco do BL, e o IT.MK só lê, sempre direto. Loja = plataforma + código. CNPJ é só informativo.
 
 editar: BL-293
+  titulo: Guardar o que é só do IT.MK sobre o pagador
   trocar aceites: sim
-  historia: Como analista de cobrança, quero o pagador (sempre uma pessoa) cadastrado com CPF, WhatsApp e modo de cobrança, para achar quem paga e saber como cobrar.
-  aceite: A tabela pagador guarda nome, CPF só com 11 números (único e obrigatório), WhatsApp só com números e DDD (mínimo 10 dígitos) e ativo
-  aceite: Pagador é sempre uma pessoa: não existe pagador só com CNPJ, e o CNPJ nunca identifica, busca nem filtra pagador
-  aceite: O modo de cobrança aceita só padrão do sistema, um Pix por pagador ou um Pix por loja, e nasce como padrão do sistema
-  aceite: A busca por nome sem acento, por CPF, por telefone e por código de loja usa índice e devolve o pagador certo em teste com dados de exemplo
-  aceite: A situação financeira (em dia, a vencer, em atraso, em acordo) vem de consulta sobre cobranças, nunca é gravada no pagador
+  historia: Como analista de cobrança, quero que o IT.MK guarde só o que é dele sobre o pagador e leia o resto da ficha do BL, para nunca haver dois cadastros diferentes da mesma pessoa.
+  aceite: A tabela guarda o CPF do pagador (11 números, chave) e o modo de cobrança, que aceita só padrão do sistema, um Pix por pagador ou um Pix por loja, e nasce como padrão do sistema
+  aceite: Nome, WhatsApp, e-mail, vínculo com a 40%, pessoas ligadas, empresas e lojas são lidos direto da ficha do BL e nunca são copiados nem gravados no IT.MK
+  aceite: Não existe chave estrangeira entre os dois bancos, e um CPF que sumiu do BL aparece como alerta de dado, sem apagar nada do IT.MK
+  aceite: A situação financeira (em dia, a vencer, em atraso, em acordo) vem de consulta sobre cobranças e nunca é gravada no pagador
+  aceite: Pagador é sempre uma pessoa: o CNPJ nunca identifica, busca nem filtra pagador
 
 editar: BL-294
+  titulo: Guardar o que é só do IT.MK sobre a loja
   trocar aceites: sim
-  historia: Como analista de cobrança, quero as lojas ligadas ao pagador e identificadas por plataforma e código, para ver todas as lojas de quem eu cobro.
-  aceite: A tabela loja guarda pagador, nome, plataforma, código da loja na plataforma (texto; na Shein é o GS), situação (ativa, bloqueada, inativa), data de início e CNPJ informativo (opcional, sem máscara, aceita letras e números)
-  aceite: Há chave única por plataforma e código, e a chave estrangeira do pagador usa on delete restrict
-  aceite: Um pagador tem uma ou mais lojas e uma loja tem um só pagador
-  aceite: O CNPJ da loja é só informação: não entra em chave única, busca, filtro, cobrança, conversa nem robô
-  aceite: A lista de pagadores com lojas filtra por situação da loja e por plataforma usando índice
+  historia: Como analista de cobrança, quero que cada loja seja identificada por plataforma e código, para cobrar, bloquear e analisar a loja certa sem depender de CNPJ.
+  aceite: A tabela guarda plataforma, código da loja na plataforma (texto; na Shein é o GS), CPF do pagador dono da loja e a situação de bloqueio de cobrança (ativa, bloqueada, inativa)
+  aceite: Há chave única por plataforma e código, e nome da loja, CNPJ informativo, data de início, percentual da 40% e dados próprios da plataforma são lidos da ficha do BL
+  aceite: Um pagador tem uma ou mais lojas e uma loja tem um só pagador, conferido contra a ficha do BL
+  aceite: O CNPJ da loja é só informação: não entra em chave, busca, filtro, cobrança, conversa nem robô
 
 editar: Cadastrar pagador com lojas
+  titulo: Consultar pagador e lojas na ficha do BL
   trocar aceites: sim
-  historia: Como analista de cobrança, quero cadastrar o pagador com CPF, WhatsApp e uma ou mais lojas numa só ação, para ele já aparecer completo na carteira.
-  aceite: O servidor grava pagador e lojas numa só transação, tudo ou nada, e exige nome com mais de 2 letras, CPF válido com 11 números, WhatsApp com DDD (mínimo 10 dígitos), nome da loja, plataforma, código da loja e data de início
-  aceite: Plataforma só aceita Shein, Mercado Livre, Shopee ou Kwai, e o mesmo código na mesma plataforma devolve erro de duplicado
-  aceite: CPF repetido devolve erro de duplicado e aponta o pagador que já existe
-  aceite: O CNPJ da loja, quando informado, é guardado sem máscara só como informação e nunca é exigido
-  aceite: O pagador novo nasce sem cobrança, portanto em dia, com modo de cobrança padrão do sistema e robô como Atende, e a ação grava evento com o usuário
+  historia: Como analista de cobrança, quero ver o pagador e as lojas dele exatamente como estão na ficha do BL, para cobrar com dados que ninguém digitou de novo.
+  aceite: O servidor lê a ficha direto do BL com credencial só de leitura, e um teste prova que escrever, alterar ou apagar no BL é recusado
+  aceite: Devolve pagador com CPF, lojas por plataforma e código, e o CNPJ só como informação
+  aceite: CPF que não existe no BL devolve erro de não encontrado, sem criar nada no IT.MK
+  aceite: Tempo limite e nova tentativa limitada; se o BL não responde, a tela mostra aviso e o resto do IT.MK continua funcionando
 
 editar: Consultar carteira com filtro único
   tirar aceite: Uma só consulta busca por nome sem acento, telefone (só números), GS ou nome da loja, e devolve o mesmo resultado em Pagadores e Lojas, Inadimplência, Recebimentos e Conversas
-  aceite: Uma só consulta busca por nome sem acento, CPF, telefone (só números), código ou nome da loja, e devolve o mesmo resultado em Pagadores e Lojas, Inadimplência, Recebimentos e Conversas
+  aceite: Uma só consulta busca por nome sem acento, CPF, telefone (só números), código ou nome da loja, lendo a ficha do BL, e devolve o mesmo resultado em Pagadores e Lojas, Inadimplência, Recebimentos e Conversas
   aceite: Nenhuma busca nem filtro usa o CNPJ
 
 editar: BL-155
-  aceite: O formulário pede CPF do pagador (11 números, obrigatório), código da loja na plataforma e plataforma, e o CNPJ da loja é opcional e vem rotulado como informativo
-  aceite: CPF repetido mostra aviso com o pagador que já existe
+  titulo: Levar o cadastro de novo pagador à ficha do BL
+  trocar aceites: sim
+  historia: Como analista de cobrança, quero abrir o cadastro de um pagador novo na ficha do BL, para ele ser cadastrado uma só vez e aparecer aqui sozinho.
+  aceite: O botão de novo pagador leva à ficha do BL, e o IT.MK não grava pagador nem loja
+  aceite: Quando o CPF ainda não existe no BL, a tela avisa e mostra o caminho para cadastrar lá
+  aceite: A lista mostra o CPF do pagador e a loja por plataforma e código, com o CNPJ rotulado como informativo

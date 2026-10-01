@@ -1,46 +1,103 @@
 lote: Base de clientes do grupo BL
 depois de: Ajuste CPF e loja
 
-# Regra: a base do BL é SOMENTE LEITURA (só SELECT, credencial de leitura). Nenhum segredo vai para o texto.
+# Regra: a base do BL é SOMENTE LEITURA (só SELECT e escuta, credencial de leitura). A ficha do cliente e as lojas ficam 100% no BL. Nenhum segredo vai para o texto.
 
 Base de clientes do grupo BL [Integrações] {v0.1}
-meta: os clientes da 40% chegam do sistema do BL sem nunca escrever nele
-- Ler clientes da 40% na base do BL
-  historia: Como analista de cobrança, quero que os clientes ligados à empresa 40% venham do sistema do BL, para não digitar de novo quem já está cadastrado.
-  aceite: A conexão com a base do BL usa credencial só de leitura, e um teste prova que escrever, alterar ou apagar nessa base é recusado
-  aceite: Só entram clientes (CPF) ligados, pelo vínculo, à companhia 40%, passando por empresa e cliente da empresa
-  aceite: Vêm nome, CPF, WhatsApp, e das empresas o CNPJ e o regime tributário, e o CNPJ fica só como informação
-  aceite: A chave de acesso fica fora do repositório, do protótipo e do log, e nunca é lida de volta
+meta: a carteira da 40% chega da ficha do BL em tempo real, sem escrever nela e sem estourar as requisições
+- Ler a ficha do cliente direto do BL
+  historia: Como analista de cobrança, quero que a ficha do cliente e as lojas venham sempre direto do BL, para nunca cobrar com dado velho.
+  aceite: A conexão usa credencial só de leitura, e um teste prova que escrever, alterar ou apagar no BL é recusado
+  aceite: Só entram clientes (CPF) com vínculo ativo na companhia 40%, passando por empresa e cliente da empresa
+  aceite: Vêm nome, CPF, WhatsApp, e-mail, vínculo, pessoas ligadas, empresas (CNPJ só informativo e regime tributário) e lojas por plataforma e código
+  aceite: Nada da ficha é gravado no IT.MK; a chave de acesso fica fora do repositório, do protótipo e do log, e nunca é lida de volta
+  aceite: Tempo limite, nova tentativa limitada e chave geral para desligar a integração sem nova versão
   prioridade: Deve 2
-  valor: 9 sem isso a carteira nasce vazia
+  valor: 10 sem a ficha a carteira nasce vazia
   pontos: 5
-- Sincronizar a carteira com o BL
-  depende: Ler clientes da 40% na base do BL
-  historia: Como analista de cobrança, quero a carteira sempre em dia com o BL, para cobrar quem entrou e parar de cobrar quem saiu.
-  aceite: A sincronização roda sozinha em horário fixo e a pedido, é repetível e não duplica pagador
-  aceite: Cliente novo vinculado à 40% entra como pagador; cliente que perdeu o vínculo fica inativo e nada é apagado
-  aceite: Mudança de nome, WhatsApp ou regime tributário no BL chega ao IT.MK sem apagar o que o analista cadastrou aqui (lojas, modo de cobrança, robô)
-  aceite: Falha de leitura vai para a fila de erros das integrações e a última sincronização boa continua valendo
+- Proteger o BL contra excesso de requisições
+  depende: Ler a ficha do cliente direto do BL
+  historia: Como dono do IT.MK, quero que o IT.MK nunca sobrecarregue o BL, para as duas empresas continuarem funcionando.
+  aceite: As consultas usam um número limitado de conexões e juntam pedidos iguais feitos ao mesmo tempo
+  aceite: Há limite de pedidos por segundo e, quando o BL demora ou falha, um corte automático para de insistir e volta aos poucos
+  aceite: O número de pedidos ao BL por minuto é medido e há alerta quando passa do limite combinado
   prioridade: Deve 2
-  valor: 9 carteira velha gera cobrança errada
+  valor: 9 uma sobrecarga derruba os dois sistemas
+  pontos: 5
+- Escutar as mudanças do BL em tempo real
+  depende: Ler a ficha do cliente direto do BL
+  historia: Como analista de cobrança, quero saber na hora quando um cliente entra, sai ou muda no BL, para o robô e a carteira agirem sem esperar.
+  aceite: O IT.MK escuta as mudanças de cliente, vínculo com a 40% e loja com a credencial de leitura, sem escrever nada no BL
+  aceite: Um só canal atende todas as telas, e a mesma mudança chegando duas vezes não duplica efeito
+  aceite: Se a escuta cai, ela volta sozinha e confere o que mudou no intervalo, sem perder nenhuma mudança
+  aceite: Falha vai para a fila de erros das integrações
+  prioridade: Deve 2
+  valor: 10 é o tempo real que o dono pediu
   pontos: 8
-- Painel da sincronização com o BL [Frontend]
-  depende: Sincronizar a carteira com o BL
-  historia: Como analista de cobrança, quero ver quando a carteira veio do BL pela última vez e o que mudou, para confiar nos dados.
-  aceite: Mostra data da última sincronização, quantos entraram, quantos saíram e quantos deram erro
-  aceite: Tem o botão Sincronizar agora
+
+Reação às mudanças do BL [Backend] {v0.1}
+meta: o IT.MK reage na hora quando um cliente entra ou sai do vínculo
+- Reagir à saída do vínculo com a 40%
+  depende: Escutar as mudanças do BL em tempo real
+  historia: Como analista de cobrança, quero que o cliente que saiu fique inativo com a história guardada e o robô pare, para não cobrar quem não é mais da carteira nem perder o que já aconteceu.
+  aceite: Cliente que perde o vínculo fica inativo na carteira e nada é apagado
+  aceite: A tela mostra que já houve vínculo, a data de saída e o motivo (inadimplência, pedido do cliente, encerramento da loja ou da empresa, ou outros) com o detalhe em texto, lidos da ficha do BL
+  aceite: O robô para de cobrar esse pagador na hora, e a mudança grava evento com hora
+  aceite: Motivo inadimplência abre um caso na esteira de ex-clientes inadimplentes
+  aceite: Vínculo que volta reativa o pagador e fica registrado como novo vínculo
+  prioridade: Deve 2
+  valor: 9 cobrar quem saiu gera erro e reclamação
+  pontos: 5
+
+Esteira de ex-clientes inadimplentes [Database] {v1.2}
+meta: o ex-cliente inadimplente é cobrado por etapas próprias, com tudo registrado
+- Criar a esteira de cobrança de ex-clientes
+  depende: Reagir à saída do vínculo com a 40%
+  historia: Como analista de cobrança, quero um caso de cobrança para cada ex-cliente inadimplente, para acompanhar a dívida dele em etapas.
+  aceite: A tabela de caso guarda CPF, data e motivo da saída, valor devido (numeric com duas casas), etapa atual e situação
+  aceite: A tabela de movimentos de etapa só aceita inserir, e existe teste que prova que editar e apagar falham
+  aceite: As etapas são dados e não código: cobrança amigável, negociação e acordo, notificação formal e jurídico, e todas ficam disponíveis para ligar quando a pessoa quiser
+  aceite: Toda tabela nova tem regra de acesso por linha ligada e testada
+  prioridade: Deve 3
+  valor: 8 é o que recupera dinheiro de quem já saiu
+  pontos: 5
+- Andar o caso do ex-cliente pelas etapas [Backend]
+  depende: Criar a esteira de cobrança de ex-clientes
+  historia: Como analista de cobrança, quero mover o caso entre as etapas e usar acordo e Pix por parcela, para recuperar a dívida do ex-cliente.
+  aceite: Cada etapa pode ser ligada ou desligada, e jurídico e notificação formal nascem desligadas
+  aceite: Só são permitidos os passos de etapa definidos, e qualquer outro recusa com erro do negócio
+  aceite: Acordo e parcelas usam o que já existe, com um Pix por parcela e a regra única de arredondamento
+  aceite: Cada passo grava evento com usuário, motivo e hora
+  prioridade: Deve 3
+  valor: 8 sem etapas o caso fica parado
+  pontos: 8
+- Tela da esteira de ex-clientes [Frontend]
+  depende: Andar o caso do ex-cliente pelas etapas
+  historia: Como analista de cobrança, quero ver os ex-clientes inadimplentes por etapa, para saber quem cobrar hoje.
+  aceite: Mostra cada caso com CPF, motivo e data da saída, valor devido e etapa, em quadro por etapa
+  aceite: Sem barra de rolagem horizontal e sem espaço vazio em nenhuma largura de computador
   prioridade: Deveria 3
-  valor: 6 dá confiança nos dados
-  pontos: 3
+  valor: 7 dá visão do que está parado
+  pontos: 5
 
 Pendências fora do sistema
-- Marcar o vínculo da 40% nos clientes no sistema do BL
+- Criar na ficha do BL os campos que o IT.MK precisa
   tipo: Tarefa
   responsavel: William
-  prazo: 10/10/2026
-  aceite: Os clientes da carteira aparecem vinculados à 40% no sistema do BL
+  prazo: 08/10/2026
+  aceite: A ficha do BL tem cliente, vínculo com data e motivo de saída, pessoas ligadas, empresas e lojas por plataforma e código, com percentual da 40%
+- Liberar o aviso em tempo real nas tabelas da ficha do BL
+  tipo: Tarefa
+  responsavel: William
+  prazo: 08/10/2026
+  aceite: O IT.MK consegue escutar cliente, vínculo e loja com a credencial de leitura
 - Criar a credencial de leitura da base do BL
   tipo: Tarefa
   responsavel: William
-  prazo: 10/10/2026
+  prazo: 08/10/2026
   aceite: Existe usuário só de leitura entregue ao time por canal seguro
+- Marcar o vínculo da 40% nos clientes no sistema do BL
+  tipo: Tarefa
+  responsavel: William
+  prazo: 08/10/2026
+  aceite: Os clientes da carteira aparecem vinculados à 40% no sistema do BL
