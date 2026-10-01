@@ -499,7 +499,7 @@ meta: o analista de marketplaces vê reputação, anúncios e reclamações do M
   historia: Como consultor, quero gerar o convite de autorização do vendedor, para conectar a loja sem erro de conta.
   aceite: Usa a porta do servidor: o link de auth.mercadolivre.com.br leva response_type code, client_id, redirect_uri e state aleatório, e o retorno confere o state, porque o Mercado Livre não valida
   aceite: A troca do code por token usa POST oauth token com grant_type authorization_code e o escopo offline_access, para receber o refresh token
-  aceite: Conta de operador ou colaborador (erro invalid_operator_user_id) é recusada com mensagem clara e a conexão fica Com erro, e o sistema grava quem autorizou
+  aceite: Conta de operador ou secundária (erro invalid_operator_user_id) é recusada com mensagem clara e a conexão fica Com erro, e o sistema grava quem autorizou
   prioridade: Deve 2
   valor: 9 conta de operador não conecta e o vendedor não entende o erro
   pontos: 3
