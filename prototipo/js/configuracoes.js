@@ -201,9 +201,9 @@ function cardsReceb(){
    '<div class="cf-sw"><div><b>Último Pix recebido</b><small>'+esc(av.ultimo.t)+'</small></div><b>'+esc(av.ultimo.v)+'</b></div>'+
    '<button class="btn" data-cf="rctestar" style="width:auto;padding:0 16px;align-self:flex-start">Pedir teste ao BL</button></div></div>';
   var c3='<div class="cx"><div class="cx-cab">'+ic('timer')+'<h3>Link, juros e multa</h3></div><div class="cf-corpo">'+
-   rcCampo('validadeLinkDias','Validade do link após o vencimento (dias)',rcNum('validadeLinkDias',R.validadeLinkDias,'dias'),(inter?'Padrão de 30 dias. No Inter existe campo próprio para esse prazo, e o sistema o envia na cobrança.':'Padrão de 30 dias. No Asaas o QR Code vale 12 meses, então o sistema remove a cobrança ao fim desse prazo.'))+
-   '<div class="cf-sw"><div><b>Juros e multa</b><small>Desligado por padrão. Quando ligado, o Pix passa a cobrar os dois depois do vencimento.</small></div><label class="sw"><input type="checkbox" role="switch" data-rc="jurosMultaLigado"'+(R.jurosMultaLigado?' checked':'')+' aria-label="Juros e multa"><span></span></label></div>'+
-   (R.jurosMultaLigado?'<div class="f-grade">'+rcCampo('multaPct','Multa (uma vez)',rcNum('multaPct',R.multaPct,'%'))+rcCampo('jurosPct','Juros (ao mês)',rcNum('jurosPct',R.jurosPct,'%'))+'</div>':'')+'</div></div>';
+   '<div class="fe-aviso"><span>A validade do link, os juros e a multa são configurados no Java do BL, junto com o Pix. Aqui só aparecem.</span></div>'+
+   lin('Validade do link após o vencimento',R.validadeLinkDias+' dias')+lin('Juros e multa',R.jurosMultaLigado?'Ligados':'Desligados')+
+   (R.jurosMultaLigado?lin('Multa (uma vez)',String(R.multaPct).replace('.',',')+'%')+lin('Juros (ao mês)',String(R.jurosPct).replace('.',',')+'%'):'')+'</div></div>';
   var c4='<div class="cx"><div class="cx-cab">'+ic('qr-code')+'<h3>Modo padrão do Pix</h3></div><div class="cf-corpo">'+
    '<label class="lembrar"><input type="radio" name="rc-modo" data-rc="modoPix" value="pagador"'+(R.modoPix==='pagador'?' checked':'')+'>Um Pix por pagador (padrão): uma cobrança com o total de todas as lojas.</label>'+
    '<label class="lembrar"><input type="radio" name="rc-modo" data-rc="modoPix" value="loja"'+(R.modoPix==='loja'?' checked':'')+'>Um Pix por loja: cada loja paga o seu valor separado.</label>'+
