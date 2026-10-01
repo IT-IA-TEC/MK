@@ -1,0 +1,1148 @@
+versão: v0.1
+  entrega: 15/10/2026
+  meta: o analista entra no sistema e acha qualquer pagador, suas lojas e a ficha completa
+versão: v1.0
+  entrega: 05/11/2026
+  meta: o analista vê a situação de cada loja nas quatro plataformas, preenche a análise e compara com a anterior
+versão: v1.1
+  entrega: 26/11/2026
+  meta: o analista fecha o mês, gera os Pix e confere o dinheiro que entrou
+versão: v1.2
+  entrega: 17/12/2026
+  meta: atraso, acordo, contestação e conversa são tratados dentro do sistema
+versão: v1.3
+  entrega: 14/01/2027
+  meta: o robô cobra sozinho, com limites, aprovação de uma pessoa e auditoria
+versão: v1.4
+  entrega: 04/02/2027
+  meta: o dono vê tudo no Dashboard e todas as telas passam na conferência de qualidade
+
+pronto: A regra de negócio fica em classes que não conhecem Spring, tela, SQL nem HTTP
+pronto: Existe teste automático da regra que roda sem tela, sem banco e sem rede
+pronto: O relógio é injetado, nenhuma regra lê a data de hoje direto
+pronto: Segredo nunca aparece em log, resposta ou tela
+pronto: Operação repetida não duplica efeito
+pronto: Dinheiro em Java é BigDecimal com duas casas ou centavos inteiros, nunca double, com uma só regra de arredondamento
+pronto: Pedido e resposta da API são objetos simples, nunca a entidade nem a linha do banco
+
+Decisões de arquitetura [Backend] {v0.1}
+meta: o dono e o time técnico deixam por escrito, com data e responsável, as escolhas do servidor que travam o código, antes de 15/10/2026
+- Decidir tipo exato do dinheiro em Java
+  depende: Decidir tolerância de centavos e arredondamento
+  historia: Como responsável pelo financeiro, quero que o servidor guarde todo valor em R$ de forma exata e arredonde de um jeito só, para o mesmo valor sair igual no Fechamento, no Pix e no acordo.
+  aceite: Está escrito se o servidor usa BigDecimal com duas casas ou centavos em número inteiro, e que double e float nunca são usados para dinheiro
+  aceite: Está escrita a regra única de arredondamento e onde ela vale: valor da 40%, Pix, juros e multa, rateio entre lojas, acordos e parcelas
+  aceite: Está escrito para onde vai a sobra de centavos: última loja com saldo no rateio e última parcela no parcelamento, como no protótipo
+  aceite: Existe um caso de teste com R$ 100,00 em 3 parcelas (33,33 mais 33,33 mais 33,34) que fecha no total
+  prioridade: Deve 2
+  valor: 10 erro de centavo se repete em toda cobrança e em todo Pix
+  pontos: 2
+- Decidir onde o servidor roda
+  depende: Decidir onde o webhook de Pix entra
+  historia: Como dono do IT.MK, quero o servidor na nuvem com endereço de saída fixo, para o Banco Inter e a Shopee aceitarem as chamadas e o aviso de pagamento chegar sempre.
+  aceite: Está registrado que o servidor roda na nuvem, com IP fixo e aceitando certificado de cliente, porque o Inter e a Shopee exigem (decisão de 01/10/2026)
+  aceite: Estão registrados o provedor da nuvem, a região e o custo mensal aceito, conferidos nos preços oficiais na data da decisão
+  aceite: Está registrado que existem dois ambientes do servidor (teste e produção) com endereços, chaves e certificados diferentes
+  aceite: Está registrado quem pode publicar em produção e que publicação não sai na sexta-feira
+  prioridade: Deve 2
+  valor: 9 sem IP fixo o Inter e a Shopee não aceitam o servidor
+  pontos: 2
+- Decidir login e quem agiu
+  depende: Decidir quem fala com o banco e o fim da Data API
+  historia: Como dono do IT.MK, quero que toda ação fique ligada a uma pessoa que entrou com o seu login, para saber quem fez cada coisa.
+  aceite: Está registrado o caminho login do Supabase, servidor Spring no meio e banco, e que o app JavaFX nunca guarda chave nem senha do banco (decisão de 01/10/2026)
+  aceite: Está registrado que o servidor confere assinatura, emissor, público e validade do token, que o algoritmo é escolhido pelo servidor e que alg none é recusado
+  aceite: Está registrado que toda ação grava o usuário, o robô, o sistema ou o aviso do provedor, e que a visão é única, sem nível que mude o que a tela mostra
+  aceite: Estão registrados o tempo de vida da sessão e o limite de tentativas de entrada, com os números definidos pelo time
+  prioridade: Deve 2
+  valor: 9 sem saber quem agiu a auditoria perde o valor
+  pontos: 2
+- Decidir módulos do servidor
+  historia: Como time técnico, quero decidir como o servidor se divide em módulos, para a regra de negócio não depender de Spring, tela nem banco.
+  aceite: Está registrado o desenho com quatro módulos (domínio, aplicação, adaptadores e servidor) e as setas de dependência apontando para dentro, e que só o módulo servidor conhece o Spring
+  aceite: Está registrado que o servidor começa como um programa só, dividido em módulos no código, sem microsserviços, com a justificativa
+  aceite: Está registrado que o código se agrupa por assunto do negócio (cobranca, recebimento, inadimplencia, atendimento, marketplaces, configuracao) e não só por camada técnica
+  aceite: Está registrado que o app JavaFX e o servidor compartilham só objetos simples de pedido e resposta, nunca entidades
+  prioridade: Deve 2
+  valor: 9 a divisão em módulos trava todo o código que vem depois
+  pontos: 2
+- Fechar glossário com o dono
+  depende: Decidir módulos do servidor
+  historia: Como dono do IT.MK, quero fechar com o time técnico o significado de cada termo, para a tela, o código e o banco usarem a mesma palavra.
+  aceite: Está escrito o significado de pagador, loja, plataforma, competência, faturado, cobrança, Pix, recebimento, comprovante, divergência, promessa, acordo, parcela, contestação, memória de cálculo, régua, robô, conversa e mensagem
+  aceite: Está escrito o significado de Baixa (hoje, cobrança antiga baixada como perdida ou como quitada, com motivo) e de Saída (hoje, pedido de saída de loja), as duas abas de Inadimplência, confirmado pelo dono
+  aceite: Está escrito qual nome vale para o percentual da loja (padrão 40) e qual vale para a alíquota (imposto dividido pelo faturado), porque a coluna Alíquota % do Fechamento hoje guarda o percentual
+  aceite: Cada termo tem um só nome de classe, e se o dono mudar um termo, classe, tabela e tela são renomeadas juntas
+  prioridade: Deve 2
+  valor: 8 sem palavra única a mesma coisa ganha três nomes no código
+  pontos: 2
+- Decidir faixas de atraso e prazos
+  depende: Fechar glossário com o dono
+  historia: Como responsável pelo financeiro, quero decidir se as faixas de atraso e os prazos são fixos ou mudam em Configurações, para o atraso ser contado igual em todas as telas.
+  aceite: Está registrado se as faixas (até 30, 31 a 60, 61 a 90 e acima de 90 dias, do protótipo) são fixas no código ou configuráveis
+  aceite: Está registrado, para cada prazo, se é fixo ou configurável: vencimento (dia 20 do mês seguinte), prazo do Pix após o vencimento (30 dias), prazo para entrar em A pedir bloqueio (15 dias), prazo de baixa sugerida (365 dias) e máximo de parcelas (12)
+  aceite: Está registrado como conferir o prazo de 15 dias de Configurações com a régua, que hoje traz Aviso de bloqueio no dia 20 e Pedir bloqueio no dia 25
+  aceite: Está registrado que o atraso conta em dias corridos a partir do vencimento, pela data do servidor no fuso de São Paulo
+  prioridade: Deve 3
+  valor: 7 atraso contado diferente gera cobrança e bloqueio errados
+  pontos: 1
+- Decidir regra de LGPD com parecer jurídico
+  depende: Decidir guarda e anonimização da auditoria
+  historia: Como dono do IT.MK, quero um parecer jurídico sobre guarda de dado e pedido de apagar dado pessoal, para o servidor tratar o pedido sem quebrar a prova da cobrança.
+  aceite: Existe parecer jurídico anexado com a base legal da cobrança por mensagem, ou a decisão registra que o servidor não apaga nada até o parecer chegar (decisão de 01/10/2026)
+  aceite: Está escrito que o pedido de apagar dado pessoal atua só na tabela de pagador e que a auditoria fica só com o identificador, com o selo de integridade ainda válido
+  aceite: Está escrito o prazo de guarda das mensagens recebidas e das mídias, que hoje não têm prazo
+  aceite: Enquanto não houver parecer, nenhuma rotina do servidor apaga, edita ou anonimiza auditoria nem mensagem
+  prioridade: Deve 3
+  valor: 8 auditoria que nunca apaga pode colidir com o pedido de apagar dado pessoal
+  pontos: 2
+- Confirmar fórmula do valor da 40%
+  depende: Fechar glossário com o dono
+  historia: Como responsável pelo financeiro, quero a fórmula do valor da 40% confirmada por escrito, para o servidor calcular igual ao Fechamento aprovado.
+  aceite: Está escrito que o valor da 40% é o imposto vezes o percentual da loja (padrão 40%), como no Fechamento do protótipo, e não o faturado menos o imposto vezes 40%
+  aceite: Está escrito que a alíquota é o imposto dividido pelo faturado, serve só para conferir e aparece na memória de cálculo
+  aceite: Está escrito o exemplo conferido: imposto de R$ 3.140,00 com percentual 40% dá R$ 1.256,00, e imposto de R$ 1.375,50 dá R$ 550,20
+  aceite: Está escrito que o percentual pode mudar por loja e que a mudança vale daqui para frente, sem refazer cobrança de competência fechada
+  prioridade: Deve 2
+  valor: 10 é o valor que o pagador paga todo mês
+  pontos: 1
+- Decidir quem trata divergência
+  depende: Fechar glossário com o dono
+  historia: Como dono do IT.MK, quero definir quem decide cada Pix que não bateu e em quanto tempo, para nenhum dinheiro ficar parado sem dono.
+  aceite: Está registrado quem trata as divergências (valor diferente, quem pagou é diferente, fora do prazo, duplicado) e em quanto tempo, e que o servidor nunca devolve sozinho (decisão de 01/10/2026)
+  aceite: Está registrado quantas horas sem aviso do provedor geram alerta para a equipe, com o número definido pelo dono
+  aceite: Está registrado o titular da conta que recebe como decisão aberta do dono, até ser definido
+  prioridade: Deve 3
+  valor: 8 divergência sem dono vira dinheiro do cliente parado
+  pontos: 1
+
+Base do servidor [Backend] {v0.1}
+meta: o servidor nasce com módulos separados, dinheiro exato, relógio injetado, login pelo Supabase, histórico imutável e proteção contra repetição e excesso
+- Estrutura de módulos do servidor
+  depende: Decidir módulos do servidor
+  historia: Como time técnico, quero o projeto do servidor criado com os módulos domínio, aplicação, adaptadores e servidor, para a regra de negócio nascer separada do Spring, do SQL e do HTTP.
+  aceite: Existem os quatro módulos no build, o módulo domínio não depende de Spring, JDBC nem Jackson, e o build falha se alguém acrescentar essa dependência
+  aceite: Existe um teste de arquitetura que falha quando um controller chama repositório direto ou quando o domínio importa classe de fora
+  aceite: Só o módulo servidor tem a classe Main e os perfis teste e produção, e o domínio compila e testa sem subir o Spring
+  aceite: Cada caso de uso é uma classe com nome de negócio (por exemplo Fechar competência) que recebe um pedido simples e devolve uma resposta simples
+  prioridade: Deve 2
+  valor: 10 sem esta base cada regra nasce presa ao framework
+  pontos: 5
+- Objeto Dinheiro exato
+  depende: Decidir tipo exato do dinheiro em Java
+  historia: Como responsável pelo financeiro, quero que todo valor em R$ no servidor seja um objeto exato e imutável, para a soma das cobranças sempre fechar.
+  aceite: Existe a classe Dinheiro com duas casas e sem construtor que aceite double ou float, e em teste 0,10 mais 0,20 dá exatamente 0,30
+  aceite: A regra única de arredondamento fica num só lugar, e o teste de R$ 100,00 em 3 partes dá 33,33, 33,33 e 33,34
+  aceite: A comparação com a tolerância configurada (R$ 0,02 hoje) é um método do próprio Dinheiro, e nenhum outro código compara valor por subtração solta
+  aceite: Valor em R$ entra e sai da API como texto com ponto decimal, por exemplo 1256.00, nunca como número de ponto flutuante
+  prioridade: Deve 2
+  valor: 10 o mesmo valor precisa sair igual em toda tela e em todo Pix
+  pontos: 3
+- Competência e relógio injetado
+  depende: Estrutura de módulos do servidor
+  historia: Como time técnico, quero que a data de hoje e a competência venham de objetos injetados, para testar vencimento e atraso sem esperar o calendário.
+  aceite: Existem o objeto Competência (primeiro dia do mês) e a classe Relógio injetada, e o build acusa uso direto de LocalDate.now ou Instant.now fora do adaptador do relógio
+  aceite: Um teste com data fixa prova que a cobrança com vencimento em 20/10/2026 está em atraso de 1 dia em 21/10/2026 e na faixa até 30 dias
+  aceite: O fuso usado para virar o dia é America/Sao_Paulo em toda tarefa agendada, e a hora vem do servidor, nunca da tela
+  prioridade: Deve 2
+  valor: 9 atraso contado errado gera cobrança errada
+  pontos: 2
+- Erros do negócio e conflito 409
+  depende: Guardar versão do registro para edição concorrente
+  historia: Como analista de cobrança, quero mensagem clara quando algo não pode ser feito e aviso quando outra pessoa mudou o mesmo registro, para não perder o que ela fez.
+  aceite: Erro do negócio é exceção com mensagem em português simples (por exemplo Contestação em andamento. A cobrança fica parada.), e nenhum método devolve ou aceita null de propósito
+  aceite: Gravar com versão antiga devolve HTTP 409 com 0 linhas afetadas, e a tela recebe um código fixo para pedir que recarregue
+  aceite: Um teste com duas gravações ao mesmo tempo no mesmo acordo mostra que só uma vale e a outra recebe 409
+  aceite: O erro para quem chama é genérico, sem SQL e sem caminho de arquivo, com código de rastreio, e o detalhe vai só para o log do servidor
+  prioridade: Deve 2
+  valor: 9 dois analistas no mesmo acordo é situação comum
+  pontos: 3
+- Login e sessão pelo servidor
+  depende: Decidir login e quem agiu
+  historia: Como dono do IT.MK, quero que cada pessoa entre com o seu login do Supabase e o servidor confira quem é, para o app JavaFX nunca guardar chave do banco.
+  aceite: Toda chamada, exceto a saúde do servidor e o aviso do provedor, exige token do Supabase e responde 401 sem token válido, conferindo assinatura, emissor, público e validade
+  aceite: O algoritmo vem da configuração do servidor e nunca do cabeçalho, e um token com alg none é recusado em teste
+  aceite: O usuário do token liga a um usuário ativo da tabela de usuários, e usuário inativo recebe 403 mesmo com token válido
+  aceite: Nenhuma chave sb_secret nem texto de conexão do banco aparece em resposta, em log ou no pacote do app JavaFX
+  prioridade: Deve 2
+  valor: 10 sem login conferido no servidor qualquer um fala com o banco
+  pontos: 5
+- Acesso por módulo e Aprova a fila do robô
+  depende: Criar usuários e permissões
+  historia: Como dono do IT.MK, quero que o servidor confira em toda chamada se a pessoa pode usar aquele módulo e se aprova a fila do robô, para ninguém usar o que não foi liberado.
+  aceite: Cada módulo de Configurações (Dashboard, Conversas, Pagadores e Lojas, Marketplaces, Fechamento do mês, Recebimentos, Inadimplência e Acordos, Configurações) tem checagem no servidor, e o padrão é negar
+  aceite: Aprovar item da fila do robô exige Aprova a fila do robô ligado, e todo usuário novo nasce com ele ligado
+  aceite: A permissão libera ou nega o módulo inteiro e nenhuma permissão muda o que aparece dentro dele, porque a visão é única
+  aceite: Um teste chama cada endpoint sem permissão e confirma 403, e falha de autorização vai para o log
+  prioridade: Deve 3
+  valor: 8 evita uso por quem não deveria entrar no módulo
+  pontos: 5
+- Histórico imutável de ações
+  depende: Criar tabela de auditoria só de inserção
+  historia: Como dono do IT.MK, quero que o servidor grave quem fez cada ação importante e quando, para provar o que aconteceu numa disputa.
+  aceite: Toda ação de dinheiro, acordo, contestação, bloqueio, conexão, configuração e robô grava um evento com ator (usuário, robô, sistema ou provedor), ação, estado de origem e de destino, resultado e motivo
+  aceite: Se a gravação do evento obrigatório falha, a ação é cancelada (falha fechada) e o erro vai para o log do servidor
+  aceite: O evento nunca leva segredo, token, chave ou dado pessoal sensível, só o identificador ou os últimos 4 caracteres
+  aceite: O servidor só insere nessa tabela, e um teste prova que editar e apagar falham
+  prioridade: Deve 2
+  valor: 10 é a prova do que o sistema e o robô fizeram
+  pontos: 5
+- Logs sem segredo e configuração por ambiente
+  depende: Estrutura de módulos do servidor
+  historia: Como time técnico, quero logs sem dado sensível e configuração separada por ambiente, para um erro nunca vazar chave nem misturar teste com produção.
+  aceite: Segredo, token, chave Pix, CPF, CNPJ, telefone e corpo completo de aviso são mascarados ou ficam fora do log, e existe teste que procura esses valores na saída do log
+  aceite: Endereços, chaves e certificados vêm de variável de ambiente ou do cofre, nunca do código nem do repositório, com valores diferentes em teste e produção
+  aceite: Cada requisição leva um código de rastreio que atravessa entrada, processamento e saída, e a quebra de linha do texto de entrada é limpa antes de ir ao log
+  prioridade: Deve 2
+  valor: 9 log com segredo é vazamento
+  pontos: 3
+- Limite de tentativas e proteção contra excesso
+  depende: Login e sessão pelo servidor
+  historia: Como dono do IT.MK, quero que o servidor segure tentativas de entrada e excesso de chamadas, para ninguém derrubar o sistema nem adivinhar senha.
+  aceite: Depois do número de tentativas de entrada definido na decisão de login, o servidor responde 429 com tempo de espera e grava o evento
+  aceite: Excesso de chamadas por usuário e por endereço recebe 429 com Retry-After, e o aviso do provedor tem limite próprio que não bloqueia o provedor legítimo
+  aceite: Corpo acima do tamanho máximo recebe 413, tipo de conteúdo inesperado recebe 415 e método não permitido recebe 405
+  prioridade: Deveria 3
+  valor: 7 protege a entrada contra abuso
+  pontos: 3
+- Idempotência e fila de tarefas
+  depende: Estrutura de módulos do servidor
+  historia: Como time técnico, quero uma chave de idempotência guardada com o resultado e uma fila de tarefas no banco, para repetir um pedido ou reiniciar o servidor sem duplicar efeito.
+  aceite: Ação que cria dinheiro ou mensagem aceita uma chave de idempotência, guarda o resultado com ela e devolve o mesmo resultado na repetição
+  aceite: A fila de tarefas guarda tipo, estado, tentativas e próxima tentativa, o servidor pega a tarefa com trava, e falha repetida vai para a fila de erros com alerta
+  aceite: As tarefas agendadas usam America/Sao_Paulo e rodam uma só vez por rodada, mesmo com dois servidores ligados
+  aceite: Nenhuma chamada externa fica dentro de transação aberta: primeiro grava a intenção, depois chama, depois grava o resultado
+  prioridade: Deve 2
+  valor: 9 reinício do servidor não pode cobrar duas vezes
+  pontos: 5
+
+Carteira de clientes no servidor [Backend] {v0.1}
+meta: o analista cadastra, acha e abre qualquer pagador com suas lojas, situação financeira e ficha completa, com uma só consulta por tela
+- Cadastrar pagador com lojas
+  depende: Criar tabela de loja
+  historia: Como analista de cobrança, quero cadastrar o pagador com WhatsApp e uma ou mais lojas numa só ação, para ele já aparecer completo na carteira.
+  aceite: O servidor grava pagador e lojas numa só transação, tudo ou nada, e exige nome com mais de 2 letras, WhatsApp com DDD (mínimo 10 dígitos), nome da loja, GS só com números (mínimo 8 dígitos), plataforma e data de início
+  aceite: Plataforma só aceita Shein, Mercado Livre, Shopee ou Kwai, e o mesmo GS na mesma plataforma devolve erro de duplicado
+  aceite: O documento do pagador, quando informado, aceita letras e números (CNPJ alfanumérico), é guardado sem máscara e é único
+  aceite: O pagador novo nasce sem cobrança, portanto em dia, com modo de cobrança padrão do sistema e robô como Atende, e a ação grava evento com o usuário
+  prioridade: Deve 2
+  valor: 10 sem pagador e loja nenhuma outra tela existe
+  pontos: 5
+- Consultar carteira com filtro único
+  depende: Cadastrar pagador com lojas
+  historia: Como analista de cobrança, quero achar qualquer pagador pelo mesmo campo de busca em toda tela, para não repetir a procura.
+  aceite: Uma só consulta busca por nome sem acento, telefone (só números), GS ou nome da loja, e devolve o mesmo resultado em Pagadores e Lojas, Inadimplência, Recebimentos e Conversas
+  aceite: A consulta filtra por situação da loja (ativa, bloqueada, inativa), situação financeira (em dia, a vencer, em atraso, em acordo), situação do robô (Atende, Não atende, Em teste) e plataforma, e devolve cada pagador só com as lojas que casaram
+  aceite: A resposta traz a contagem de pagadores e de lojas e vem paginada por chave de busca, e o plano da consulta foi conferido com dados de exemplo
+  prioridade: Deve 2
+  valor: 9 é a porta de entrada de todas as telas
+  pontos: 5
+- Situação financeira derivada
+  depende: Consultar carteira com filtro único
+  historia: Como analista de cobrança, quero que o servidor calcule a situação financeira do pagador, para ela ser igual em todas as telas.
+  aceite: A situação (em dia, a vencer, em atraso, em acordo) sai de consulta sobre cobrança e acordo, nunca de campo copiado, e a precedência entre em acordo e em atraso segue a decisão da lista de status da cobrança
+  aceite: Saldo é o total menos os pagamentos, e saldo de até R$ 0,02 conta como quitado
+  aceite: Teste com data fixa e quatro pagadores de exemplo, um por situação, devolve a situação certa e os dias do maior atraso
+  prioridade: Deve 2
+  valor: 9 todas as telas e o robô leem esta situação
+  pontos: 3
+- Ficha do pagador em uma chamada
+  depende: Situação financeira derivada
+  historia: Como analista de cobrança, quero abrir a ficha do pagador e receber tudo de uma vez, para atender sem esperar várias telas carregarem.
+  aceite: Uma chamada devolve dados do pagador, lojas com situação e selo da análise, financeiro (em aberto, próximo vencimento, competências em aberto), acordo com parcelas, comprovantes, pessoas ligadas e linha do tempo
+  aceite: A resposta é um objeto simples, sem entidade, com os textos de situação já prontos (por exemplo Em atraso 12 dias) e valores em R$ como texto exato com duas casas
+  aceite: Identificador público é aleatório, nunca número sequencial, e identificador que não existe devolve 404
+  prioridade: Deve 2
+  valor: 9 a ficha é aberta por todos os módulos
+  pontos: 5
+- Linha do tempo e pessoas ligadas
+  depende: Cadastrar pagador com lojas
+  historia: Como analista de cobrança, quero ver tudo o que aconteceu com o pagador em ordem e quem são os contatos dele, para saber com quem falar e o que já foi feito.
+  aceite: A linha do tempo junta cobrança enviada, pagamento, promessa, acordo, contestação, bloqueio, saída e conversa, da mais nova para a mais antiga, com usuário e hora, paginada por chave de busca
+  aceite: A linha do tempo vem dos eventos já gravados e ninguém a edita, evento novo entra só por ação do sistema
+  aceite: Pessoas ligadas guardam nome, papel (responsável, financeiro, sócio) e telefone, e o responsável aparece uma só vez por pagador
+  prioridade: Deveria 3
+  valor: 6 ajuda a achar quem decide quando o responsável some
+  pontos: 3
+- Situação da loja e bloqueio
+  depende: Cadastrar pagador com lojas
+  historia: Como analista de cobrança, quero que a loja só mude entre ativa, bloqueada e inativa por passos permitidos, para nenhuma loja ser bloqueada por engano.
+  aceite: Só são permitidas ativa para bloqueada, bloqueada para ativa e ativa para inativa, e qualquer outra mudança recusa com erro do negócio
+  aceite: Loja com promessa, acordo ativo ou contestação ativa não pode ser marcada como bloqueada pelo servidor
+  aceite: Cada mudança usa atualização condicional pelo estado esperado e confere as linhas afetadas, e com 0 linhas outra pessoa mudou antes e a resposta é 409
+  aceite: Cada mudança grava evento com usuário, motivo e hora
+  prioridade: Deve 3
+  valor: 8 bloquear loja errada afeta o negócio do cliente
+  pontos: 3
+- Modo de cobrança por pagador
+  depende: Cadastrar pagador com lojas
+  historia: Como analista de cobrança, quero escolher se o pagador recebe um Pix por pagador ou um Pix por loja, para cobrar do jeito combinado com ele.
+  aceite: O modo aceita padrão do sistema, um Pix por pagador ou um Pix por loja, e nasce como padrão do sistema
+  aceite: O modo efetivo é o do pagador e, se for padrão do sistema, o de Configurações (hoje um Pix por pagador)
+  aceite: Mudar o modo não muda cobrança nem Pix já gerados, vale só para os próximos
+  prioridade: Deve 3
+  valor: 7 muda quantos Pix existem por pagador
+  pontos: 2
+
+Conexões com marketplaces no servidor [Backend] {v1.0}
+meta: o analista de marketplaces vê e renova a conexão de cada loja nas quatro plataformas, e nenhum segredo volta para a tela
+- Cadastrar conexão por loja
+  depende: Criar conexão por loja e plataforma
+  historia: Como analista de marketplaces, quero registrar a conexão de cada loja com a plataforma dela, para saber onde falta autorizar.
+  aceite: A conexão é única por loja e plataforma e guarda situação (Sem conexão, Aguardando autorização, Conectada, Com erro, Vencida), quem autorizou, data da autorização e último teste
+  aceite: Dados próprios da plataforma (tipo de loja da Shein, CPF ou CNPJ da Shopee, país do Mercado Livre) só são aceitos para a plataforma certa e nenhum deles é valor em R$
+  aceite: Mudar a situação segue transições permitidas e grava evento com usuário e motivo
+  aceite: Loja sem conexão ativa só aceita a base Valor manual no Fechamento
+  prioridade: Deve 2
+  valor: 9 é a base de todo o painel de lojas
+  pontos: 5
+- Validade e situação Vencida por plataforma
+  depende: Guardar validade da conexão por plataforma
+  historia: Como analista de marketplaces, quero que o servidor calcule a validade de cada conexão e vire Vencida sozinho, para renovar antes de a loja ficar sem dado.
+  aceite: Shopee usa a validade lida da API (expire_time) ou 7, 30, 90, 180 ou 365 dias ou data livre até 365 dias, Mercado Livre vale 6 meses da autorização, Shein não tem validade fixa e Kwai fica a confirmar e não vira Vencida
+  aceite: Conectada com validade no passado aparece como Vencida, calculada com o relógio injetado, com teste de data fixa nas quatro plataformas
+  aceite: A resposta traz a data de vencimento e quantos dias faltam, e uma consulta lista as conexões que vencem dentro do prazo de aviso
+  aceite: Mercado Livre sem chamada com sucesso há 4 meses gera alerta, porque a conexão cai
+  prioridade: Deve 3
+  valor: 8 conexão vencida deixa a análise e o faturado sem dado
+  pontos: 3
+- Segredo só de gravação na conexão
+  depende: Guardar segredos no Vault só de gravação
+  historia: Como dono do IT.MK, quero que a chave e o token de cada loja sejam aceitos uma vez e nunca devolvidos, para evitar vazamento.
+  aceite: A API aceita o segredo na criação e na troca e nunca o devolve, e a resposta traz só configurado, os últimos 4 caracteres e a data da troca
+  aceite: Só o módulo que chama a plataforma lê o segredo, com conta própria, e cada leitura grava evento com quem, para quê e quando, sem o valor
+  aceite: O teste de conexão não mostra o segredo nem a resposta crua da plataforma, e um teste procura o segredo nas respostas e no log e não acha
+  aceite: Trocar e revogar grava evento com usuário, e segredo revogado nunca é lido
+  prioridade: Deve 2
+  valor: 10 segredo exposto dá acesso às lojas do cliente
+  pontos: 5
+- Convite e porta de autorização
+  depende: Cadastrar conexão por loja
+  historia: Como analista de marketplaces, quero mandar ao cliente o convite para autorizar a loja e receber a volta, para conectar sem pedir a chave por mensagem.
+  aceite: O convite leva endereço de retorno fixo e um código state aleatório de uso único, e a volta com state errado ou repetido é recusada
+  aceite: A porta de autorização é uma interface do domínio (iniciar, trocar código por token, renovar, revogar) sem classe de plataforma, e os adaptadores ficam nas Integrações
+  aceite: A situação vira Aguardando autorização ao enviar o convite e Conectada ou Com erro na volta, com o motivo em texto simples (por exemplo Autorização feita por operador da conta. Precisa ser o administrador.)
+  aceite: Autorização revogada pelo vendedor muda a situação para Com erro e o servidor não tenta de novo em loop
+  prioridade: Deve 3
+  valor: 8 sem a porta nenhuma plataforma conecta
+  pontos: 5
+- Aplicativos por plataforma
+  depende: Guardar aplicativo por plataforma
+  historia: Como analista de marketplaces, quero ver o aplicativo de cada plataforma e a situação dele, para saber se a integração está aprovada.
+  aceite: Cada plataforma tem um só aplicativo ativo com identificador, situação (Aprovado, Em revisão), tipo, endereço de retorno, lista de IPs e data da última troca
+  aceite: A Shopee guarda dois endereços de retorno (teste e produção) e as outras plataformas guardam um
+  aceite: O segredo do aplicativo (Partner Key, chave secreta) é só de gravação e a resposta mostra só a data da última troca
+  aceite: O convite só é gerado para plataforma com aplicativo Aprovado
+  prioridade: Deve 3
+  valor: 7 sem aplicativo aprovado a plataforma não conecta
+  pontos: 3
+- Capacidades por plataforma no contrato
+  depende: Criar tabela de plataformas e capacidades
+  historia: Como time técnico, quero que cada plataforma diga no contrato o que entrega, para o código tratar a Kwai sem notas sem exceção surpresa.
+  aceite: O contrato da plataforma declara capacidades (entrega pedidos, entrega notas, conexão por API) lidas dos dados, e a Kwai declara que não entrega notas
+  aceite: Pedir notas a plataforma sem essa capacidade devolve resposta de capacidade ausente, nunca exceção, com teste usando a Kwai
+  aceite: Plataforma nova exige só um adaptador e uma linha de dados, e nenhum código fora do adaptador usa if por nome de plataforma
+  aceite: A ordem dos conectores é Shopee, Mercado Livre, Shein e Kwai, e a Kwai só entra depois de ter a documentação
+  prioridade: Deve 3
+  valor: 7 evita regra espalhada por plataforma
+  pontos: 3
+
+Análise de loja no servidor [Backend] {v1.0}
+meta: o analista de marketplaces preenche a análise de cada loja, compara com a anterior e compara as plataformas do mesmo cliente
+- Salvar análise como foto imutável
+  depende: Criar análise de loja como foto imutável
+  historia: Como analista de marketplaces, quero salvar a análise da loja como uma foto com data e autor, para comparar com a anterior sem perder nada.
+  aceite: Salvar grava a análise, os campos, as listas e a observação numa só transação, tudo ou nada, com data e autor vindos do servidor
+  aceite: Análise salva nunca é editada nem apagada, corrigir é salvar outra, e um teste prova que editar e apagar falham
+  aceite: Duas pessoas salvando ao mesmo tempo na mesma loja geram duas análises com números diferentes e nenhuma se perde
+  aceite: A resposta devolve o número e a data da análise, e a ação grava evento com o usuário
+  prioridade: Deve 2
+  valor: 9 sem foto guardada não há comparação com a análise anterior
+  pontos: 5
+- Campos da análise por plataforma com origem
+  depende: Guardar campos da análise com origem
+  historia: Como analista de marketplaces, quero saber de onde veio cada campo da análise, para confiar no que leio e não editar à mão o que vem da API.
+  aceite: Cada campo traz origem Manual, API, Calculado ou Cadastro, e campo com origem API ou Calculado recusa gravação manual
+  aceite: Os campos mudam por plataforma (Shein, Mercado Livre, Shopee, Kwai), e o campo que a plataforma não entrega, como desempenho e violações da Shein, nasce Manual
+  aceite: Concorrência e preço de terceiros nunca recebem origem API
+  aceite: Até o conector ser ligado, todo campo previsto por API segue Manual e editável, e a ligação muda a origem sem mudar a ficha
+  prioridade: Deve 3
+  valor: 8 o selo de origem evita editar à mão o que vem da API
+  pontos: 8
+- Faixa de saúde e indicadores comparáveis
+  depende: Calcular indicadores e faixa de saúde única
+  historia: Como analista de marketplaces, quero a mesma régua de indicadores e de faixa de saúde nas quatro plataformas, para comparar lojas de plataformas diferentes.
+  aceite: A faixa usa Excelente, Boa, Regular e Ruim, calculada pelo servidor, e no protótipo o Mercado Livre vem pela cor (Verde, Amarelo, Laranja, Vermelho) e a Shopee pela nota (4 ou mais, 3, 2, 1), com a lista final em decisão registrada
+  aceite: Os indicadores são produtos ativos, violações e penalidades, devoluções, faixa de saúde, faturamento e pedidos, taxas e comissões, campanhas e cupons, com a mesma definição nas quatro plataformas
+  aceite: Indicador que a plataforma não entrega volta como não se aplica (taxas da Kwai) e nunca como zero
+  aceite: O cálculo tem teste com casos fixos de entrada e saída e guarda a versão da regra
+  prioridade: Deveria 3
+  valor: 7 uma faixa só permite comparar lojas
+  pontos: 5
+- Painel da carteira com selo da análise
+  depende: Criar selo da análise e consultas do painel
+  historia: Como analista de marketplaces, quero a lista de todas as lojas com situação da conexão, selo e faixa numa só chamada, para saber onde falta análise.
+  aceite: O selo é Sem análise (nenhuma salva), Em dia (última há 30 dias ou menos) ou Desatualizada (mais de 30 dias), calculado com o relógio injetado
+  aceite: Uma só chamada devolve loja, plataforma, situação efetiva da conexão, selo, dias desde a análise e faixa de saúde, com filtro por plataforma, situação e selo
+  aceite: Os contadores (Lojas, Conectadas, Sem análise, Desatualizadas) saem da mesma consulta da lista, sem segunda conta
+  aceite: Teste com data fixa: análise de 01/10/2026 está Em dia em 31/10/2026 e Desatualizada em 01/11/2026
+  prioridade: Deve 3
+  valor: 8 é a lista de trabalho diária do analista de marketplaces
+  pontos: 5
+- Relatório da análise com comparação
+  depende: Salvar análise como foto imutável
+  historia: Como analista de marketplaces, quero o relatório da análise com a variação em relação à anterior e o PDF, para mostrar ao cliente o que melhorou e o que piorou.
+  aceite: O relatório compara a análise com a anterior da mesma loja (a última por data) e mostra a variação de cada indicador comparável, e loja sem análise anterior aparece sem variação
+  aceite: Mais é melhor para produtos ativos, faturamento e pedidos, menos é melhor para violações e devoluções, taxas e campanhas só mostram a variação sem julgar, e a faixa segue a ordem Ruim, Regular, Boa, Excelente
+  aceite: O servidor entrega os dados do relatório e do PDF com o texto de variação pronto (subiu, desceu, igual) e a tela só mostra
+  aceite: O histórico de análises do pagador lista data e autor, da mais nova para a mais antiga, e nenhuma é apagada
+  prioridade: Deveria 3
+  valor: 7 o cliente entende o que mudou sem ler planilha
+  pontos: 5
+- Comparar plataformas do mesmo cliente
+  depende: Faixa de saúde e indicadores comparáveis
+  historia: Como analista de marketplaces, quero comparar as plataformas de um mesmo cliente lado a lado, para ver em qual ele vai melhor e pior.
+  aceite: O servidor soma por plataforma a análise mais recente de cada loja do pagador e devolve uma coluna por plataforma com quantas lojas têm análise
+  aceite: Para cada indicador com sentido marca a plataforma melhor e a pior, e indicador neutro não recebe marca
+  aceite: Com uma só plataforma com análise, ou com valores iguais, nenhuma marca é feita
+  aceite: Plataforma sem loja volta como Sem loja e plataforma sem análise volta como Sem análise
+  prioridade: Poderia 4
+  valor: 5 ajuda a conversa com o cliente e não bloqueia a cobrança
+  pontos: 3
+
+Faturamento e bases no servidor [Backend] {v1.1}
+meta: o analista fecha o mês com o faturado de cada loja guardado por base de cálculo, com histórico de cada troca de base
+- Base de cálculo como estratégia por plataforma
+  depende: Criar bases de cálculo do faturado
+  historia: Como analista de cobrança, quero escolher de onde vem o faturado de cada loja, para cobrar sobre a base certa.
+  aceite: Existem cinco bases (Faturamento total, Valor dos produtos sem frete, Pedidos concluídos, Notas fiscais emitidas e Valor manual), cada uma como estratégia com a mesma interface
+  aceite: A estratégia declara por capacidade o que aceita: a Kwai não aceita Notas fiscais emitidas e loja sem conexão ativa só aceita Valor manual
+  aceite: A base padrão vem de Configurações e cai em Faturamento total quando a loja não suporta a escolhida
+  aceite: Acrescentar base ou plataforma não muda o código de cobrança, e o teste cobre as cinco bases com a Kwai e com loja sem conexão
+  prioridade: Deve 3
+  valor: 8 base errada gera cobrança errada
+  pontos: 5
+- Faturado por loja e competência
+  depende: Guardar faturado por loja e base
+  historia: Como analista de cobrança, quero o faturado e o imposto de cada loja por competência e base, para conferir o valor antes de fechar.
+  aceite: Cada loja guarda, por competência, o valor de cada base, a base escolhida, o imposto, o percentual, o valor da 40% e a origem (API, planilha ou manual)
+  aceite: Faturado vazio (a calcular), zero (sem movimento) e valor são três estados: vazio não gera cobrança e zero vira Sem movimento
+  aceite: Trocar a base refaz o imposto proporcional ao novo faturado (imposto vezes o faturado novo dividido pelo antigo), pela regra única de arredondamento
+  aceite: O servidor entrega ao Fechamento só as linhas da competência com os valores já calculados, como texto exato
+  prioridade: Deve 2
+  valor: 9 é a entrada do cálculo da cobrança
+  pontos: 8
+- Alterar base com alcance e duração
+  depende: Guardar alteração de base com histórico
+  historia: Como analista de cobrança, quero trocar a base de uma loja, de várias ou de todas, neste mês ou para sempre, para corrigir o valor sem mexer loja por loja.
+  aceite: A troca aceita alcance (só esta loja, lojas selecionadas ou todas) e duração (somente no mês vigente ou para sempre), e para sempre grava a base própria da loja e vale nos próximos meses ainda abertos
+  aceite: Loja que não entrega a base escolhida fica como estava, e a resposta diz quantas mudaram e quantas não entregam
+  aceite: Cada troca grava usuário, hora, competência, base de antes e de depois, alcance e duração, e a linha volta para conferência
+  aceite: Competência fechada recusa a troca com erro do negócio
+  prioridade: Deve 3
+  valor: 7 troca de base sem rastro muda o valor sem explicação
+  pontos: 5
+- Pedidos e notas do faturado
+  depende: Guardar pedidos e notas
+  historia: Como analista de cobrança, quero ver os pedidos e as notas que formam o faturado, para provar o número numa contestação.
+  aceite: Pedidos e notas têm identificador externo único por plataforma, e importar o mesmo lote duas vezes não duplica
+  aceite: A soma e a contagem do lote batem com o total do arquivo antes de a competência fechar, senão o servidor mostra a diferença
+  aceite: Dado pessoal do comprador que a plataforma mascara não é guardado
+  aceite: A consulta de notas da Kwai devolve capacidade ausente, porque ela não entrega notas
+  prioridade: Deveria 3
+  valor: 7 permite provar o faturado numa contestação
+  pontos: 5
+
+Fechamento do mês no servidor [Backend] {v1.1}
+meta: o analista fecha o mês com o valor da 40% calculado igual ao protótipo, linhas conferidas, cobranças geradas e enviadas e a memória de cada valor guardada
+- Abrir e fechar competência
+  depende: Criar competências do fechamento
+  historia: Como analista de cobrança, quero abrir a competência do mês e fechá-la quando tudo estiver calculado, conferido e enviado, para o valor ficar travado.
+  aceite: Abrir cria a competência com o primeiro dia do mês, vencimento no dia 20 do mês seguinte (regra de Configurações) e estado aberta, uma só por mês
+  aceite: Fechar mostra o que falta (lojas a calcular, linhas a conferir, cobranças não enviadas), só fecha com confirmação e grava usuário e hora na mesma transação do evento
+  aceite: Competência fechada recusa mudança de faturado, imposto, percentual e base com erro do negócio, porque ajuste depois do fechamento está fora do plano
+  aceite: Dois pedidos de fechar ao mesmo tempo fecham uma vez só e o segundo recebe 409
+  prioridade: Deve 2
+  valor: 9 fechado precisa ficar congelado para o valor não mudar sem aviso
+  pontos: 3
+- Calcular cobrança com imposto e valor da 40%
+  depende: Confirmar fórmula do valor da 40%
+  historia: Como analista de cobrança, quero que o servidor calcule o valor da 40% de cada loja, para a cobrança sair igual à do Fechamento aprovado.
+  aceite: O valor da 40% de cada loja é o imposto vezes o percentual da loja (padrão 40%), pela regra única de arredondamento, e a alíquota é o imposto dividido pelo faturado
+  aceite: Teste fixo: imposto de R$ 3.140,00 com 40% dá R$ 1.256,00, imposto de R$ 1.375,50 dá R$ 550,20 e imposto de R$ 3.000,00 com percentual 35 dá R$ 1.050,00
+  aceite: O total da cobrança do pagador é a soma do valor da 40% das lojas conferidas, e loja Não cobrar ou Sem movimento fica fora
+  aceite: O valor nunca vem da tela, o servidor recalcula a partir de imposto e percentual a cada gravação
+  prioridade: Deve 2
+  valor: 10 é o valor que o pagador paga todo mês
+  pontos: 5
+- Conferência da linha e regra só conferida é cobrada
+  depende: Calcular cobrança com imposto e valor da 40%
+  historia: Como analista de cobrança, quero conferir cada linha antes de ela entrar na cobrança, para só cobrar o que uma pessoa viu.
+  aceite: O servidor calcula os alertas Faturado sem imposto, Alíquota fora do padrão, Valor muito diferente do mês anterior (mais de 35%), Loja bloqueada, Loja em saída e Sem responsável
+  aceite: Conferir linha com alerta pede confirmação, conferir grava usuário e hora, e conferir em lote vale só para linhas sem alerta
+  aceite: Mudar faturado, imposto, percentual, base ou Não cobrar tira a conferência da linha, e só linha conferida entra na cobrança e no envio
+  aceite: Toda alteração exige motivo e grava o histórico da loja com antes, depois, usuário e hora
+  prioridade: Deve 2
+  valor: 9 evita cobrar valor que ninguém olhou
+  pontos: 5
+- Importar planilha com prévia
+  depende: Faturado por loja e competência
+  historia: Como analista de cobrança, quero importar o faturado e o imposto por planilha e ver o que muda antes de gravar, para não estragar o que já está certo.
+  aceite: O servidor aceita .xlsx, .xls e .csv, valida extensão, tamanho e conteúdo, gera o nome e o caminho do arquivo e guarda o hash
+  aceite: A prévia mostra Novas, Alteradas e Sem mudança, e nada é gravado até a pessoa confirmar
+  aceite: Gravar o mesmo arquivo de novo não duplica nada, e linha rejeitada guarda o motivo
+  aceite: Loja nova entra com base Valor manual e etiqueta Nova, linha alterada volta para conferência, e competência fechada recusa a importação
+  prioridade: Deve 3
+  valor: 8 é como o faturado chega de plataforma sem conexão
+  pontos: 8
+- Versões imutáveis do cálculo
+  depende: Versionar cálculo e guardar memória de cálculo
+  historia: Como analista de cobrança, quero que recalcular crie uma versão nova e nunca apague a anterior, para explicar o valor de cada época.
+  aceite: Cada cobrança guarda a versão da regra usada, as entradas (base, faturado, imposto, alíquota, percentual) e o resultado
+  aceite: Recalcular cria versão nova ligada à anterior com motivo e autor, e a antiga fica Substituída, nunca editada
+  aceite: Mudar o percentual em Configurações vale daqui para frente e não refaz cobrança gerada nem competência fechada
+  aceite: Existe teste de regressão com casos fixos de entrada e saída para cada versão da regra
+  prioridade: Deve 2
+  valor: 10 sem a versão o valor cobrado não se explica numa contestação
+  pontos: 5
+- Gerar cobranças por pagador ou por loja
+  depende: Criar cobrança e itens por loja
+  historia: Como analista de cobrança, quero gerar a cobrança de cada pagador com um item por loja, para enviar um total que bate com o cálculo.
+  aceite: A cobrança nasce com um item por loja conferida e o total é igual à soma dos itens, garantido no servidor e no banco
+  aceite: Há uma só cobrança por pagador, competência, tipo e versão, e gerar de novo não duplica
+  aceite: Ficam separados, sem cobrança, o pagador sem WhatsApp válido, sem responsável cadastrado, sem loja conferida ou com todas as lojas em Não cobrar, e a resposta diz o motivo de cada um
+  aceite: O modo um Pix por loja gera um item e um Pix por loja, e o modo por pagador gera um total
+  prioridade: Deve 2
+  valor: 10 é o centro de todo o dinheiro do IT.MK
+  pontos: 8
+- Agendar e enviar cobranças do mês
+  depende: Agendar envio da cobrança
+  historia: Como analista de cobrança, quero agendar o envio das cobranças do mês, para as mensagens saírem no dia e na hora certos.
+  aceite: Agendar exige data e hora que ainda não passaram, e o envio leva só o pagador pronto naquela hora, uma mensagem por pagador com todas as lojas, o total, o link do Pix e o copia e cola
+  aceite: Enviar antes dispara na hora e encerra o agendamento, e cancelar o agendamento não apaga cobrança
+  aceite: Cobrança já enviada não é reenviada, pela chave de idempotência (cobrança, data e canal), mesmo se o servidor reiniciar
+  aceite: Cobrança enviada passa a Enviada em Recebimentos e entra na fila do Dashboard
+  prioridade: Deve 3
+  valor: 8 evita cobrar duas vezes quando o sistema reinicia
+  pontos: 5
+- Estados do Pix como máquina de estados
+  depende: Criar Pix com estados
+  historia: Como analista de cobrança, quero que o Pix só mude de estado por passos permitidos, para o dinheiro nunca ficar num estado impossível.
+  aceite: Os estados são Pix gerado, Enviado, Pago, Expirado e Cancelado, e as mudanças permitidas são gerado para enviado, enviado para pago, gerado ou enviado para expirado e gerado ou enviado para cancelado
+  aceite: Pix pago não volta, e Expirado ou Cancelado só vira novo Pix com identificador novo, nunca reaproveitado
+  aceite: A mudança usa atualização condicional (where estado igual ao esperado) e confere as linhas afetadas, e chamar o passo final sem os anteriores é recusado
+  aceite: Cada mudança grava evento com ator e hora
+  prioridade: Deve 2
+  valor: 9 estado errado do Pix gera baixa errada
+  pontos: 3
+- Memória de cálculo e extrato da cobrança
+  depende: Versões imutáveis do cálculo
+  historia: Como analista de cobrança, quero abrir a memória de cálculo de qualquer cobrança e o extrato que vai ao cliente, para explicar o valor.
+  aceite: A memória traz competência, base usada, fonte do dado, período da fonte, faturado na base, alíquota e sua origem, imposto, percentual da 40%, valor da 40%, vencimento, quem conferiu e quando, e as versões do cálculo
+  aceite: O extrato é a versão curta, uma linha por loja no formato faturado, imposto vezes percentual igual ao valor da 40%, mais o total e o vencimento, gerado pelo servidor
+  aceite: O extrato usa a versão vigente do cálculo naquele dia, e abrir a memória de uma cobrança antiga mostra o cálculo da época
+  aceite: A memória abre pelo Fechamento, pela ficha do pagador, por Conversas e pela contestação, sempre pela mesma chamada
+  prioridade: Deve 2
+  valor: 10 é a prova do valor cobrado
+  pontos: 5
+
+Cobrança e Pix no servidor [Backend] {v1.1}
+meta: o analista gera a cobrança com Pix de cada pagador, a baixa acontece sozinha quando tudo bate, e o que não bate vai para uma pessoa
+- Porta única de provedor de Pix
+  depende: Estrutura de módulos do servidor
+  historia: Como time técnico, quero uma interface única de provedor de Pix, para trocar de Asaas para Banco Inter sem mexer na cobrança.
+  aceite: A interface do domínio tem criar cobrança, obter copia e cola e link, remover, consultar, devolver e validar aviso, e nenhuma regra conhece Asaas nem Inter
+  aceite: Os dois adaptadores (das Integrações) obedecem ao mesmo contrato, e o provedor ativo vem de Configurações
+  aceite: Existe um provedor falso que simula sucesso, erro, lentidão e resposta repetida, e as regras de cobrança passam com ele sem rede
+  aceite: O identificador nosso da cobrança é gerado e guardado antes da chamada, externalReference no Asaas e txid de 26 a 35 letras e números no Inter
+  prioridade: Deve 2
+  valor: 10 sem a porta a cobrança fica presa a um banco
+  pontos: 5
+- Gerar Pix por cobrança
+  depende: Porta única de provedor de Pix
+  historia: Como analista de cobrança, quero que o servidor gere o Pix de cada cobrança e a segunda via quando precisar, para o pagador sempre ter um Pix válido.
+  aceite: Gerar guarda cobrança, parcela, provedor, identificador no provedor, copia e cola, link, vencimento, prazo final, valor e estado, e a chamada ao provedor fica fora de transação aberta
+  aceite: O valor do Pix é o total da cobrança ou da loja, fixo, sem pagamento parcial, e nunca vem da tela
+  aceite: Segunda via reenvia o mesmo Pix enquanto ele vale, e se valor ou vencimento mudou depois do envio o servidor gera Pix novo, avisa o pagador e anula o anterior
+  aceite: Gerar duas vezes com a mesma chave de idempotência devolve o mesmo resultado, e identificador cancelado nunca é reaproveitado
+  prioridade: Deve 2
+  valor: 10 sem Pix guardado não há como receber nem conferir
+  pontos: 8
+- Validade de 30 dias e remoção da cobrança
+  depende: Controlar validade após o vencimento
+  historia: Como responsável pelo financeiro, quero que o Pix deixe de valer 30 dias depois do vencimento, para não receber Pix fora do prazo sem querer.
+  aceite: O prazo final é o vencimento mais 30 dias (decisão de 01/10/2026), guardado em cada Pix, com o número de dias lido de Configurações
+  aceite: No Inter o prazo vai no campo validadeAposVencimento, e vencimento em dia não útil move a data, o que a mensagem ao cliente explica
+  aceite: No Asaas uma rotina diária remove a cobrança em aberto cujo prazo acabou, porque o QR vale 12 meses, passa o Pix para Expirado e grava evento
+  aceite: Pix pago depois do prazo vai para divergência com o motivo fora do prazo ou expirado e não é baixado
+  prioridade: Deve 3
+  valor: 8 sem a remoção o Asaas aceita Pix por até 12 meses
+  pontos: 5
+- Juros e multa desligados
+  depende: Guardar juros e multa desligados por padrão
+  historia: Como responsável pelo financeiro, quero juros e multa desligados por padrão, para nunca cobrar a mais sem o dono decidir.
+  aceite: Com juros e multa desligados nenhum campo de juros ou multa vai ao provedor, e o teste de criação confere o pedido sem esses campos
+  aceite: Ligar exige usuário e motivo, a multa vale uma vez e os juros valem ao mês, com os valores que o dono definir e campos vazios até lá
+  aceite: Com juros e multa ligados o servidor guarda valor original e componentes separados, e a mensagem ao cliente não promete valor fixo, porque o valor muda por dia
+  aceite: O servidor confere que a conta do Asaas não tem juros e multa padrão ligados e alerta se tiver
+  prioridade: Deve 3
+  valor: 7 cobrar juros sem querer gera reclamação e risco legal
+  pontos: 3
+- Endpoint do aviso de pagamento
+  depende: Guardar aviso bruto do provedor
+  historia: Como analista de cobrança, quero que o aviso de pagamento chegue seguro e seja respondido rápido, para a baixa automática funcionar e o provedor nunca pausar o envio.
+  aceite: O endereço é exclusivo por provedor e por ambiente, só aceita POST e confere o token do cabeçalho asaas-access-token (Asaas) ou o certificado de cliente e a lista de IPs (Inter), com comparação em tempo constante e 401 sem dizer o motivo
+  aceite: O servidor grava o aviso inteiro antes de processar e responde HTTP 200 logo depois de gravar, em até 10 segundos (prazo do Asaas, que só aceita 200), e o processamento segue por fila
+  aceite: Aviso repetido (mesmo id no Asaas, mesmo endToEndId no Inter) responde 200 e não processa de novo, e um teste com 20 envios iguais ao mesmo tempo grava um só
+  aceite: O aviso aceita campos novos e lista com vários Pix, e o corpo completo nunca vai para o log comum
+  prioridade: Deve 2
+  valor: 10 sem isso o Pix pago não é baixado sozinho
+  pontos: 8
+- Baixa automática por aviso
+  depende: Endpoint do aviso de pagamento
+  historia: Como analista de cobrança, quero que o Pix pago seja baixado sozinho só quando tudo bate, para não conferir comprovante um por um.
+  aceite: A baixa automática só acontece se a cobrança for achada pelo identificador, o valor for igual (dentro de R$ 0,02) ou a diferença for explicada por juros e multa ligados, o Pix estiver no prazo, o pagador for o mesmo e o identificador da transação for novo
+  aceite: Antes de baixar o servidor consulta o provedor quando faltar dado ou houver diferença de valor, e confere valor, moeda e identificador
+  aceite: Qualquer outro caso cria divergência com motivo, valor esperado, valor recebido, quem pagou, hora e identificador, e nada é baixado
+  aceite: A baixa grava pagamento, status da cobrança, Pix Pago e evento numa só transação com trava, e quitar loja bloqueada cria a pendência de desbloqueio
+  prioridade: Deve 2
+  valor: 10 reduz a conferência manual e evita baixa errada
+  pontos: 8
+- Parcelamento com um Pix por parcela
+  depende: Gerar um Pix por pagador ou por loja e por parcela
+  historia: Como analista de cobrança, quero um Pix por parcela do acordo, para cada pagamento ligar certo na parcela.
+  aceite: Cada parcela tem um Pix próprio com vencimento e identificador próprios, e por loja quando o modo for um Pix por loja
+  aceite: A soma das parcelas é igual ao total com a diferença de centavos na última parcela, e R$ 100,00 em 3 vezes dá 33,33, 33,33 e 33,34
+  aceite: O número de parcelas respeita o máximo de Configurações (hoje 12) e as periodicidades Mensal, Quinzenal e Datas livres
+  aceite: Pix de parcela é de valor fixo, não aceita pagamento parcial, e cada pagamento baixa só a parcela dele
+  prioridade: Deve 3
+  valor: 8 parcelamento muda quantos Pix existem
+  pontos: 5
+- Reconciliação diária de avisos perdidos
+  depende: Baixa automática por aviso
+  historia: Como analista de cobrança, quero que o servidor confira todo dia o que o provedor recebeu, para nenhum Pix pago ficar sem baixa por aviso perdido.
+  aceite: Uma rotina diária pede ao provedor os pagamentos do período e compara com o que foi baixado, e a diferença entra no fluxo de divergência sem baixar sozinha
+  aceite: No Asaas a conferência cobre os 14 dias em que o provedor guarda os eventos, e no Inter consulta GET /webhook/callbacks e reenvia por POST /webhook/callbacks/retry quando acha erro
+  aceite: Quando o Asaas pausar a fila depois de 15 falhas seguidas, o servidor alerta a equipe com o passo a passo para reativar e depois processa os eventos guardados sem duplicar
+  aceite: As chamadas ao provedor respeitam espera e limite próprios e nunca repetem logo depois de erro 429
+  prioridade: Deveria 2
+  valor: 9 pega aviso perdido ou fora de ordem
+  pontos: 5
+
+Recebimentos no servidor [Backend] {v1.1}
+meta: o analista confere o dinheiro que entrou sem pagamento duplicado, e cada divergência vai para uma pessoa decidir
+- Registrar pagamento sem duplicar
+  depende: Criar pagamento com identificador único
+  historia: Como analista de cobrança, quero que o mesmo pagamento nunca seja lançado duas vezes, para não errar o saldo.
+  aceite: Cada pagamento guarda cobrança (pode ficar sem), valor, moeda BRL, meio, data, recebido em e o identificador da transação, que é único
+  aceite: O mesmo identificador de novo não cria linha, e 20 envios iguais ao mesmo tempo gravam um pagamento só
+  aceite: Pagamento que quita o saldo (dentro de R$ 0,02) muda a cobrança para Quitada, e pagamento menor deixa Parcial com o saldo restante, tudo numa transação com trava
+  aceite: O rateio entre lojas dá a cada loja a parte proporcional ao saldo, com a sobra de centavos na última loja com saldo, pela regra única
+  prioridade: Deve 2
+  valor: 10 pagamento duplicado erra o saldo e o dinheiro do cliente
+  pontos: 8
+- Classificar quatro tipos de divergência
+  depende: Criar divergência com quatro motivos
+  historia: Como analista de cobrança, quero que todo Pix que não bate vá para uma lista com o motivo, para uma pessoa decidir.
+  aceite: Os motivos são Valor diferente, Quem pagou é diferente do pagador, Pix fora do prazo ou expirado e Pagamento duplicado, e nenhum outro
+  aceite: Segundo Pix com outro endToEndId para cobrança já paga é Pagamento duplicado, e o mesmo identificador repetido é ignorado e não vira divergência
+  aceite: Valor maior só baixa sozinho se a diferença for explicada por juros e multa ligados, senão é Valor diferente
+  aceite: Cada divergência traz pagador, cobrança esperada, valor esperado, valor recebido, quem pagou, hora, provedor e identificador, e nasce aberta
+  prioridade: Deve 2
+  valor: 9 nada se resolve sozinho com o dinheiro do cliente
+  pontos: 5
+- Resolver divergência sem devolução automática
+  depende: Registrar decisão da divergência e crédito
+  historia: Como analista de cobrança, quero escolher o que fazer com cada divergência, para ter prova de quem decidiu e quando.
+  aceite: A resolução aceita aceitar e dar baixa, devolver, ligar a outra cobrança ou guardar como crédito, e só uma pessoa decide, com nome, hora e motivo
+  aceite: O servidor nunca devolve sozinho (decisão de 01/10/2026), e a devolução só é aceita até 90 dias depois do Pix
+  aceite: A devolução chama o provedor, grava motivo e usuário e só fecha ao receber o aviso final do provedor
+  aceite: Dois analistas resolvendo a mesma divergência ao mesmo tempo: só uma decisão vale e a outra recebe 409
+  prioridade: Deve 2
+  valor: 9 nunca devolver sozinho é regra aprovada pelo dono
+  pontos: 8
+- Conferir comprovante
+  depende: Guardar comprovante com hash
+  historia: Como analista de cobrança, quero conferir o comprovante de quem paga por fora do link, para dar a baixa certa.
+  aceite: O comprovante entra em a conferir com valor lido, quem pagou, destino e competência sugerida, em PDF, PNG ou JPG com tipo e tamanho validados e nome gerado pelo servidor
+  aceite: Destino diferente da conta que recebe só segue com decisão escrita de uma pessoa (aceitar com motivo ou rejeitar), e possível duplicado (mesmo valor, data e pagador, ou mesma transação) pede confirmação
+  aceite: Valor igual baixa, valor menor baixa como parcial e valor maior pergunta se a sobra vai para a próxima competência mais antiga ou para crédito
+  aceite: Rejeitar guarda o motivo (Comprovante ilegível, Valor não confere, Não é pagamento da VHSS, Duplicado ou Outro) e nada é apagado
+  prioridade: Deveria 3
+  valor: 7 o primeiro mês roda em paralelo com conferência manual
+  pontos: 5
+- Lançar pagamento manual
+  depende: Registrar pagamento sem duplicar
+  historia: Como analista de cobrança, quero lançar à mão um pagamento que veio por fora, para a cobrança não ficar em aberto.
+  aceite: Lançar exige pagador, valor, data e forma (Pix, Transferência ou Outro), e aceita banco, ID da transação, observação e comprovante
+  aceite: Valor igual ou menor que o saldo baixa as cobranças escolhidas, das mais antigas para as mais novas, e a sobra vira crédito do pagador
+  aceite: Mesma transação, ou mesmo valor, data e pagador, avisa possível duplicado e só grava com confirmação
+  aceite: A resposta mostra o saldo antes e depois e grava quem lançou
+  prioridade: Deve 3
+  valor: 7 sem lançamento manual o pagamento por fora fica sem baixa
+  pontos: 3
+- Pagamento sem cobrança ligada
+  depende: Guardar pagamento sem cobrança ligada
+  historia: Como analista de cobrança, quero ver os pagamentos sem cobrança e ligar cada um à cobrança certa, para todo dinheiro ter dono.
+  aceite: A consulta Sem cobrança ligada é paginada e filtra por período (30 dias, 90 dias, 6 meses, 12 meses ou todo) e por valor mínimo e máximo
+  aceite: A consulta sugere a cobrança provável quando valor e data batem, e ligar baixa a cobrança escolhida
+  aceite: Desfazer baixa exige motivo, nunca apaga o pagamento, ele volta para Sem cobrança ligada, e grava usuário e hora
+  aceite: Marcar como crédito, devolvido ou descartado exige motivo e nada é apagado
+  prioridade: Deve 3
+  valor: 7 dinheiro sem ligação precisa de dono
+  pontos: 3
+- Crédito do pagador
+  depende: Resolver divergência sem devolução automática
+  historia: Como analista de cobrança, quero que a sobra de um pagamento fique como crédito do pagador, para usar na próxima cobrança.
+  aceite: O crédito é uma soma de lançamentos de entrada e de saída com motivo, sem saldo editável
+  aceite: Sobra de pagamento e divergência guardada como crédito entram como lançamento de entrada ligado ao pagamento de origem
+  aceite: Usar crédito numa cobrança é lançamento de saída que baixa a cobrança, e nunca deixa o saldo abaixo de zero
+  aceite: A ficha do pagador mostra o saldo pela mesma conta
+  prioridade: Deveria 3
+  valor: 6 evita perder a sobra quando o pagador paga a mais
+  pontos: 3
+
+Configurações no servidor [Backend] {v1.1}
+meta: o responsável pelo financeiro muda provedor, juros, modo, régua e modelos pela tela, e cada mudança fica guardada
+- Guardar configuração de recebimento
+  depende: Guardar provedor de Pix, ambiente e chave Pix
+  historia: Como responsável pelo financeiro, quero escolher o provedor de Pix, o ambiente e o modo, para gerar cobrança no lugar certo.
+  aceite: A configuração guarda provedor (Asaas ou Banco Inter, com Asaas de partida), ambiente (teste ou produção), chave Pix recebedora, validade do link em dias (30), modo do Pix e base padrão
+  aceite: Cada mudança grava histórico com usuário, hora, antes e depois, e só vale daqui para frente
+  aceite: A resposta não traz campo do outro provedor, e o titular da conta que recebe fica como em aberto até o dono definir
+  aceite: Trocar de teste para produção limpa as credenciais do outro ambiente e avisa
+  prioridade: Deve 3
+  valor: 8 sem provedor configurado não há Pix
+  pontos: 3
+- Credenciais do provedor só de gravação
+  depende: Guardar credenciais do Inter e do Asaas
+  historia: Como responsável pelo financeiro, quero guardar as credenciais do Pix sem que apareçam depois e testar a conexão, para o sistema gerar cobrança sem expor a chave.
+  aceite: O Asaas guarda a chave de API e o token do aviso (32 a 255 caracteres, gerado pelo sistema), e o Inter guarda Client ID, Client Secret, certificado .crt e chave privada .key, separados por provedor e por ambiente, e nada é devolvido depois de salvo
+  aceite: Chave de teste do Asaas (prefixo aact_hmlg) é recusada em produção e a de produção (prefixo aact_prod) é recusada em teste, com mensagem simples
+  aceite: O teste de conexão diz funcionou ou o que falhou (credencial, ambiente, certificado vencido, escopo faltando, chave Pix da conta, aviso não cadastrado), sem mostrar segredo
+  aceite: A resposta traz a data de vencimento do certificado do Inter, e o servidor alerta 90 dias e 30 dias antes
+  prioridade: Deve 2
+  valor: 9 sem credencial guardada não há Pix
+  pontos: 5
+- Régua como dados validados
+  depende: Guardar régua como dados validados
+  historia: Como analista de cobrança, quero mudar os dias e as ações da régua sem pedir entrega nova, para ajustar a cobrança com frequência.
+  aceite: Cada etapa tem dia em relação ao vencimento, ação (só avisar a equipe, enviar com revisão ou enviar sem revisão), modelo e ativa, e as seis de partida são Lembrete (dia -2), Vencimento (0), Atraso 1 (3), Atraso 2 (10), Aviso de bloqueio (20) e Pedir bloqueio (25)
+  aceite: Dois dias iguais na mesma régua são recusados, e etapa só aponta para modelo aprovado
+  aceite: A regra de pausa (promessa, acordo, contestação) fica no código e não nos dados, e as exceções por pagador (Não cobrar, Régua mais firme, Régua mais leve) ficam em lista própria
+  aceite: Mudar a régua grava histórico e vale daqui para frente
+  prioridade: Deveria 3
+  valor: 7 a régua muda com frequência
+  pontos: 5
+- Modelos de mensagem com aprovação
+  depende: Guardar modelos de mensagem com aprovação
+  historia: Como analista de cobrança, quero modelos de mensagem aprovados pela equipe, para o robô só falar com o pagador o que foi aprovado.
+  aceite: O modelo guarda nome, texto, variáveis permitidas (nome, competência, lojas, faturado, imposto, quarenta, total, vencimento, Pix, dias, suporte) e situação (Rascunho, Aprovado ou Reprovado)
+  aceite: Variável fora da lista permitida é recusada ao gravar
+  aceite: Qualquer usuário aprova, com nome e hora, e editar texto aprovado cria versão nova que precisa de nova aprovação
+  aceite: Modelo reprovado avisa quais etapas da régua o usam, e cada envio guarda a versão do modelo usada
+  prioridade: Deve 3
+  valor: 8 evita texto livre perigoso saindo para o pagador
+  pontos: 5
+- Gerir usuários e permissões
+  depende: Acesso por módulo e Aprova a fila do robô
+  historia: Como dono do IT.MK, quero adicionar e remover usuários e escolher o que cada um usa, para cada pessoa entrar com o seu login e ficar registrada.
+  aceite: Adicionar usuário exige nome e e-mail único, e o novo usuário nasce com Aprova a fila do robô ligado
+  aceite: Cada usuário tem os módulos liberados, Atende conversas e Aprova a fila do robô, e remover o deixa inativo, nunca apaga, e a auditoria continua apontando para ele
+  aceite: Remover quem atende deixa as conversas sem dono, elas continuam visíveis, e existe a ação de transferir as conversas para outro atendente
+  aceite: A coluna Ver valores em R$ do protótipo não existe no servidor, porque a visão é única
+  prioridade: Deve 3
+  valor: 8 sem saber quem agiu a auditoria perde o valor
+  pontos: 3
+- Histórico de alterações de configuração
+  depende: Guardar histórico de configuração
+  historia: Como responsável pelo financeiro, quero saber quem mudou cada configuração e quando, para explicar por que o comportamento mudou.
+  aceite: Toda mudança em Configurações grava data e hora, usuário, onde mudou, valor antes e valor depois
+  aceite: Valor de segredo nunca aparece no antes ou no depois, só o registro de que foi trocado
+  aceite: A lista vai da mais nova para a mais antiga com paginação por chave de busca, e mudança de regra nunca recalcula cobrança fechada
+  prioridade: Deve 3
+  valor: 7 mudar limite ou régua sem rastro causa disputa
+  pontos: 2
+
+Inadimplência e acordos no servidor [Backend] {v1.2}
+meta: atraso, promessa, acordo, bloqueio, saída e baixa são tratados dentro do sistema, com a régua pausando sozinha
+- Faixas de atraso e carteira em atraso
+  depende: Decidir faixas de atraso e prazos
+  historia: Como analista de cobrança, quero a lista de quem está em atraso com dias, valor e faixa, para cobrar primeiro quem deve há mais tempo.
+  aceite: Pagador em atraso é quem tem cobrança com saldo acima de R$ 0,02 e vencimento passado, e o valor vencido é a soma desses saldos
+  aceite: A faixa é objeto de valor (até 30 dias, 31 a 60, 61 a 90 e acima de 90) e o teste cobre os limites 30, 31, 60, 61, 90 e 91 dias
+  aceite: A lista vem ordenada por maior atraso e depois por maior valor, com a contagem de cada faixa
+  aceite: Os contadores (pagadores em atraso, valor vencido, acordos ativos, lojas bloqueadas, saídas em andamento) saem da mesma consulta da lista
+  prioridade: Deve 2
+  valor: 9 é a tela de trabalho diário de quem cobra
+  pontos: 5
+- Política Régua pode agir
+  depende: Estrutura de módulos do servidor
+  historia: Como analista de cobrança, quero que a régua pare sozinha quando houver promessa, acordo ativo ou contestação ativa, para não cobrar quem está negociando.
+  aceite: A política Régua pode agir está no domínio e responde não quando há promessa ativa, acordo ativo ou contestação ativa, com o motivo em texto (por exemplo Contestação em andamento. A cobrança fica parada.)
+  aceite: Acordo ativo é acordo não quebrado com ao menos uma parcela não paga, e contestação ativa é Aberta, Em análise ou Aguardando cliente
+  aceite: Existe teste com as 8 combinações de promessa, acordo e contestação, sem tela e sem banco
+  aceite: Cobrança manual com a régua pausada mostra o aviso e só envia com confirmação, e o evento grava que foi manual
+  prioridade: Deve 2
+  valor: 10 cobrar quem está negociando gera disputa e reclamação
+  pontos: 3
+- Registrar promessa de pagamento
+  depende: Criar promessa e retorno
+  historia: Como analista de cobrança, quero registrar a data que o pagador prometeu pagar, para a régua parar e eu cobrar o retorno.
+  aceite: A promessa exige a data prometida e guarda o prazo de retorno, e só existe uma promessa ativa por pagador
+  aceite: Promessa ativa pausa a régua, e os resultados possíveis são reagendado, não atendeu, recusou e número errado
+  aceite: Cada resultado entra na linha do tempo do pagador com usuário e hora, e promessa e retorno aparecem na fila do dia
+  prioridade: Deve 3
+  valor: 7 evita cobrar quem prometeu pagar
+  pontos: 3
+- Acordo com soma exata e um ativo por pagador
+  depende: Criar acordo e parcelas
+  historia: Como analista de cobrança, quero fechar acordo em parcelas e quebrá-lo se não for pago, para o pagador quitar o atraso sem eu perder o controle.
+  aceite: A soma das parcelas é igual ao total do acordo, com a diferença de centavos na última parcela, e R$ 100,00 em 3 parcelas dá 33,33, 33,33 e 33,34
+  aceite: O número de parcelas vai de 2 até o máximo de Configurações (hoje 12), com periodicidade Mensal, Quinzenal ou Datas livres e todos os vencimentos obrigatórios, e alterar parcela exige motivo e grava antes e depois
+  aceite: Só existe um acordo ativo por pagador, e dois pedidos ao mesmo tempo criam um só, com a aprovação numa transação com trava nas cobranças
+  aceite: Quebrar exige motivo, marca o acordo como quebrado, devolve o saldo para a cobrança original, a régua volta a rodar e o acordo continua no histórico
+  prioridade: Deve 2
+  valor: 9 acordo com soma errada ou duplicado gera cobrança errada
+  pontos: 8
+- Pedir bloqueio e desbloqueio ao grupo
+  depende: Criar bloqueio e desbloqueio de loja
+  historia: Como analista de cobrança, quero pedir o bloqueio e o desbloqueio de lojas ao grupo e acompanhar cada passo, para saber em que ponto cada pedido está.
+  aceite: A loja entra em A pedir quando passa do prazo de Configurações (hoje 15 dias de atraso), está ativa e a régua não está pausada
+  aceite: Os passos são a pedir, enviado ao grupo, confirmado e desbloqueio a pedir, e cada passo grava usuário e hora no histórico do bloqueio
+  aceite: O pedido leva ao grupo o nome da loja, o GS e o contato do pagador (vCard), com uma mensagem por pagador mesmo em lote, e só quem está na lista de quem confirma, em Configurações, confirma
+  aceite: Pagamento que quita a dívida muda a loja bloqueada para desbloqueio a pedir
+  prioridade: Deve 3
+  valor: 7 bloquear loja errada afeta o negócio do cliente
+  pontos: 5
+- Pedidos de saída e baixas
+  depende: Registrar pedidos de saída e baixas
+  historia: Como analista de cobrança, quero registrar pedidos de saída de loja e baixar cobrança muito antiga, para limpar a lista sem perder o histórico.
+  aceite: O pedido de saída guarda pagador, lojas, data do pedido, data efetiva e situação (pendente, concluída, cancelada), e cancelar exige motivo
+  aceite: Concluir a saída só vale com o em aberto quitado ou baixado com motivo, e a baixa nunca apaga a cobrança
+  aceite: Cobrança sem movimento há mais de 365 dias (prazo de Configurações) entra na fila de Baixas, com baixar como perdida, baixar como quitada (pagamento não registrado) ou manter em cobrança, todas com motivo
+  aceite: A baixa é lançamento novo ligado à cobrança, sai do valor vencido do Dashboard e continua no histórico e no relatório
+  prioridade: Deveria 3
+  valor: 6 mantém a lista de atraso limpa sem apagar o passado
+  pontos: 5
+- Relatórios de cobrança
+  depende: Faixas de atraso e carteira em atraso
+  historia: Como dono do IT.MK, quero os relatórios do dia, do mês e o envelhecimento da carteira, para acompanhar a cobrança sem pedir planilha.
+  aceite: O relatório do dia traz cobrado, recebido, comprovantes, bloqueios pedidos, acordos criados e o movimento por categoria, e navega para os dias anteriores
+  aceite: O envelhecimento soma quantidade e valor por faixa (até 30, 31 a 60, 61 a 90 e acima de 90), e o total das faixas é igual ao valor vencido
+  aceite: A exportação sai em CSV com ponto e vírgula e valor com vírgula, e o PDF é gerado no servidor
+  prioridade: Deveria 3
+  valor: 6 acompanha a cobrança sem montar planilha
+  pontos: 5
+
+Contestações no servidor [Backend] {v1.2}
+meta: a contestação para a cobrança na hora, anexa a prova do valor e só uma pessoa decide
+- Abrir contestação pausando a régua
+  depende: Criar contestação com situações, motivos e prazo
+  historia: Como analista de cobrança, quero abrir a contestação do pagador e parar a cobrança dele na hora, para não cobrar quem contesta o valor.
+  aceite: Abrir exige pagador, ao menos uma cobrança, motivo e prazo para responder, e a descrição é opcional
+  aceite: Na mesma transação o servidor anexa a memória de cálculo da versão vigente, pausa a régua do pagador e grava o evento na cobrança
+  aceite: Com contestação ativa o robô não cobra aquela cobrança, e a checagem falha fechada: se não der para saber, não cobra
+  aceite: O caso de uso Cobrar pagador em atraso devolve bloqueado por contestação com o motivo, e nada é enviado
+  prioridade: Deve 2
+  valor: 9 cobrar quem contestou gera disputa e reclamação
+  pontos: 5
+- Situações, motivos e prazo da contestação
+  depende: Abrir contestação pausando a régua
+  historia: Como analista de cobrança, quero situação, motivo e prazo em cada contestação, para saber o que está parado e o que venceu.
+  aceite: Os motivos são Valor errado, Loja encerrada, Pagamento já feito, Não reconhece a loja, Faturamento diferente e Outro
+  aceite: As situações são Aberta, Em análise, Aguardando cliente, Procedente, Improcedente e Ajustada, as três primeiras são ativas e pausam a régua, e só valem as transições permitidas
+  aceite: Passar de ativa para encerrada devolve a régua e grava o evento, e passar de encerrada para ativa pausa de novo
+  aceite: O prazo mostra a data e quantos dias restam, Vence hoje ou Vencido há N dias, com o relógio injetado, e contestação encerrada mostra Encerrada
+  prioridade: Deve 3
+  valor: 8 o prazo evita contestação esquecida
+  pontos: 3
+- Decidir contestação só por pessoa
+  depende: Situações, motivos e prazo da contestação
+  historia: Como dono do IT.MK, quero que só uma pessoa decida a contestação, para o robô nunca resolver uma disputa de dinheiro.
+  aceite: Só uma pessoa muda a situação para Procedente, Improcedente ou Ajustada, a decisão guarda o nome e o robô nunca decide
+  aceite: Procedente ou Ajustada cria lançamento de ajuste ligado à cobrança e nunca edita o valor antigo
+  aceite: Resposta do robô a uma contestação entra na fila de aprovação como Resposta a contestação e não sai sozinha
+  aceite: Duas pessoas decidindo a mesma contestação: só uma vale e a outra recebe 409
+  prioridade: Deve 2
+  valor: 9 quem decide a disputa precisa ser uma pessoa
+  pontos: 3
+- Histórico da contestação
+  depende: Guardar histórico e memória de cálculo da contestação
+  historia: Como analista de cobrança, quero o histórico da contestação com a memória de cálculo anexada, para decidir com a prova na mão.
+  aceite: A linha do tempo é só de inserção e guarda abertura, memória anexada, régua pausada, cada mudança de situação e régua voltou, com autor e hora
+  aceite: Anexos têm tipo e tamanho validados, nome gerado pelo servidor e hash
+  aceite: A memória anexada é a versão do dia da abertura, e recalcular depois não muda o anexo
+  aceite: A lista de contestações filtra por situação, busca por pagador, motivo e cobrança, e mostra as ativas primeiro, por prazo
+  prioridade: Deve 3
+  valor: 8 a memória anexada é a prova do valor cobrado
+  pontos: 3
+
+Conversas no servidor [Backend] {v1.2}
+meta: o analista atende o pagador pelo sistema, sabe quem cuida de cada conversa e por que o robô passou para uma pessoa
+- Receber mensagens por porta
+  depende: Criar conversa e mensagem
+  historia: Como analista de cobrança, quero que as mensagens do pagador cheguem na conversa certa, para atender e provar o que foi dito.
+  aceite: A porta de canal (interface do domínio) recebe texto, imagem, PDF e áudio, e o adaptador da WhatsGW fica nas Integrações
+  aceite: A mensagem entra na conversa pelo telefone, e número desconhecido, grupo e canal de transmissão não disparam cobrança
+  aceite: Mensagem repetida (mesmo waid) não duplica, e mensagem antiga reenviada depois de reconexão é gravada mas não faz o robô responder
+  aceite: Imagem e PDF viram anexo com hash e entram em comprovantes a conferir, e mídia grande é gravada antes de decodificar
+  prioridade: Deve 3
+  valor: 9 é a base do atendimento e da prova de cobrança
+  pontos: 5
+- Enviar mensagem pela conversa
+  depende: Receber mensagens por porta
+  historia: Como analista de cobrança, quero responder o pagador e mandar a cobrança pela conversa, para atender sem sair do sistema.
+  aceite: Enviar passa pela porta de canal, e nota interna nunca é enviada ao pagador
+  aceite: A cobrança manual monta a mensagem com as lojas e o total, e grava o evento na ficha do pagador
+  aceite: Mensagem enviada e recebida atualiza a última mensagem e as não lidas da conversa na mesma transação
+  prioridade: Deve 3
+  valor: 8 sem envio não há atendimento
+  pontos: 3
+- Atribuir, assumir e devolver conversa
+  depende: Registrar atribuição e escalação
+  historia: Como analista de cobrança, quero saber quem cuida de cada conversa e poder assumi-la, para ninguém ficar sem resposta.
+  aceite: A conversa tem um só responsável por vez (uma pessoa ou o robô), e cada troca grava quem, quando e motivo
+  aceite: Assumir põe o dono (quem assumiu, se estava sem dono) e para o robô só nessa conversa, e devolver devolve ao robô, ambos com uma nota interna na conversa
+  aceite: Atribuir só aceita usuário que Atende conversas, e conversa sem dono continua visível para quem tem o módulo Conversas
+  prioridade: Deve 3
+  valor: 8 evita conversa parada sem dono
+  pontos: 3
+- Escalar conversa com motivo
+  depende: Atribuir, assumir e devolver conversa
+  historia: Como analista de cobrança, quero saber por que o robô passou a conversa para uma pessoa, para atender o que o robô não pode resolver.
+  aceite: Escalar exige motivo (por exemplo Pediu parcelamento, Contestou o valor, Pediu nota fiscal fora da cobrança) e grava quem escalou, robô ou pessoa, e quando
+  aceite: Dúvida, contestação, parcelamento, pedido de nota, ameaça, tom agressivo e áudio que o robô não entende passam sempre para uma pessoa
+  aceite: Pedido de parcelamento ou de prazo novo também entra na fila de aprovação, e o robô não responde valor
+  prioridade: Deve 3
+  valor: 8 o robô não decide o que é delicado
+  pontos: 3
+- Etiquetas e não lidas
+  depende: Criar etiquetas do pagador e da conversa
+  historia: Como analista de cobrança, quero etiquetas e o contador de não lidas, para achar rápido quem precisa de atenção.
+  aceite: A etiqueta tem nome único e cor e parte de VIP, Negociação, Reclamação e Novo cliente
+  aceite: O contador de não lidas de cada conversa vem de uma só fonte, e marcar como não lida deixa no mínimo 1
+  aceite: A lista filtra por sem resposta (última mensagem do pagador), comprovante a conferir e loja bloqueada, e as conversas fixadas vêm primeiro
+  prioridade: Deveria 3
+  valor: 5 organiza a fila de conversas sem mudar a cobrança
+  pontos: 3
+- Ligar e desligar robô na conversa
+  depende: Atribuir, assumir e devolver conversa
+  historia: Como analista de cobrança, quero ligar e desligar o robô numa conversa, para atender sozinho quando for preciso.
+  aceite: O botão Robô ON/OFF da conversa liga e desliga o robô só naquela conversa e não muda de comportamento (decisão do dono)
+  aceite: Ele é separado da pausa geral do módulo Robô e da situação Atende, Não atende ou Em teste do pagador
+  aceite: Conversa com o robô desligado não recebe resposta automática mesmo com o robô geral ligado, e com o robô geral pausado ligar na conversa não faz nada sair
+  aceite: Cada mudança grava evento com usuário e hora
+  prioridade: Deve 3
+  valor: 7 dá controle ao atendente sem parar o robô todo
+  pontos: 2
+
+Robô de cobrança no servidor [Backend] {v1.3}
+meta: o robô cobra sozinho dentro de limites, com aprovação de uma pessoa e auditoria completa
+- Decidir a próxima ação sem enviar
+  depende: Política Régua pode agir
+  historia: Como dono do IT.MK, quero que o robô primeiro decida o que fazer e só depois envie, para testar a decisão sem mandar mensagem.
+  aceite: Decidir é uma classe do domínio que recebe a situação do pagador, as cobranças, as pausas e a hora do relógio injetado e devolve uma ação ou nada, com a regra aplicada e o motivo
+  aceite: Enviar é um adaptador separado atrás da porta de canal, e trocar por uma versão que só registra (modo sombra) não muda a decisão
+  aceite: As ações são lembrete antes do vencimento, cobrança do mês com Pix, aviso de atraso, pedido de comprovante, confirmação de pagamento, extrato e segunda via, cada uma ligável em Regras e limites
+  aceite: Existe teste de decisão sem tela, sem banco e sem rede para cada pausa e para cada limite
+  prioridade: Deve 2
+  valor: 10 separar decidir de enviar permite testar o robô sem risco
+  pontos: 8
+- Limites e fila de saída
+  depende: Guardar limites, horários e feriados do robô
+  historia: Como dono do IT.MK, quero que o servidor conte de verdade os limites de envio, para o número não ser banido, já que a WhatsGW não controla isso.
+  aceite: O servidor conta e respeita 40 mensagens por dia no total, 1 por pagador por dia e 180 minutos de intervalo mínimo, valores iniciais baixos, e cada subida grava quem e por quê
+  aceite: Só envia de segunda a sexta, das 09:00 às 17:30, e não envia nos feriados da lista (01/01, 21/04, 01/05, 07/09, 12/10, 02/11, 15/11 e 25/12) enquanto a chave de feriado estiver ligada
+  aceite: A verificação roda ao enfileirar e de novo na hora de enviar, o que não passa fica na fila com o motivo, e um só consumidor envia uma mensagem por vez, guardando o contador que liberou
+  aceite: Falha ambígua (tempo esgotado depois de enviar) não repete sozinha e marca a conferir, e só falha claramente não entregue tenta de novo, poucas vezes e com espera crescente
+  prioridade: Deve 2
+  valor: 10 sem limite o número pode ser banido
+  pontos: 8
+- Modo sombra e simulador
+  depende: Decidir a próxima ação sem enviar
+  historia: Como analista de cobrança, quero ver o que o robô faria sem ele enviar nada, para confiar nele antes de soltar.
+  aceite: Com o modo sombra ligado o robô só sugere e nunca chama o canal, e o pagador Em teste também só sugere
+  aceite: Cada sugestão guarda se foi Aprovada sem edição, Editada ou Recusada, e a taxa de aprovação sem edição é calculada para decidir a saída do modo sombra
+  aceite: O simulador responde Enviaria agora, Só sugeriria ou Não enviaria agora, com cada item da verificação marcado Sim ou Não e o motivo, e nunca chama o canal
+  aceite: A verificação tem robô geral ligado, número conectado, pagador atende, ação liberada, dia e horário, limite por pagador, limite total, intervalo, cliente não pediu para parar, competência conferida, modelo aprovado e sem promessa nem acordo
+  prioridade: Deve 2
+  valor: 9 mede se dá para confiar antes de soltar o robô
+  pontos: 5
+- Fila de aprovação do robô
+  depende: Criar fila de aprovação e modo sombra
+  historia: Como analista de cobrança, quero aprovar, editar ou recusar o que o robô propõe, para ele não agir sozinho no que é delicado.
+  aceite: Entram na fila Parcelamento, Prazo novo, Bloqueio, Desbloqueio, Resposta a contestação e mensagem fora do padrão, com pagador, pedido do cliente, proposta e há quanto tempo espera
+  aceite: Qualquer usuário com Aprova a fila do robô ligado aprova, edita e aprova ou recusa, e a ação grava quem, quando, antes e depois
+  aceite: Aprovar gera a ação pela mesma fila de saída, com a mesma idempotência e os mesmos limites e horários, e vira agendado se não puder sair agora
+  aceite: Dois usuários no mesmo item: só uma decisão vale e a outra recebe 409, e a aprovação vale para uma só execução
+  prioridade: Deve 2
+  valor: 9 uma pessoa decide o que o robô não faz sozinho
+  pontos: 8
+- Situação do robô por pagador e em lote
+  depende: Guardar situação do robô por pagador
+  historia: Como analista de cobrança, quero marcar se o robô atende cada pagador, um a um ou em lote, para ele não falar com quem está em negociação.
+  aceite: A situação é Atende, Não atende ou Em teste, com motivo, desde quando e quem alterou, e Não atende exige motivo escrito
+  aceite: Marcar em lote muda vários pagadores numa só operação e grava um evento por pagador
+  aceite: Pagador Não atende não recebe envio do robô, e pagador Em teste só recebe sugestão
+  aceite: A lista filtra por situação do robô e mostra a contagem de cada uma
+  prioridade: Deve 3
+  valor: 7 controla quem o robô pode cobrar
+  pontos: 3
+- Pausa geral, desconexão e restrição
+  depende: Guardar estado da conexão do WhatsApp
+  historia: Como dono do IT.MK, quero pausar o robô todo e que ele pare sozinho se o número cair, para nada sair com o número desconectado.
+  aceite: Pausar o robô todo exige motivo e grava quem, quando e motivo, a pausa vale na hora de enviar e não só ao enfileirar, e cancela o que estava pendente no canal
+  aceite: Evento de número desconectado (phonestate) ou de conta crítica ou restrita (account_health) muda o estado do WhatsApp, pausa o robô e abre alerta para a equipe com o motivo
+  aceite: Em restrição o robô só volta depois do fim da restrição e da confirmação de uma pessoa, e em desconexão depois de reconectar e confirmar
+  aceite: Falhas de envio seguidas, no número definido pelo time, pausam o robô sozinho e avisam a equipe
+  prioridade: Deve 3
+  valor: 8 envio com número caído se perde ou piora o risco de banimento
+  pontos: 5
+- Atendimento humano
+  depende: Escalar conversa com motivo
+  historia: Como analista de cobrança, quero a lista do que o robô passou para uma pessoa, com o tempo de espera, para atender primeiro o que está parado há mais tempo.
+  aceite: A lista traz pagador, motivo da passagem, tempo de espera em minutos e responsável (ou Sem dono), do mais antigo para o mais novo
+  aceite: As faixas de espera do protótipo (até 20, de 21 a 45 e acima de 45 minutos) vêm prontas na resposta, com os valores a confirmar com o dono
+  aceite: Assumir pela lista abre a conversa, para o robô nela e grava quem assumiu, e a conversa sai da lista quando a pessoa responde ou devolve ao robô
+  prioridade: Deve 3
+  valor: 8 evita conversa parada sem dono
+  pontos: 3
+- Auditoria do robô com selo de integridade
+  depende: Registrar execuções do robô
+  historia: Como dono do IT.MK, quero ver tudo o que o robô fez e também o que decidiu não fazer, para confiar nele e me defender.
+  aceite: Cada rodada grava execução (início, fim, versão do robô, versão da regra, resultado) e cada ação grava pagador, cobrança, ação, regra aplicada, canal, chave de idempotência, texto final enviado e resultado
+  aceite: O que o robô decidiu não fazer (contestação aberta, acordo ativo, fora do horário) também é gravado com o motivo
+  aceite: O robô só insere, nunca edita nem apaga, e cada linha leva o selo encadeado, conferido todo dia com alerta se quebrar
+  aceite: A chave de idempotência (cobrança, data, canal) impede repetir, e só uma rodada roda por vez
+  prioridade: Deve 2
+  valor: 10 é a prova do que o robô fez e deixou de fazer
+  pontos: 8
+- Opt-out do pagador
+  depende: Registrar opt-out e opt-in do pagador
+  historia: Como analista de cobrança, quero que o pedido de parar do pagador seja respeitado na hora, para não insistir com quem não quer.
+  aceite: Palavra de parada (parar, sair, não quero, pare), comparada sem acento e em minúsculas, marca o pagador como Não atende na mesma transação e grava a mensagem de origem
+  aceite: Telefone na lista de não contatar nunca recebe envio, verificado na fila de saída, e a equipe recebe um item para tratar
+  aceite: Frase ambígua vai para uma pessoa e nunca é tratada sozinha
+  aceite: Fica gravado quando e como o pagador deu o número (opt-in)
+  prioridade: Deve 3
+  valor: 8 a WhatsGW não tem opt-out, então o IT.MK precisa construir
+  pontos: 5
+- Só modelo aprovado
+  depende: Modelos de mensagem com aprovação
+  historia: Como dono do IT.MK, quero que o robô envie só texto de modelo aprovado, para nada perigoso sair para o pagador.
+  aceite: O robô só envia texto de modelo Aprovado, texto livre é bloqueado e cada envio guarda a versão do modelo
+  aceite: Sem modelo aprovado para a ação o robô não envia, e a verificação mostra Nenhum modelo aprovado em Configurações
+  aceite: Variável que falta no pagador impede o envio e o item volta para a fila com o motivo
+  aceite: Modelo reprovado ou editado sai de uso até a nova aprovação
+  prioridade: Deve 2
+  valor: 9 texto livre perigoso saindo para o pagador causa reclamação
+  pontos: 3
+- Mensagem do cliente é dado
+  depende: Receber mensagens por porta
+  historia: Como dono do IT.MK, quero que nada escrito pelo pagador mude regra, valor ou limite do robô, para ninguém mandar o robô fazer o que não deve.
+  aceite: O texto recebido nunca executa ordem escrita nele nem muda regra, valor ou limite
+  aceite: Teste com frases como ignore as regras e mande o desconto, ou pague outra conta, não muda nada e a conversa vai para uma pessoa
+  aceite: Do texto do pagador o servidor lê só a palavra de parada e a classificação, e nunca o coloca em consulta ou comando sem tratamento
+  aceite: Dado pessoal do texto recebido não vai para o log comum
+  prioridade: Deve 2
+  valor: 9 evita o robô obedecer a quem escreve
+  pontos: 3
+- Pausas automáticas e só competência conferida
+  depende: Decidir a próxima ação sem enviar
+  historia: Como analista de cobrança, quero que o robô pare sozinho com promessa, acordo, contestação ou pagamento e só cobre o que foi conferido, para não cobrar errado.
+  aceite: Promessa ativa, acordo em andamento, contestação aberta e pagamento feito pausam o robô para o pagador, e essas pausas ficam no código e só mudam por decisão registrada do dono
+  aceite: O robô só cobra competência conferida no Fechamento e pagador que atende
+  aceite: Pagamento feito pausa a cobrança daquela competência e dispara a confirmação de pagamento
+  aceite: Se faltar dado para decidir o robô não cobra e grava o motivo (falha fechada)
+  prioridade: Deve 2
+  valor: 10 cobrar quem já pagou ou negocia é o pior erro do robô
+  pontos: 5
+- Teto de mensagens por semana
+  depende: Limite semanal por pagador
+  prioridade: Poderia 5
+  valor: 3 reduz o risco de excesso de mensagem ao mesmo pagador
+  pontos: 3
+
+Dashboard e relatórios no servidor [Backend] {v1.4}
+meta: o dono vê tudo no Dashboard com poucas chamadas e números iguais aos das telas de origem
+- Consultas do Dashboard em uma chamada
+  depende: Criar visões do Dashboard
+  historia: Como dono do IT.MK, quero ver cobrado, recebido, a vencer, vencido e pontualidade numa só chamada, para acompanhar a empresa sem esperar várias consultas.
+  aceite: Uma chamada devolve por período (mês atual, meses anteriores e últimos 3 meses) cobrado, recebido, a vencer e vencido, cada um com a quantidade de cobranças, mais pontualidade, Pix pagos hoje e conversas aguardando uma pessoa
+  aceite: Cada indicador tem fórmula escrita, pontualidade é cobranças pagas em dia dividido pelas cobranças pagas (116 de 141 dá 82%) e vencido não inclui o que foi baixado
+  aceite: Cada número bate com a tela de origem (por exemplo recebido do mês é igual à soma dos pagamentos do mês), conferido com dados de exemplo
+  aceite: Mês fechado vem de tabela fechada e não de recálculo, e valores em R$ saem como texto exato
+  prioridade: Deve 3
+  valor: 9 é a visão única do dono
+  pontos: 8
+- Fila do dia, pendências e alertas
+  depende: Criar fila do dia, pendências e alertas de dado
+  historia: Como analista de cobrança, quero a fila do dia, as pendências de decisão e os alertas de dado numa chamada, para saber por onde começar.
+  aceite: A fila do dia traz Cobrar hoje, Promessas, Retornos combinados para hoje, Parcelas de acordo e Mensagens sem resposta, sempre de hoje, com pagador, lojas, dias de atraso e valor
+  aceite: As pendências somam comprovantes para conferir, bloqueios a pedir, desbloqueios a pedir e pedidos de saída em andamento, sem repetir a mesma informação em dois grupos
+  aceite: Os alertas de dado listam faturado sem imposto, alíquota fora do padrão, valor com diferença maior que 35% do mês anterior, loja bloqueada, loja em saída e pagador sem responsável
+  aceite: A chamada usa o relógio injetado, e cobrança quitada sai da fila na hora
+  prioridade: Deve 3
+  valor: 8 é a lista de trabalho do dia
+  pontos: 5
+- Rankings e série cobrado x recebido
+  depende: Consultas do Dashboard em uma chamada
+  historia: Como dono do IT.MK, quero os maiores devedores, os maiores pagadores e a série de cobrado contra recebido, para ver a tendência da cobrança.
+  aceite: Maiores devedores e maiores pagadores vêm dos mesmos saldos e pagamentos das outras telas, com a soma conferida
+  aceite: A série cobrado x recebido por mês traz os meses fechados da tabela fechada e o mês atual calculado
+  aceite: Valor por loja e atraso por pagador trazem a mediana junto da média
+  prioridade: Deveria 3
+  valor: 6 mostra a tendência sem pedir relatório
+  pontos: 3
+
+Qualidade do servidor [Backend] {v1.4}
+meta: o servidor passa na conferência de testes, segurança, desempenho e alertas antes de a cobrança automática ficar solta
+- Testes de aceite dado quando então
+  depende: Estrutura de módulos do servidor
+  historia: Como time técnico, quero cada critério de aceite escrito como dado, quando, então e virado teste automático, para provar que a regra funciona sem abrir tela.
+  aceite: Cada critério de regra de negócio está escrito como dado, quando, então e virou teste automático que roda sem tela
+  aceite: Existem testes de aceite para a régua pausar com promessa, acordo ativo ou contestação ativa (8 combinações), faixas de 30, 60 e 90 dias, valor da 40% igual ao imposto vezes o percentual, base de cálculo por plataforma e os quatro motivos de divergência
+  aceite: Nenhum teste depende de ordem, da data de hoje ou de dado de outro teste, e todos rodam em segundos
+  aceite: A entrega falha se algum teste de aceite falhar
+  prioridade: Deve 2
+  valor: 9 é a prova de que o servidor faz o que o protótipo aprovado mostra
+  pontos: 8
+- Teste de integração dos repositórios
+  depende: Criar projetos de teste e produção
+  historia: Como time técnico, quero testar os repositórios contra um banco de verdade, para pegar erro de consulta que teste com banco falso não pega.
+  aceite: As consultas e gravações rodam contra um PostgreSQL de verdade em contêiner com dados fictícios, nunca contra banco em memória
+  aceite: Cada repositório tem teste de gravar, ler, unicidade e atualização condicional
+  aceite: O teste de concorrência dispara 20 chamadas iguais de baixa, acordo e contestação e só uma vale
+  aceite: Nenhum dado de pagador real entra no teste
+  prioridade: Deve 3
+  valor: 8 teste com banco falso repete o código e não prova nada
+  pontos: 5
+- Monitoramento e alertas
+  depende: Logs sem segredo e configuração por ambiente
+  historia: Como dono do IT.MK, quero ser avisado quando algo importante falhar, para agir antes de o dinheiro ou o robô parar.
+  aceite: Existem alertas para falha de assinatura do aviso, erro 4xx e 5xx contínuo, fila de erros acima do limite, aviso de pagamento sem chegar há mais horas que o definido, certificado do Inter a 30 dias do fim, chave do Asaas sem uso por 2 meses e Pix pago sem confirmação do provedor
+  aceite: Cada alerta diz o que aconteceu, o impacto e o que fazer, e não se repete sem parar até resolver
+  aceite: O servidor expõe métricas de avisos recebidos, processados, duplicados descartados, falhas, tempo de processamento e fila pendente
+  prioridade: Deve 3
+  valor: 8 sem alerta o aviso perdido só aparece quando o cliente reclama
+  pontos: 5
+- Revisão de segurança OWASP
+  depende: Testar regra de acesso do banco
+  historia: Como time técnico, quero uma revisão de segurança do servidor antes de entregar, para não abrir brecha com dinheiro e segredo.
+  aceite: A entrada usa lista de permitidos, validação nos objetos de pedido, tamanho máximo (413) e tipo de conteúdo (415), e nenhum JSON liga direto na entidade
+  aceite: Toda consulta é parametrizada, nenhum SQL é montado com texto de fora e nenhum dado externo usa a serialização nativa do Java
+  aceite: Chamadas para fora usam lista de destinos permitidos, só HTTPS e sem seguir redirecionamento, e cadastrar 169.254.169.254 como destino é bloqueado em teste
+  aceite: A revisão confere controle de acesso, falhas de criptografia, injeção, configuração insegura, componentes vulneráveis e falhas de log, e o resultado é anexado ao item
+  prioridade: Deve 3
+  valor: 9 o servidor guarda segredo e dinheiro
+  pontos: 5
+- Ensaio de carga leve
+  depende: Endpoint do aviso de pagamento
+  historia: Como time técnico, quero um ensaio de carga leve, para saber que o aviso de pagamento e as telas aguentam o uso real.
+  aceite: O ensaio manda avisos de pagamento em rajada e todos respondem 200 dentro do prazo de 10 segundos do Asaas
+  aceite: O ensaio abre o Dashboard, a carteira e a lista de conversas com o volume de dados estimado e confere o tempo contra a meta definida pelo time
+  aceite: O resultado e o plano de cada consulta pesada ficam anexados, e nenhum envio real sai, porque o ensaio usa provedor e canal falsos
+  prioridade: Deveria 3
+  valor: 6 mostra gargalo antes de o fechamento do mês pesar
+  pontos: 3
