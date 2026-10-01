@@ -60,7 +60,7 @@ Nota de acesso: na cópia local da base **não existe a pasta `livros/`**; cada 
 Livro central. Partes: valores (comportamento x arquitetura), paradigmas, **princípios SOLID**, **princípios de componentes**, **arquitetura**, **detalhes**.
 - **Dois valores**: o software tem que funcionar (comportamento) e tem que ser fácil de mudar (arquitetura). Arquitetura é o segundo, é "importante, não urgente" (Matriz de Eisenhower, cap. 2): é o P.O. e o time que precisam brigar por ela.
 - **Paradigmas** (cap. 3-6): estruturada disciplina o fluxo; OO dá polimorfismo, que permite inverter dependência; funcional ensina **imutabilidade** (sem variável que muda não há disputa de gravação), **segregar o que muda** do que não muda e **Event Sourcing** (guardar os fatos, não só o estado final; p. 106).
-- **SOLID** (p. 111-?): SRP (um módulo, **um ator** que pede mudança), OCP (estender sem editar), LSP (substituível), ISP (não depender do que não usa), DIP (depender de abstração). SRP: classe `Employee` com `calculatePay` (contabilidade), `reportHours` (RH), `save` (DBA) quebra por "duplicação acidental" e "fusões" (p. 113-117).
+- **SOLID** (p. 111-): SRP (um módulo, **um ator** que pede mudança), OCP (estender sem editar), LSP (substituível), ISP (não depender do que não usa), DIP (depender de abstração). SRP: classe `Employee` com `calculatePay` (contabilidade), `reportHours` (RH), `save` (DBA) quebra por "duplicação acidental" e "fusões" (p. 113-117).
 - **Componentes** (cap. 12-14): quem muda junto fica junto (CCP), quem se reusa junto fica junto (CRP), sem ciclos entre pacotes (ADP), depender na direção da estabilidade (SDP), estável = abstrato (SAP).
 - **Arquitetura** (cap. 15-28): arquitetura serve a **casos de uso** e **mantém opções abertas** (adiar decisão de banco, web, framework). Limites separam o que muda em ritmos diferentes; banco e GUI são **plug-ins** do negócio (p. 235-242). Duplicação **verdadeira x acidental**: duas telas parecidas hoje podem divergir amanhã; não unificar à força (p. 219-221). Modos de desacoplamento: fonte, implantação, serviço; "nascer monolito, crescer se precisar" (p. 219-222).
 - **Regras de negócio** (cap. 20, p. 260-264): **Entidades** (regras cruciais, valem para a empresa toda) e **Casos de uso** (regras da aplicação; orquestram as entidades; recebem estruturas simples de entrada e devolvem de saída; não conhecem HTML nem SQL).
@@ -71,7 +71,7 @@ Livro central. Partes: valores (comportamento x arquitetura), paradigmas, **prin
 - **Serviços** (cap. 27): serviço **não** é, por si, arquitetura; limites cortam os serviços por dentro.
 - **Limite de teste** (cap. 28, p. 323-): testes são o círculo mais externo; **testes fortemente ligados à estrutura ou à GUI ficam frágeis** e engessam o sistema; criar uma **API de teste**.
 - **Detalhes** (cap. 30-32, p. 355-371): banco, web e frameworks são detalhes. **"Não case com o framework"**: use, mas atrás de limite.
-- **Capítulo perdido** (cap. 34, p. 380-): pacote por camada, por recurso, portas e adaptadores, **pacote por componente**; arquitetura em camadas "relaxada" deixa o controller pular o serviço.
+- **Capítulo perdido** (cap. 34, p. 380-391): pacote por camada, por recurso, portas e adaptadores, **pacote por componente**; arquitetura em camadas "relaxada" deixa o controller pular o serviço.
 
 ### 2.2 Princípios de Design e Padrões de Projeto (Martin, 39 p.) [BASE]
 Versão curta (2000). **Quatro sintomas de design podre**: rigidez (mudança simples vira cascata), fragilidade (quebra longe do que mexeu), imobilidade (não reaproveita), viscosidade (é mais fácil fazer errado que certo; ambiente lento também conta) (p. 4-6). Causa: dependências novas e não planejadas. Solução: "firewalls de dependência" (p. 6). Depois: OCP (p. 8), LSP com pré e pós-condições (p. 12-16), DIP (p. 16), ISP (p. 18), REP/CCP/CRP (p. 21-22), ADP, SDP, SAP com métricas (instabilidade I = Ae/(Aa+Ae); abstração A = Na/Nc) (p. 23-32), padrões Abstract Server, Adapter, Observer, Bridge, Abstract Factory (p. 33-37). Redesenho total "raramente dá certo" (p. 4).
@@ -87,12 +87,12 @@ Versão curta (2000). **Quatro sintomas de design podre**: rigidez (mudança sim
 
 ### 2.4 Trabalho eficaz com código legado (Michael Feathers, 408 p.) [BASE]
 - **Código legado = código sem testes** (a ideia atravessa o livro). Quatro razões de mudar: nova função, correção, refatoração, otimização (cap. 1).
-- **Editar e Rezar x Cobrir e Modificar** (cap. 2): cobrir com testes é um "torno" que segura o comportamento enquanto muda só o que quer. **Feedback em minutos, não em uma noite** (p. 28-31).
+- **Editar e Rezar x Cobrir e Modificar** (cap. 2): cobrir com testes é um "torno" que segura o comportamento enquanto muda só o que quer. **Feedback em minutos, não em uma noite** (p. 27-31).
 - **Algoritmo de alteração** (cap. 2): 1) identificar pontos de alteração; 2) achar pontos de teste; 3) eliminar dependências; 4) escrever testes; 5) alterar e refatorar. Cada alteração deve trazer mais código para dentro da cobertura ("ilhas viram continentes").
-- **Pontos de extensão** (seam; cap. 4): lugar onde se muda o comportamento **sem editar naquele lugar** (ex.: trocar a classe que fala com o sistema externo por uma falsa no teste).
-- **Brotar Método/Classe** e **Encapsular Método/Classe** (cap. 6, p. 85-105): como acrescentar funcionalidade com segurança em classe que não consegue entrar em teste; Brotar Classe quando é uma responsabilidade nova.
-- **Testes de caracterização** (cap. 13, p. 205-): registrar **o que o sistema faz hoje**, não o que "deveria" fazer: escreva uma asserção que falha, deixe a falha mostrar o comportamento, ajuste o teste.
-- **Edição hiperatenta, objetivo único, preservar assinaturas, confiar no compilador** (cap. 23, p. 320-): jeito de fazer as primeiras incisões seguras sem testes.
+- **Pontos de extensão** (seam; cap. 4, p. 46-60): lugar onde se muda o comportamento **sem editar naquele lugar** (ex.: trocar a classe que fala com o sistema externo por uma falsa no teste).
+- **Brotar Método/Classe** e **Encapsular Método/Classe** (cap. 6, p. 73-90): como acrescentar funcionalidade com segurança em classe que não consegue entrar em teste; Brotar Classe quando é uma responsabilidade nova.
+- **Testes de caracterização** (cap. 13, p. 189-): registrar **o que o sistema faz hoje**, não o que "deveria" fazer: escreva uma asserção que falha, deixe a falha mostrar o comportamento, ajuste o teste.
+- **Edição hiperatenta, objetivo único, preservar assinaturas, confiar no compilador** (cap. 23, p. 297-): jeito de fazer as primeiras incisões seguras sem testes.
 - **Catálogo de quebra de dependência** (cap. 25): Extrair interface, Parametrizar construtor, Extrair e sobrescrever chamada, Encapsular referências globais, etc.
 
 ### 2.5 Domain-Driven Design, Referência (Eric Evans, 62 p.) [BASE]
@@ -106,7 +106,7 @@ Catálogo de 23 padrões em **criação, estrutura, comportamento**. Princípios
 Nomes (cap. 2, p. 48), funções pequenas que fazem uma coisa (cap. 3, p. 62), comentários (cap. 4), formatação (cap. 5), objetos e estruturas de dados, Lei de Demeter, DTO (cap. 6, p. 124), erros (cap. 7, p. 134), **limites com código de terceiros** e testes de aprendizado (cap. 8, p. 144), testes de unidade, TDD, F.I.R.S.T. (cap. 9, p. 152), classes e SRP (cap. 10, p. 166), sistemas e injeção de dependência (cap. 11, p. 184), emergência, concorrência, e o catálogo de **cheiros e heurísticas C1-C5, E1-E2, F1-F4, G1-G36, J1-J3, N1-N7, T1-T9** (cap. 17, p. 316).
 
 ### 2.8 The Clean Coder (Martin, 247 p., inglês, OCR irregular) [BASE]
-Postura profissional. **Dizer não / dizer sim** (cap. 2-3: "tentarei" não é compromisso), **TDD** (três leis, p. 109-114), **Testes de aceite** (cap. 7, p. 133-143): escritos por quem pede **junto** com quem programa, definem "pronto" e **são automatizados**. **Pirâmide de automação de testes** (cap. 8, p. 148-153): unidade (~100%), componente (~50%), integração (~20%), sistema (~10%), exploratório (~5%) e "QA não deve achar nada". **Estimativa** (cap. 10, p. 168-175): PERT com três números (otimista O, normal N, pessimista P; esperado = (O+4N+P)/6). **Pressão** (cap. 11).
+Postura profissional. **Dizer não / dizer sim** (cap. 2-3, p. 59-66: "vou tentar" não é compromisso; sem o resultado prometido, você falhou), **TDD** (três leis, p. 110-117), **Testes de aceite** (cap. 7, p. 133-143): escritos por quem pede **junto** com quem programa, definem "pronto" e **são automatizados**. **Pirâmide de automação de testes** (cap. 8, p. 148-153): unidade (~100%), componente (~50%), integração (~20%), sistema (~10%), exploratório (~5%) e "QA não deve achar nada". **Estimativa** (cap. 10, p. 168-175): PERT com três números (otimista O, normal N, pessimista P; esperado = (O+4N+P)/6). **Pressão** (cap. 11).
 
 ### 2.9 OAuth 2.0: proteja suas aplicações com Spring Security OAuth2 (A. Eloy, 343 p., 2017) [BASE]
 Caps. 1-2 (p. 11-48): confidencialidade, integridade, disponibilidade; **papéis** (Resource Owner, Client, Resource Server, Authorization Server); registro do client (`client_id`, `client_secret`, **URI de redirecionamento obrigatória**); **OAuth é autorização, não autenticação** (p. 47). Cap. 3 (p. 50-72): projeto Spring Boot (`spring-boot-starter-web`, banco, Lombok). Caps. 4-6: configuração do Resource Server/Authorization Server. **Grant types**, cada um com "quando usar": Password (cap. 7, p. 140: só com altíssima confiança; evitar), **Authorization Code** (cap. 9, p. 170: app web que redireciona; confidencial), Implicit (cap. 10: app público no navegador), **Client Credentials** (cap. 11, p. 199: aplicação acessa recurso em benefício próprio, sem usuário). **Refresh token, escopos e roles** (cap. 12, p. 203-220). **Tokens no banco** (cap. 13), **introspecção** (`check_token`) e **JWT assinado** (cap. 15, p. 258-291): remoto custa rede, JWT evita a ida ao servidor mas precisa de assinatura (`alg: none` é perigoso). **OpenID Connect** para autenticar (cap. 16). **Modelo de ameaças** (cap. 17, p. 324-340): `redirect_uri` e `state`.
@@ -118,7 +118,7 @@ Web services em Java (SOAP, WSDL, JAXB), **REST** (cap. 5, p. 99-: recursos, mé
 DSL = linguagem específica de domínio. **Interna** (dentro da linguagem hospedeira, "interface fluente") x **externa** (arquivo próprio). Conceitos: modelo de domínio, **modelo semântico** (a DSL preenche; manter a DSL independente dele). "Devo usar?" (cap. 2.5, p. 49-52): ajuda a aproximar código e especialista do negócio, **mas tem custo alto de construção e pode virar linguagem geral**; só vale com modelo complexo/crescente. Técnicas: encadeamento de métodos, funções aninhadas, closures. Exemplos em Java e Scala.
 
 ### 2.12 Introdução à arquitetura de design de software (Paulo Silveira et al., 265 p.) [BASE]
-Livro de **Java** (a base mais próxima do IT.MK). Cap. 3 (p. 60-93): programe para interface; **componha em vez de herdar** (p. 69); **imutabilidade** (p. 74); **modelo anêmico** é problema (p. 81); DDD (p. 85). Cap. 4 (p. 94-): baixo acoplamento, alta coesão, **injeção de dependência** (DAO que abre a própria conexão é ruim, p. 97), frameworks de DI, fábricas. Cap. 5 (p. 131-): testes de sistema/aceite, **TDD e ATDD**, **teste de integração do DAO contra banco real** (mock só espelha o que foi digitado, p. 145), integração contínua. Cap. 6 (p. 159-): **layers x tiers**, cliente gordo x magro, **minimizar chamadas remotas (round-trips), tamanho da carga (DTO) e usar cache** (p. 159-164), MVC web, ORM, mensagem assíncrona, nuvem. Cap. 7 (p. 213-): REST, SOAP, **não quebrar compatibilidade de contrato** (p. 224), princípios SOA. **JavaFX aparece uma vez** (doc_01558), só como "interface rica no cliente".
+Livro de **Java** (a base mais próxima do IT.MK). Cap. 3 (p. 60-93): programe para interface; **componha em vez de herdar** (p. 69); **imutabilidade** (p. 74); **modelo anêmico** é problema (p. 81); DDD (p. 85). Cap. 4 (p. 94-): baixo acoplamento, alta coesão, **injeção de dependência** (DAO que abre a própria conexão é ruim, p. 97), frameworks de DI, fábricas. Cap. 5 (p. 131-): testes de sistema/aceite, **TDD e ATDD**, **teste de integração do DAO contra banco real** (mock só espelha o que foi digitado, p. 145), integração contínua. Cap. 6 (p. 159-): **layers x tiers**, cliente gordo x magro, **minimizar chamadas remotas (round-trips), tamanho da carga (DTO) e usar cache** (p. 159-164), MVC web, ORM, mensagem assíncrona, nuvem. Cap. 7 (p. 213-): REST (p. 231), SOAP, **não quebrar compatibilidade de contrato** (p. 224), princípios SOA. **JavaFX aparece uma vez** (doc_01558), só como "interface rica no cliente".
 
 ### 2.13 The Software Craftsman (Sandro Mancuso, 112 p. na base) [BASE]
 Profissionalismo e pragmatismo. **Dívida técnica**: "lista de dívida técnica" vira justificativa para código ruim; "rápido não é sujo" (p. 47). Qualidade é sempre esperada, não custa tanto quanto se acha (p. 99). **Quatro regras de design simples** (Beck/Rainsberger): passa nos testes, minimiza duplicação, maximiza clareza, tem poucos elementos; na prática: nomes bons, depois tirar duplicação (p. 103). "A melhor linha de código é a que não se escreve." Nem tudo precisa de TDD, mas "como regra, testo tudo" (p. 100).
@@ -127,7 +127,7 @@ Profissionalismo e pragmatismo. **Dívida técnica**: "lista de dívida técnica
 - **Desconstruindo a Web** (250 p.): o caminho de uma requisição web (DNS, TCP, TLS, HTTP, cache). Útil só para entender latência e cache.
 - **Business Intelligence a custo zero** (210 p.): BI como metodologia de fatos e dimensões; carga (ETL) e dashboard. Possível uso na tela Dashboard, não é prioridade.
 - **Big Data** (263 p.): conceitual, sem aplicação ao IT.MK hoje.
-- **UX e Usabilidade Aplicados em Mobile e Web (Caelum)** (165 p.): ISO 9241-210 (6 princípios), **10 heurísticas de Nielsen** (p. 79-90 do livro), Leis de Fitts e Hick, zonas do polegar, **C.R.A.P.** (Contraste, Repetição, Alinhamento, Proximidade), teoria das cores, **teste de usabilidade** (apêndice).
+- **UX e Usabilidade Aplicados em Mobile e Web (Caelum)** (165 p.): ISO 9241-210 (6 princípios), **10 heurísticas de Nielsen** (páginas impressas 79-87), Leis de Fitts e Hick, zonas do polegar, **C.R.A.P.** (Contraste, Repetição, Alinhamento, Proximidade), teoria das cores, **teste de usabilidade** (apêndice).
 - **Introdução e boas práticas em UX Design** (225 p.): processo de UX e arquitetura de informação.
 - **Web Design Responsivo** (148 p.): layout fluido (medida relativa: **alvo / contexto = resultado**), `meta viewport`, imagens flexíveis (`max-width: 100%`), media queries, **breakpoints pelo conteúdo** (quando surge rolagem), mobile first.
 - **A Web Mobile** (220 p.): "use sempre media queries baseadas no conteúdo da sua página" (cap. 13), formulários mobile, acessibilidade.
@@ -148,13 +148,13 @@ Cada regra tem fonte. A coluna "exija" é o que o P.O. pede no plano.
 | R2 | Centro = **Entidades** (regras de toda a empresa) + **Casos de uso** (regras da aplicação). Fora = adaptadores, banco, web, Spring, APIs. | Lista de casos de uso com nome de negócio (ex.: "Fechar competência"). |
 | R3 | Dados que cruzam o limite são **estruturas simples**; **não** passe entidade nem linha do banco para a tela (p. 220, 265, 355). | DTOs/modelos de pedido e resposta separados da entidade. |
 | R4 | Fluxo de controle e dependência podem ir em sentidos opostos: o caso de uso chama uma **interface** (porta de saída) e o adaptador de fora a implementa (p. 275). | Interfaces de repositório e de integração **no domínio**, implementação **no adaptador**. |
-| R5 | **Banco é detalhe**: regras só conhecem "funções para buscar e salvar"; **todo o SQL fica na camada de banco** (p. 242, 273, 355). | Nenhuma consulta SQL fora do módulo de persistência. |
+| R5 | **Banco é detalhe**: regras só conhecem "funções para buscar e salvar"; **todo o SQL fica na camada de banco** (p. 236-242, 273, 355). | Nenhuma consulta SQL fora do módulo de persistência. |
 | R6 | **Web/tela é detalhe**: a regra deve funcionar com outra interface (p. 366). | Caso de uso executável por teste, sem tela. |
 | R7 | **Framework é detalhe**: não herdar de classe do framework em entidade; `@Autowired` e anotações do Spring **não** vão em objeto de negócio; Spring liga tudo no `Main` (p. 368-371). | Módulo de domínio sem dependência do Spring (verificável no build). |
 | R8 | `Main` é o plug-in sujo que monta o sistema; pode haver um por ambiente (p. 306). | Perfis dev/teste/produção só no `Main`. |
 | R9 | Decida **tarde** o que pode ser decidido tarde (banco, serviço, web): "boa arquitetura deixa opções abertas" (cap. 15-16, p. 219). | Registro de decisões com data e motivo; nada de "microsserviços por padrão". |
 | R10 | **Limite completo é caro**: use limite parcial só onde há eixo de mudança real; limite parcial sem disciplina degrada (p. 291-295). | Justificativa escrita para cada limite. |
-| R11 | **Organize por assunto do negócio** (pacote por componente / por recurso), não só por camada técnica; em camadas "relaxadas" o controller pula o serviço e fura regra (cap. 34, p. 380-). | Estrutura de pastas com nomes do negócio. Regra de revisão: "controller nunca fala com repositório". |
+| R11 | **Organize por assunto do negócio** (pacote por componente / por recurso), não só por camada técnica; em camadas "relaxadas" o controller pula o serviço e fura regra (cap. 34, p. 380-391). | Estrutura de pastas com nomes do negócio. Regra de revisão: "controller nunca fala com repositório". |
 | R12 | **Testabilidade é parte do desenho**: crie uma **API de teste** para regras sem GUI; teste preso à estrutura ou à GUI é frágil (cap. 28, p. 323-). | Testes de regra que não abrem tela. |
 | R13 | **Camadas (layers) x níveis físicos (tiers)**: mais camadas lógicas ajudam, mais níveis físicos custam chamadas remotas; reduza distribuição (Silveira cap. 6.1, p. 159-164). | Contagem de chamadas por tela (meta: 1 por tela). |
 
@@ -163,7 +163,7 @@ Cada regra tem fonte. A coluna "exija" é o que o P.O. pede no plano.
 - **OCP**: acrescentar plataforma (Kwai, nova) ou nova ação da régua **adicionando código**, não editando `if/else` espalhado. Sinal de alerta: `switch` por plataforma em vários lugares (cheiro "Switches repetidos"; solução: polimorfismo/Strategy).
 - **LSP**: implementações de uma interface (ex.: cliente Shein, cliente Shopee) devem obedecer ao **mesmo contrato** (pré e pós-condições). Se uma plataforma não suporta algo (Kwai não entrega notas), isso deve estar **no contrato** (capacidades), não como exceção surpresa. [LEITURA]
 - **ISP**: interfaces pequenas por tipo de cliente (uma interface para "enviar mensagem", outra para "ler conversas"), não uma interface gorda por serviço.
-- **DIP**: dependa de interface; **o dono da interface é quem usa**, não quem implementa (p. 18; Arquitetura Limpa p. 298-300).
+- **DIP**: dependa de interface; **o dono da interface é quem usa**, não quem implementa (p. 18; Arquitetura Limpa p. 299; Princípios de Design p. 16-18).
 - **Pacotes**: sem **ciclos** (ADP); **quem muda junto fica junto** (CCP); depender de pacotes mais estáveis; no início do projeto agrupe para facilitar manutenção (CCP), depois ajuste para reuso (Princípios de Design p. 22).
 
 ### 3.3 DDD: o que fazer [BASE: Evans; Silveira 3.6]
@@ -242,7 +242,7 @@ Cada regra tem fonte. A coluna "exija" é o que o P.O. pede no plano.
 - **Compatibilidade de contrato**: ler só o que usa, **ignorar campo novo**, versionar quando quebrar (MustIgnore; novas URLs por versão incompatível) (Silveira p. 224-228).
 - **Minimizar viagens, payload e usar cache** entre cliente JavaFX e servidor (Silveira p. 159-164).
 - **Assíncrono com mensagem** (store-and-forward) para tarefas sem espera de resposta e para serviços que podem cair (Silveira p. 198-202). Detalhe de Spring Integration: ver `docs/kb/05-integracoes.md`.
-- Orquestração de vários serviços exige tratar falha e desfazer (ex.: reservar hotel e voo) (Silveira p. 229-235). Para o IT.MK: bloquear loja em plataforma + marcar no banco precisa de plano de desfazer [LEITURA].
+- Orquestração de vários serviços exige tratar falha e desfazer (ex.: reservar hotel e voo) (Silveira p. 229-231). Para o IT.MK: bloquear loja em plataforma + marcar no banco precisa de plano de desfazer [LEITURA].
 
 ### 3.10 Frontend e UX (valem para o protótipo e para a tela final) [BASE: Caelum; Web Design Responsivo; A Web Mobile]
 - **Heurísticas de Nielsen**: visibilidade do estado do sistema, correspondência com o mundo real, liberdade e controle, consistência e padrões, **prevenção de erros**, reconhecer em vez de lembrar, flexibilidade, design minimalista, ajudar a recuperar de erros, ajuda.
@@ -329,7 +329,7 @@ Formato: caixas que o dev marca (base-po §6). Cada item tem fonte.
 
 ### 5.2 Backend (Java + Spring) [BASE + LEITURA]
 - [ ] Cada **caso de uso** é uma classe com nome de negócio; recebe **pedido simples** e devolve **resposta simples** (sem entidade, sem `HttpRequest`) (Arquitetura Limpa p. 263-265).
-- [ ] **Controller só traduz** e chama o caso de uso; sem regra nem acesso direto a repositório (p. 380-).
+- [ ] **Controller só traduz** e chama o caso de uso; sem regra nem acesso direto a repositório (p. 389-391).
 - [ ] **Repositório** é interface no domínio; implementação no adaptador; **nenhum SQL fora do adaptador** (R4, R5).
 - [ ] Dependências entram **pelo construtor**; `@Autowired` e anotações do Spring **fora** das entidades e regras; Spring configurado no `Main`/módulo de configuração (p. 371).
 - [ ] **Entidades com comportamento** (não só getter/setter); sem `setSaldo` solto (Silveira p. 81-85).
@@ -341,7 +341,7 @@ Formato: caixas que o dev marca (base-po §6). Cada item tem fonte.
 - [ ] **Relógio injetado** para regras de atraso/vencimento.
 
 ### 5.3 Database [BASE parcial + LEITURA]
-- [ ] **Esquema não vaza** para casos de uso nem para a tela: o domínio não conhece tabela nem coluna (Arquitetura Limpa p. 242, 355).
+- [ ] **Esquema não vaza** para casos de uso nem para a tela: o domínio não conhece tabela nem coluna (Arquitetura Limpa p. 236-242, 355).
 - [ ] Mudança de estrutura em produção em **passos de expansão e contração** (campo novo, gravar nos dois, migrar leitura, remover o antigo), sem parar o sistema (Fowler p. 93-94).
 - [ ] **Teste de integração do repositório** contra um banco de teste real, não só com dublê (Silveira p. 145-149).
 - [ ] **Uma transação = um agregado**; regra entre agregados aceita atraso (Evans p. 25).
@@ -389,11 +389,11 @@ Formato: caixas que o dev marca (base-po §6). Cada item tem fonte.
 14. **Muitas chamadas remotas por tela** (Silveira p. 159-164).
 15. **Dois nomes para a mesma coisa** (cobrança/fatura/boleto; pagador/cliente/devedor). Quebra a linguagem ubíqua (Evans p. 11-12; Clean Code "uma palavra por conceito").
 16. **Dinheiro em `double`**, soma de centavos errada, arredondar em lugar diferente [CONFIRMAR: não está na base; o protótipo já usa centavos].
-17. **OAuth**: usar para autenticar; `redirect_uri` livre; sem `state`; token em texto puro; Password grant por comodidade; JWT sem assinatura (OAuth p. 47, 140, 275, 327-340).
+17. **OAuth**: usar para autenticar; `redirect_uri` livre; sem `state`; token em texto puro; Password grant por comodidade; JWT sem assinatura (OAuth p. 47, 140, 271, 327-340).
 18. **Dependência do relógio** (testes que passam hoje e falham amanhã): injetar a data (Repetível).
 19. **Singleton e estáticos** escondem dependência e impedem teste; prefira injeção (Silveira cap. 4; Feathers "Encapsular referências globais").
 20. **Estimativa sem faixa** ("fica pronto sexta"). Peça os três números (PERT) e **compromisso explícito** ("vou entregar") em vez de "vou tentar" (Clean Coder cap. 3 e 10).
-21. **Camadas "relaxadas"**: controller que pula o caso de uso e acessa o repositório. "Controladores web nunca devem acessar repositórios diretamente" precisa de verificação automática (p. 383-386).
+21. **Camadas "relaxadas"**: controller que pula o caso de uso e acessa o repositório. "Controladores web nunca devem acessar repositórios diretamente" precisa de verificação automática (p. 389-391).
 22. **Limite parcial esquecido**: separação "reservada" que ninguém respeita acaba apodrecendo (p. 291-295).
 
 ---
@@ -538,26 +538,26 @@ Base local: `/home/user/it-hub-ia/agent-s-conhecimento/agentes_kb_pronto/`. Cada
 | Livro | Categoria | Arquivos (documentos/) | Páginas citadas neste manual |
 |---|---|---|---|
 | Arquitetura Limpa (Martin) | `arquitetura-de-software` | `..._doc_00001` a `00489` (arquivo = página) | SOLID 111-130; limites 219-250; regras de negócio 260-265; limpa 273-285; humble 286-290; parciais 291-295; camadas 296; main 306; serviços 314-322; teste 323-330; banco 355; web 366; frameworks 368-371; cap. perdido 380-390 |
-| Princípios de Design e Padrões (Martin) | `arquitetura-de-software` | `00005`-`02043` (início `02005`) | todas (39 p.) |
+| Princípios de Design e Padrões (Martin) | `arquitetura-de-software` | `02005` a `02043` | todas (39 p.) |
 | Refatoração (Fowler, 2ª ed.) | `arquitetura-de-software` | início `02044` (fim `02523`) | cap. 2: 70-103; cap. 3: 107-125; cap. 4: 126-140; catálogo 141- |
-| Trabalho eficaz com código legado (Feathers) | `arquitetura-de-software` | início `02922` (fim `03329`) | cap. 2: 36-45; cap. 4: 47-60; cap. 6: 85-105; cap. 13: 205-215; cap. 23: 320-330 |
+| Trabalho eficaz com código legado (Feathers) | `arquitetura-de-software` | início `02922` (fim `03329`) | cap. 2: 27-36; cap. 4: 46-60 (ponto de extensão p. 52); cap. 6: 73-90; cap. 13: 189-199; cap. 23: 297-307 |
 | Domain-Driven Design Referência (Evans) | `padroes-e-design-de-software` | início `00710` (fim `00771`) | 9-62 |
 | Domain Driven Design Rápido (InfoQ) | `padroes-e-design-de-software` | início `00604` (fim `00709`) | apoio (tradução automática) |
-| Padrões de Projetos (GoF) | `padroes-e-design-de-software` | início `01514` (fim `01873`) | MVC 18-19; catálogo 95-300 |
+| Padrões de Projetos (GoF) | `padroes-e-design-de-software` | início `01514` (fim `01873`) | MVC 17-19; "programe para interface" 31; catálogo ≈ 92-297 |
 | Clean Code (Martin) | `codigo-limpo` | `codigo-limpo__doc_00001` a `00462` (arquivo = página; página impressa + 31) | cap. 2: 48; cap. 3: 62; cap. 6: 124; cap. 7: 134; cap. 8: 144-151; cap. 9: 152-164; cap. 10: 166; cap. 17: 316- |
-| The Clean Coder (Martin) | `padroes-e-design-de-software` | início `00221` (fim `00467`) | cap. 5: 109-114; cap. 7: 133-143; cap. 8: 148-153; cap. 10: 168-175 |
+| The Clean Coder (Martin) | `padroes-e-design-de-software` | início `00221` (fim `00467`) | cap. 2-3: 59-66; cap. 5: 110-117; cap. 7: 133-143; cap. 8: 148-153; cap. 10: 168-181 |
 | OAuth 2.0 com Spring Security OAuth2 | `arquitetura-de-software` | início `01662` (fim `02004`) | 11-48; 57-60; 140; 170; 188; 199; 203-220; 223-233; 258-291; 292-321; 324-340 |
-| SOA Aplicado | `arquitetura-de-software` | início `02524` (fim `02809`) | cap. 5: 99-115; cap. 6: 147-; cap. 7: 200- |
+| SOA Aplicado | `arquitetura-de-software` | início `02524` (fim `02809`) | cap. 5: 99-115; cap. 6: 147-; cap. 7: ≈ 200- |
 | DSL (Casa do Código) | `arquitetura-de-software` | início `01213` (fim `01396`) | cap. 1-2: 14-55 (em especial 49-52) |
 | Introdução à arquitetura de design de software (Silveira) | `arquitetura-de-software` | início `01397` (fim `01661`) | 60-93; 94-113; 131-158; 159-174; 198-202; 213-236; JavaFX: `doc_01558` |
 | The Software Craftsman (Mancuso) | `arquitetura-de-software` | início `02810` (fim `02921`) | 47; 49; 99-103 |
-| UX e Usabilidade em Mobile e Web (Caelum) | `padroes-e-design-de-software` | início `02328` (fim `02492`) | heurísticas ~ 84-90; C.R.A.P. ~ 150-155; apêndice testes ~ 160- |
+| UX e Usabilidade em Mobile e Web (Caelum) | `padroes-e-design-de-software` | início `02328` (fim `02492`) | heurísticas 85-93; C.R.A.P. 147-152; apêndice de testes ~158- |
 | Web Design Responsivo | `padroes-e-design-de-software` | início `02493` (fim `02640`) | fórmula 32-33; imagens 62-63; breakpoints 99-101 |
 | A Web Mobile | `padroes-e-design-de-software` | início `00001` (fim `00220`) | cap. 13 (media queries pelo conteúdo) |
 | CSS Eficiente | `padroes-e-design-de-software` | início `00468` (fim `00603`) | índice |
 | Introdução e boas práticas em UX Design | `padroes-e-design-de-software` | início `01289` (fim `01513`) | índice |
 | Desconstruindo a Web; BI a custo zero; Big Data | `arquitetura-de-software` | `00963`-`01212`; `00753`-`00962`; `00490`-`00752` | índice (uso baixo) |
-| Linguagens (Lisp, PL, JavaScript, Haskell, Seven Languages) | `linguagens-de-programacao` | `00001`-`02612` | índice; JavaScript cap. 24 (início ~ doc_01400) |
+| Linguagens (Lisp, PL, JavaScript, Haskell, Seven Languages) | `linguagens-de-programacao` | `00001`-`02612` | índice; JavaScript cap. 24 (a partir de `doc_01443`) |
 | Índice e resumo da categoria | cada categoria | `indice.md`, `categoria_resumo.md` | listas de material |
 
 Observações de qualidade: Arquitetura Limpa e Refatoração têm OCR de confiança média (conferir números e nomes); Silveira tem OCR sem espaços entre palavras (legível); Clean Coder tem páginas de abertura com OCR fraco; DDD Rápido é tradução automática com termos trocados ("Projeto" por "Design"); Common Lisp tem só 28 KB de texto (páginas sem texto extraível).
