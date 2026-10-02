@@ -1,0 +1,144 @@
+# Marca como Pronto para testar os itens do Database que ja foram criados no Supabase "MK - Cobrancas" (46 itens).
+# Colar na aba Database, em Editar em lote. Nao e Aceito: aceitar so depois de testar (docs/banco-itmk.md, secao 6).
+# Ficam de fora: itens "BL:" (sao do BL), Decidir ... (sao decisoes), BL-283 (so existe producao, falta o projeto de teste),
+# BL-297 (leitura das pessoas ligadas depende do BL), BL-303 (apagar dado pessoal ainda nao foi testado),
+# BL-352 e BL-353 (faltam conferir contra as telas e os alertas que dependem do BL), BL-354 (falta o plano EXPLAIN),
+# BL-351 e BL-355 (Poderia, sem criterios), BL-356, BL-358, BL-359, BL-360 e BL-361 (backup, testes automaticos e rotinas de chave).
+
+editar: BL-284
+  situação: Pronto para testar
+
+editar: BL-285
+  situação: Pronto para testar
+
+editar: BL-286
+  situação: Pronto para testar
+
+editar: BL-287
+  situação: Pronto para testar
+
+editar: BL-288
+  situação: Pronto para testar
+
+editar: BL-289
+  situação: Pronto para testar
+
+editar: BL-290
+  situação: Pronto para testar
+
+editar: BL-291
+  situação: Pronto para testar
+
+editar: BL-293
+  situação: Pronto para testar
+
+editar: BL-294
+  situação: Pronto para testar
+
+editar: BL-295
+  situação: Pronto para testar
+
+editar: BL-298
+  situação: Pronto para testar
+
+editar: BL-299
+  situação: Pronto para testar
+
+editar: BL-300
+  situação: Pronto para testar
+
+editar: BL-301
+  situação: Pronto para testar
+
+editar: BL-302
+  situação: Pronto para testar
+
+editar: BL-315
+  situação: Pronto para testar
+
+editar: BL-320
+  situação: Pronto para testar
+
+editar: BL-321
+  situação: Pronto para testar
+
+editar: BL-323
+  situação: Pronto para testar
+
+editar: BL-325
+  situação: Pronto para testar
+
+editar: BL-326
+  situação: Pronto para testar
+
+editar: BL-328
+  situação: Pronto para testar
+
+editar: BL-329
+  situação: Pronto para testar
+
+editar: BL-330
+  situação: Pronto para testar
+
+editar: BL-331
+  situação: Pronto para testar
+
+editar: BL-334
+  situação: Pronto para testar
+
+editar: BL-335
+  situação: Pronto para testar
+
+editar: BL-336
+  situação: Pronto para testar
+
+editar: BL-337
+  situação: Pronto para testar
+
+editar: BL-338
+  situação: Pronto para testar
+
+editar: BL-339
+  situação: Pronto para testar
+
+editar: BL-340
+  situação: Pronto para testar
+
+editar: BL-341
+  situação: Pronto para testar
+
+editar: BL-342
+  situação: Pronto para testar
+
+editar: BL-343
+  situação: Pronto para testar
+
+editar: BL-344
+  situação: Pronto para testar
+
+editar: BL-345
+  situação: Pronto para testar
+
+editar: BL-346
+  situação: Pronto para testar
+
+editar: BL-347
+  situação: Pronto para testar
+
+editar: BL-348
+  situação: Pronto para testar
+
+editar: BL-349
+  situação: Pronto para testar
+
+editar: BL-350
+  situação: Pronto para testar
+
+editar: BL-357
+  situação: Pronto para testar
+
+editar: BL-598
+  situação: Pronto para testar
+
+editar: BL-632
+  situação: Pronto para testar
